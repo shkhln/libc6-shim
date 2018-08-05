@@ -1,0 +1,55 @@
+#include <assert.h>
+#include <stdarg.h>
+#include <stdio.h>
+#include <time.h>
+#include <unistd.h>
+#include <sys/types.h>
+//#include <sys/syscall.h>
+
+#include "../../shim.h"
+
+#ifdef __i386__
+#define LINUX_GETPID         20
+#define LINUX_CLOCK_GETTIME 265
+#endif
+
+#ifdef __x86_64__
+#define LINUX_GETPID         39
+#define LINUX_CLOCK_GETTIME 228
+#endif
+
+#define LINUX_CLOCK_MONOTONIC 1
+
+int shim_syscall_impl(int number, va_list args) {
+
+  if (number == LINUX_GETPID) {
+
+    LOG("%s: getpid()\n", __func__);
+
+    pid_t pid = getpid();
+    LOG("%s: getpid -> %d\n", __func__, pid);
+
+    return pid;
+  }
+
+  if (number == LINUX_CLOCK_GETTIME) {
+
+    clockid_t        clock_id = va_arg(args, clockid_t);
+    struct timespec* tp       = va_arg(args, struct timespec*);
+
+    LOG("%s: clock_gettime(%d, %p)\n", __func__, clock_id, tp);
+
+    if (clock_id == LINUX_CLOCK_MONOTONIC) {
+
+      int time = clock_gettime(CLOCK_MONOTONIC, tp);
+      LOG("%s: clock_gettime -> %d\n", __func__, time);
+
+      return time;
+
+    } else {
+      assert(0);
+    }
+  }
+
+  UNIMPLEMENTED_ARGS("%d, ...", number);
+}

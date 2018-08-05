@@ -1,0 +1,5 @@
+GLIBC_2.0   { local: shim_*; };
+GLIBC_2.1   { local: shim_*; };
+GLIBC_2.2   { local: shim_*; };
+GLIBC_2.1.3 { local: shim_*; };
+GLIBC_2.2.5 { local: shim_*; };

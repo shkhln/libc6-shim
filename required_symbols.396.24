@@ -1,0 +1,482 @@
+_IO_2_1_stdout_: GLIBC_2.1, GLIBC_2.2.5
+_IO_getc: GLIBC_2.0, GLIBC_2.2.5
+_IO_putc: GLIBC_2.0, GLIBC_2.2.5
+__assert_fail: GLIBC_2.0, GLIBC_2.2.5
+__ctype_b: GLIBC_2.0, GLIBC_2.2.5
+__ctype_get_mb_cur_max: GLIBC_2.0, GLIBC_2.2.5
+__ctype_tolower: GLIBC_2.0, GLIBC_2.2.5
+__ctype_toupper: GLIBC_2.0, GLIBC_2.2.5
+__cxa_atexit: GLIBC_2.1.3, GLIBC_2.2.5
+__cxa_finalize: GLIBC_2.1.3, GLIBC_2.2.5
+__divdi3: GLIBC_2.0
+__duplocale: GLIBC_2.2.5
+__endmntent: GLIBC_2.2
+__environ: GLIBC_2.0, GLIBC_2.2.5
+__errno_location: GLIBC_2.0, GLIBC_2.2.5
+__freelocale: GLIBC_2.2.5
+__fxstat: GLIBC_2.0, GLIBC_2.2.5
+__fxstat64: GLIBC_2.1, GLIBC_2.2, GLIBC_2.2.5
+__getdelim: GLIBC_2.0, GLIBC_2.2.5
+__getmntent_r: GLIBC_2.2
+__isinf: GLIBC_2.0, GLIBC_2.2.5
+__isinff: GLIBC_2.0, GLIBC_2.2.5
+__isnan: GLIBC_2.0, GLIBC_2.2.5
+__isnanf: GLIBC_2.0, GLIBC_2.2.5
+__iswctype_l: GLIBC_2.2.5
+__libc_current_sigrtmin: GLIBC_2.1, GLIBC_2.2.5
+__lxstat: GLIBC_2.0, GLIBC_2.2.5
+__mempcpy: GLIBC_2.0
+__moddi3: GLIBC_2.0
+__newlocale: GLIBC_2.2.5
+__nl_langinfo_l: GLIBC_2.2.5
+__progname_full: GLIBC_2.0, GLIBC_2.2.5
+__pthread_atfork: GLIBC_2.0
+__pthread_getspecific: GLIBC_2.0
+__pthread_initialize: GLIBC_2.0
+__pthread_key_create: GLIBC_2.0, GLIBC_2.2.5
+__pthread_mutex_destroy: GLIBC_2.0
+__pthread_mutex_init: GLIBC_2.0
+__pthread_mutex_lock: GLIBC_2.0
+__pthread_mutex_trylock: GLIBC_2.0
+__pthread_mutex_unlock: GLIBC_2.0
+__pthread_mutexattr_destroy: GLIBC_2.0
+__pthread_mutexattr_init: GLIBC_2.0
+__pthread_mutexattr_settype: GLIBC_2.0
+__pthread_once: GLIBC_2.0
+__pthread_rwlock_destroy: GLIBC_2.2
+__pthread_rwlock_init: GLIBC_2.2
+__pthread_rwlock_rdlock: GLIBC_2.2
+__pthread_rwlock_tryrdlock: GLIBC_2.2
+__pthread_rwlock_trywrlock: GLIBC_2.2
+__pthread_rwlock_unlock: GLIBC_2.2
+__pthread_rwlock_wrlock: GLIBC_2.2
+__pthread_setspecific: GLIBC_2.0
+__rawmemchr: GLIBC_2.2.5
+__setmntent: GLIBC_2.2
+__sigsetjmp: GLIBC_2.0
+__statfs: GLIBC_2.2
+__strcoll_l: GLIBC_2.2.5
+__strdup: GLIBC_2.0, GLIBC_2.2.5
+__strndup: GLIBC_2.2.5
+__strtod_internal: GLIBC_2.0, GLIBC_2.2.5
+__strtod_l: GLIBC_2.2.5
+__strtof_internal: GLIBC_2.0, GLIBC_2.2.5
+__strtof_l: GLIBC_2.2.5
+__strtok_r: GLIBC_2.0, GLIBC_2.2.5
+__strtol_internal: GLIBC_2.0, GLIBC_2.2.5
+__strtold_internal: GLIBC_2.0, GLIBC_2.2.5
+__strtold_l: GLIBC_2.2.5
+__strtoll_internal: GLIBC_2.0, GLIBC_2.2.5
+__strtoul_internal: GLIBC_2.0, GLIBC_2.2.5
+__strtoull_internal: GLIBC_2.0, GLIBC_2.2.5
+__strxfrm_l: GLIBC_2.2.5
+__towlower_l: GLIBC_2.2.5
+__towupper_l: GLIBC_2.2.5
+__udivdi3: GLIBC_2.0
+__umoddi3: GLIBC_2.0
+__wcscoll_l: GLIBC_2.2.5
+__wcsxfrm_l: GLIBC_2.2.5
+__wctype_l: GLIBC_2.2.5
+__xmknod: GLIBC_2.0, GLIBC_2.2.5
+__xstat: GLIBC_2.0, GLIBC_2.2.5
+_environ: GLIBC_2.0, GLIBC_2.2.5
+_exit: GLIBC_2.0, GLIBC_2.2.5
+_pthread_cleanup_pop_restore: GLIBC_2.0
+_pthread_cleanup_push_defer: GLIBC_2.0
+_setjmp: GLIBC_2.0, GLIBC_2.2.5
+abort: GLIBC_2.0, GLIBC_2.2.5
+accept: GLIBC_2.0, GLIBC_2.2.5
+access: GLIBC_2.0, GLIBC_2.2.5
+acos: GLIBC_2.0, GLIBC_2.2.5
+acosf: GLIBC_2.2.5
+alarm: GLIBC_2.0, GLIBC_2.2.5
+alphasort: GLIBC_2.0, GLIBC_2.2.5
+asctime: GLIBC_2.0, GLIBC_2.2.5
+asin: GLIBC_2.0, GLIBC_2.2.5
+asprintf: GLIBC_2.0, GLIBC_2.2.5
+atan: GLIBC_2.0, GLIBC_2.2.5
+atan2: GLIBC_2.0, GLIBC_2.2.5
+atexit: GLIBC_2.0
+atof: GLIBC_2.0, GLIBC_2.2.5
+atoi: GLIBC_2.0, GLIBC_2.2.5
+backtrace: GLIBC_2.1, GLIBC_2.2.5
+bind: GLIBC_2.0, GLIBC_2.2.5
+bindtextdomain: GLIBC_2.2.5
+bsearch: GLIBC_2.0, GLIBC_2.2.5
+btowc: GLIBC_2.0, GLIBC_2.2.5
+calloc: GLIBC_2.0, GLIBC_2.2.5
+ceil: GLIBC_2.0, GLIBC_2.2.5
+ceilf: GLIBC_2.2.5
+chmod: GLIBC_2.0, GLIBC_2.2.5
+chown: GLIBC_2.1, GLIBC_2.2.5
+clearerr: GLIBC_2.2.5
+clntunix_create: GLIBC_2.1, GLIBC_2.2.5
+clock: GLIBC_2.0, GLIBC_2.2.5
+clock_gettime: GLIBC_2.2.5
+close: GLIBC_2.0, GLIBC_2.2.5
+closedir: GLIBC_2.0, GLIBC_2.2.5
+connect: GLIBC_2.0, GLIBC_2.2.5
+cos: GLIBC_2.0, GLIBC_2.2.5
+cosf: GLIBC_2.2.5
+cosh: GLIBC_2.0, GLIBC_2.2.5
+creat: GLIBC_2.0, GLIBC_2.2.5
+dirfd: GLIBC_2.0, GLIBC_2.2.5
+dirname: GLIBC_2.0, GLIBC_2.2.5
+dl_iterate_phdr: GLIBC_2.2.5
+dladdr: GLIBC_2.0, GLIBC_2.2.5
+dlclose: GLIBC_2.0, GLIBC_2.2.5
+dlerror: GLIBC_2.0, GLIBC_2.2.5
+dlopen: GLIBC_2.1, GLIBC_2.2.5
+dlsym: GLIBC_2.0, GLIBC_2.2.5
+dlvsym: GLIBC_2.1, GLIBC_2.2.5
+dup: GLIBC_2.0, GLIBC_2.2.5
+dup2: GLIBC_2.0, GLIBC_2.2.5
+endmntent: GLIBC_2.0, GLIBC_2.2.5
+environ: GLIBC_2.0, GLIBC_2.2.5
+execl: GLIBC_2.0, GLIBC_2.2.5
+execle: GLIBC_2.0, GLIBC_2.2.5
+execv: GLIBC_2.0, GLIBC_2.2.5
+execve: GLIBC_2.0, GLIBC_2.2.5
+execvp: GLIBC_2.0, GLIBC_2.2.5
+exit: GLIBC_2.0, GLIBC_2.2.5
+exp: GLIBC_2.0, GLIBC_2.2.5
+expf: GLIBC_2.2.5
+fchmod: GLIBC_2.0, GLIBC_2.2.5
+fclose: GLIBC_2.1, GLIBC_2.2.5
+fcntl: GLIBC_2.0, GLIBC_2.2.5
+fdopen: GLIBC_2.1, GLIBC_2.2.5
+fegetenv: GLIBC_2.2, GLIBC_2.2.5
+feof: GLIBC_2.0, GLIBC_2.2.5
+ferror: GLIBC_2.0, GLIBC_2.2.5
+fesetenv: GLIBC_2.2, GLIBC_2.2.5
+fflush: GLIBC_2.0, GLIBC_2.2.5
+fgetc: GLIBC_2.0, GLIBC_2.2.5
+fgets: GLIBC_2.0, GLIBC_2.2.5
+fileno: GLIBC_2.0, GLIBC_2.2.5
+finite: GLIBC_2.0, GLIBC_2.2.5
+floor: GLIBC_2.0, GLIBC_2.2.5
+floorf: GLIBC_2.2.5
+fmod: GLIBC_2.0, GLIBC_2.2.5
+fnmatch: GLIBC_2.0, GLIBC_2.2.5
+fopen: GLIBC_2.1, GLIBC_2.2.5
+fopen64: GLIBC_2.1, GLIBC_2.2.5
+fork: GLIBC_2.0, GLIBC_2.2.5
+fprintf: GLIBC_2.0, GLIBC_2.2.5
+fputc: GLIBC_2.0, GLIBC_2.2.5
+fputs: GLIBC_2.0, GLIBC_2.2.5
+fread: GLIBC_2.0, GLIBC_2.2.5
+free: GLIBC_2.0, GLIBC_2.2.5
+frexp: GLIBC_2.0, GLIBC_2.2.5
+fscanf: GLIBC_2.0, GLIBC_2.2.5
+fseek: GLIBC_2.0, GLIBC_2.2.5
+fseeko64: GLIBC_2.1, GLIBC_2.2.5
+fsync: GLIBC_2.0, GLIBC_2.2.5
+ftell: GLIBC_2.0, GLIBC_2.2.5
+ftello64: GLIBC_2.1, GLIBC_2.2.5
+ftok: GLIBC_2.0, GLIBC_2.2.5
+ftruncate: GLIBC_2.0, GLIBC_2.2.5
+ftruncate64: GLIBC_2.1, GLIBC_2.2.5
+fwrite: GLIBC_2.0, GLIBC_2.2.5
+get_nprocs: GLIBC_2.0, GLIBC_2.2.5
+getc: GLIBC_2.0, GLIBC_2.2.5
+getcwd: GLIBC_2.0, GLIBC_2.2.5
+getegid: GLIBC_2.0, GLIBC_2.2.5
+getenv: GLIBC_2.0, GLIBC_2.2.5
+geteuid: GLIBC_2.0, GLIBC_2.2.5
+getgid: GLIBC_2.0, GLIBC_2.2.5
+gethostname: GLIBC_2.0, GLIBC_2.2.5
+getmntent_r: GLIBC_2.0, GLIBC_2.2.5
+getopt_long: GLIBC_2.2.5
+getpagesize: GLIBC_2.0, GLIBC_2.2.5
+getpid: GLIBC_2.0, GLIBC_2.2.5
+getppid: GLIBC_2.0, GLIBC_2.2.5
+getpriority: GLIBC_2.0, GLIBC_2.2.5
+getrlimit: GLIBC_2.2, GLIBC_2.2.5
+getrusage: GLIBC_2.0, GLIBC_2.2.5
+getsid: GLIBC_2.0, GLIBC_2.2.5
+getsockname: GLIBC_2.2.5
+getsockopt: GLIBC_2.0, GLIBC_2.2.5
+gettext: GLIBC_2.2.5
+gettimeofday: GLIBC_2.0, GLIBC_2.2.5
+getuid: GLIBC_2.0, GLIBC_2.2.5
+getwc: GLIBC_2.2, GLIBC_2.2.5
+gnu_get_libc_version: GLIBC_2.1, GLIBC_2.2.5
+htonl: GLIBC_2.0, GLIBC_2.2.5
+index: GLIBC_2.2.5
+inet_network: GLIBC_2.2.5
+inet_ntoa: GLIBC_2.2.5
+ioctl: GLIBC_2.0, GLIBC_2.2.5
+iopl: GLIBC_2.0, GLIBC_2.2.5
+isalnum: GLIBC_2.0, GLIBC_2.2.5
+isalpha: GLIBC_2.0, GLIBC_2.2.5
+isatty: GLIBC_2.0, GLIBC_2.2.5
+islower: GLIBC_2.0, GLIBC_2.2.5
+isprint: GLIBC_2.0, GLIBC_2.2.5
+isspace: GLIBC_2.0, GLIBC_2.2.5
+isupper: GLIBC_2.0, GLIBC_2.2.5
+iswctype: GLIBC_2.0, GLIBC_2.2.5
+isxdigit: GLIBC_2.0, GLIBC_2.2.5
+kill: GLIBC_2.0, GLIBC_2.2.5
+ldexp: GLIBC_2.2.5
+link: GLIBC_2.0, GLIBC_2.2.5
+listen: GLIBC_2.0, GLIBC_2.2.5
+localeconv: GLIBC_2.0, GLIBC_2.2.5
+localtime: GLIBC_2.0, GLIBC_2.2.5
+localtime_r: GLIBC_2.0, GLIBC_2.2.5
+lockf: GLIBC_2.0, GLIBC_2.2.5
+log: GLIBC_2.0, GLIBC_2.2.5
+log10: GLIBC_2.0, GLIBC_2.2.5
+logf: GLIBC_2.0, GLIBC_2.2.5
+longjmp: GLIBC_2.0, GLIBC_2.2.5
+lseek: GLIBC_2.0, GLIBC_2.2.5
+lseek64: GLIBC_2.2, GLIBC_2.2.5
+madvise: GLIBC_2.0, GLIBC_2.2.5
+mallinfo: GLIBC_2.0, GLIBC_2.2.5
+malloc: GLIBC_2.0, GLIBC_2.2.5
+malloc_usable_size: GLIBC_2.0, GLIBC_2.2.5
+mbrtowc: GLIBC_2.0, GLIBC_2.2.5
+mbsnrtowcs: GLIBC_2.2.5
+mbsrtowcs: GLIBC_2.2.5
+memalign: GLIBC_2.0, GLIBC_2.2.5
+memchr: GLIBC_2.0, GLIBC_2.2.5
+memcmp: GLIBC_2.0, GLIBC_2.2.5
+memcpy: GLIBC_2.0, GLIBC_2.2.5
+memmove: GLIBC_2.0, GLIBC_2.2.5
+memset: GLIBC_2.0, GLIBC_2.2.5
+mincore: GLIBC_2.2.5
+mkdir: GLIBC_2.0, GLIBC_2.2.5
+mkfifo: GLIBC_2.0, GLIBC_2.2.5
+mkstemp: GLIBC_2.0, GLIBC_2.2.5
+mkstemp64: GLIBC_2.2.5
+mktime: GLIBC_2.0, GLIBC_2.2.5
+mmap: GLIBC_2.0, GLIBC_2.2.5
+mmap64: GLIBC_2.1, GLIBC_2.2.5
+mprotect: GLIBC_2.0, GLIBC_2.2.5
+munmap: GLIBC_2.0, GLIBC_2.2.5
+nanosleep: GLIBC_2.0, GLIBC_2.2.5
+nftw: GLIBC_2.1, GLIBC_2.2.5
+ntohl: GLIBC_2.0, GLIBC_2.2.5
+open: GLIBC_2.0, GLIBC_2.2.5
+open64: GLIBC_2.1, GLIBC_2.2, GLIBC_2.2.5
+opendir: GLIBC_2.0, GLIBC_2.2.5
+optarg: GLIBC_2.2.5
+optind: GLIBC_2.2.5
+pclose: GLIBC_2.1, GLIBC_2.2.5
+perror: GLIBC_2.0, GLIBC_2.2.5
+pipe: GLIBC_2.0, GLIBC_2.2.5
+poll: GLIBC_2.0, GLIBC_2.2.5
+popen: GLIBC_2.1, GLIBC_2.2.5
+posix_memalign: GLIBC_2.2, GLIBC_2.2.5
+posix_spawn: GLIBC_2.2, GLIBC_2.2.5
+posix_spawn_file_actions_adddup2: GLIBC_2.2, GLIBC_2.2.5
+posix_spawn_file_actions_addopen: GLIBC_2.2, GLIBC_2.2.5
+posix_spawn_file_actions_destroy: GLIBC_2.2, GLIBC_2.2.5
+posix_spawn_file_actions_init: GLIBC_2.2, GLIBC_2.2.5
+pow: GLIBC_2.0, GLIBC_2.2.5
+powf: GLIBC_2.0, GLIBC_2.2.5
+pread: GLIBC_2.2, GLIBC_2.2.5
+pread64: GLIBC_2.2, GLIBC_2.2.5
+printf: GLIBC_2.0, GLIBC_2.2.5
+program_invocation_name: GLIBC_2.0, GLIBC_2.2.5
+pthread_attr_destroy: GLIBC_2.0, GLIBC_2.2.5
+pthread_attr_init: GLIBC_2.1, GLIBC_2.2.5
+pthread_attr_setdetachstate: GLIBC_2.0, GLIBC_2.2.5
+pthread_attr_setinheritsched: GLIBC_2.0, GLIBC_2.2.5
+pthread_attr_setschedparam: GLIBC_2.0, GLIBC_2.2.5
+pthread_attr_setschedpolicy: GLIBC_2.0, GLIBC_2.2.5
+pthread_attr_setstacksize: GLIBC_2.1, GLIBC_2.2.5
+pthread_cancel: GLIBC_2.0, GLIBC_2.2.5
+pthread_cond_broadcast: GLIBC_2.0, GLIBC_2.2.5
+pthread_cond_destroy: GLIBC_2.0, GLIBC_2.2.5
+pthread_cond_init: GLIBC_2.0, GLIBC_2.2.5
+pthread_cond_signal: GLIBC_2.0, GLIBC_2.2.5
+pthread_cond_timedwait: GLIBC_2.0, GLIBC_2.2.5
+pthread_cond_wait: GLIBC_2.0, GLIBC_2.2.5
+pthread_condattr_destroy: GLIBC_2.0, GLIBC_2.2.5
+pthread_condattr_init: GLIBC_2.0, GLIBC_2.2.5
+pthread_condattr_setpshared: GLIBC_2.2, GLIBC_2.2.5
+pthread_create: GLIBC_2.1, GLIBC_2.2.5
+pthread_detach: GLIBC_2.0, GLIBC_2.2.5
+pthread_equal: GLIBC_2.0, GLIBC_2.2.5
+pthread_exit: GLIBC_2.0, GLIBC_2.2.5
+pthread_getspecific: GLIBC_2.0, GLIBC_2.2.5
+pthread_join: GLIBC_2.0, GLIBC_2.2.5
+pthread_key_create: GLIBC_2.0, GLIBC_2.2.5
+pthread_key_delete: GLIBC_2.0, GLIBC_2.2.5
+pthread_kill: GLIBC_2.0, GLIBC_2.2.5
+pthread_mutex_destroy: GLIBC_2.0, GLIBC_2.2.5
+pthread_mutex_init: GLIBC_2.0, GLIBC_2.2.5
+pthread_mutex_lock: GLIBC_2.0, GLIBC_2.2.5
+pthread_mutex_trylock: GLIBC_2.0, GLIBC_2.2.5
+pthread_mutex_unlock: GLIBC_2.0, GLIBC_2.2.5
+pthread_mutexattr_destroy: GLIBC_2.0, GLIBC_2.2.5
+pthread_mutexattr_init: GLIBC_2.0, GLIBC_2.2.5
+pthread_mutexattr_setpshared: GLIBC_2.2, GLIBC_2.2.5
+pthread_mutexattr_settype: GLIBC_2.1, GLIBC_2.2.5
+pthread_once: GLIBC_2.0, GLIBC_2.2.5
+pthread_rwlock_destroy: GLIBC_2.1, GLIBC_2.2.5
+pthread_rwlock_init: GLIBC_2.1, GLIBC_2.2.5
+pthread_rwlock_rdlock: GLIBC_2.1, GLIBC_2.2.5
+pthread_rwlock_tryrdlock: GLIBC_2.1, GLIBC_2.2.5
+pthread_rwlock_trywrlock: GLIBC_2.1, GLIBC_2.2.5
+pthread_rwlock_unlock: GLIBC_2.1, GLIBC_2.2.5
+pthread_rwlock_wrlock: GLIBC_2.1, GLIBC_2.2.5
+pthread_rwlockattr_init: GLIBC_2.1, GLIBC_2.2.5
+pthread_rwlockattr_setpshared: GLIBC_2.1, GLIBC_2.2.5
+pthread_self: GLIBC_2.0, GLIBC_2.2.5
+pthread_setspecific: GLIBC_2.0, GLIBC_2.2.5
+putc: GLIBC_2.0, GLIBC_2.2.5
+putchar: GLIBC_2.0, GLIBC_2.2.5
+puts: GLIBC_2.0, GLIBC_2.2.5
+putwc: GLIBC_2.2, GLIBC_2.2.5
+pwrite: GLIBC_2.2, GLIBC_2.2.5
+pwrite64: GLIBC_2.2, GLIBC_2.2.5
+qsort: GLIBC_2.0, GLIBC_2.2.5
+raise: GLIBC_2.0, GLIBC_2.2.5
+rand: GLIBC_2.0, GLIBC_2.2.5
+read: GLIBC_2.0, GLIBC_2.2.5
+readdir: GLIBC_2.0, GLIBC_2.2.5
+readdir_r: GLIBC_2.0, GLIBC_2.2.5
+readlink: GLIBC_2.0, GLIBC_2.2.5
+realloc: GLIBC_2.0, GLIBC_2.2.5
+realpath: GLIBC_2.0, GLIBC_2.2.5
+recv: GLIBC_2.0, GLIBC_2.2.5
+recvmsg: GLIBC_2.0, GLIBC_2.2.5
+remove: GLIBC_2.0, GLIBC_2.2.5
+rename: GLIBC_2.0, GLIBC_2.2.5
+rewind: GLIBC_2.0, GLIBC_2.2.5
+rewinddir: GLIBC_2.0, GLIBC_2.2.5
+rmdir: GLIBC_2.0, GLIBC_2.2.5
+roundf: GLIBC_2.2.5
+scandir: GLIBC_2.0, GLIBC_2.2.5
+sched_get_priority_max: GLIBC_2.0, GLIBC_2.2.5
+sched_get_priority_min: GLIBC_2.0, GLIBC_2.2.5
+sched_yield: GLIBC_2.0, GLIBC_2.2.5
+select: GLIBC_2.2.5
+sem_destroy: GLIBC_2.1, GLIBC_2.2.5
+sem_init: GLIBC_2.1, GLIBC_2.2.5
+sem_post: GLIBC_2.1, GLIBC_2.2.5
+sem_timedwait: GLIBC_2.2, GLIBC_2.2.5
+sem_trywait: GLIBC_2.1, GLIBC_2.2.5
+sem_wait: GLIBC_2.1, GLIBC_2.2.5
+semctl: GLIBC_2.0, GLIBC_2.2.5
+semget: GLIBC_2.0, GLIBC_2.2.5
+semop: GLIBC_2.0, GLIBC_2.2.5
+send: GLIBC_2.0, GLIBC_2.2.5
+sendmsg: GLIBC_2.0, GLIBC_2.2.5
+setenv: GLIBC_2.0, GLIBC_2.2.5
+setlocale: GLIBC_2.0, GLIBC_2.2.5
+setmntent: GLIBC_2.0, GLIBC_2.2.5
+setpriority: GLIBC_2.0, GLIBC_2.2.5
+setrlimit: GLIBC_2.2, GLIBC_2.2.5
+setsockopt: GLIBC_2.0, GLIBC_2.2.5
+setvbuf: GLIBC_2.0, GLIBC_2.2.5
+shm_open: GLIBC_2.2.5
+shm_unlink: GLIBC_2.2.5
+shmat: GLIBC_2.0, GLIBC_2.2.5
+shmctl: GLIBC_2.0, GLIBC_2.2, GLIBC_2.2.5
+shmdt: GLIBC_2.0, GLIBC_2.2.5
+shmget: GLIBC_2.0, GLIBC_2.2.5
+shutdown: GLIBC_2.0, GLIBC_2.2.5
+sigaction: GLIBC_2.0, GLIBC_2.2.5
+sigaddset: GLIBC_2.0, GLIBC_2.2.5
+sigdelset: GLIBC_2.0, GLIBC_2.2.5
+sigemptyset: GLIBC_2.0, GLIBC_2.2.5
+sigfillset: GLIBC_2.0, GLIBC_2.2.5
+sigismember: GLIBC_2.0, GLIBC_2.2.5
+signal: GLIBC_2.0, GLIBC_2.2.5
+sigprocmask: GLIBC_2.0, GLIBC_2.2.5
+sin: GLIBC_2.0, GLIBC_2.2.5
+sinf: GLIBC_2.2.5
+sinh: GLIBC_2.0, GLIBC_2.2.5
+sleep: GLIBC_2.0, GLIBC_2.2.5
+snprintf: GLIBC_2.0, GLIBC_2.2.5
+socket: GLIBC_2.0, GLIBC_2.2.5
+socketpair: GLIBC_2.0, GLIBC_2.2.5
+sprintf: GLIBC_2.0, GLIBC_2.2.5
+sqrt: GLIBC_2.0, GLIBC_2.2.5
+sqrtf: GLIBC_2.2.5
+srand: GLIBC_2.0, GLIBC_2.2.5
+sscanf: GLIBC_2.0, GLIBC_2.2.5
+statfs: GLIBC_2.0, GLIBC_2.2.5
+statfs64: GLIBC_2.1, GLIBC_2.2.5
+stderr: GLIBC_2.0, GLIBC_2.2.5
+stdin: GLIBC_2.0, GLIBC_2.2.5
+stdout: GLIBC_2.0, GLIBC_2.2.5
+stpcpy: GLIBC_2.0, GLIBC_2.2.5
+strcasecmp: GLIBC_2.0, GLIBC_2.2.5
+strcat: GLIBC_2.0, GLIBC_2.2.5
+strchr: GLIBC_2.0, GLIBC_2.2.5
+strcmp: GLIBC_2.0, GLIBC_2.2.5
+strcoll: GLIBC_2.0, GLIBC_2.2.5
+strcpy: GLIBC_2.0, GLIBC_2.2.5
+strcspn: GLIBC_2.0, GLIBC_2.2.5
+strdup: GLIBC_2.0, GLIBC_2.2.5
+strerror: GLIBC_2.0, GLIBC_2.2.5
+strerror_r: GLIBC_2.0, GLIBC_2.2.5
+strftime: GLIBC_2.0, GLIBC_2.2.5
+strlen: GLIBC_2.0, GLIBC_2.2.5
+strncasecmp: GLIBC_2.0, GLIBC_2.2.5
+strncat: GLIBC_2.0, GLIBC_2.2.5
+strncmp: GLIBC_2.0, GLIBC_2.2.5
+strncpy: GLIBC_2.0, GLIBC_2.2.5
+strndup: GLIBC_2.0, GLIBC_2.2.5
+strpbrk: GLIBC_2.0, GLIBC_2.2.5
+strrchr: GLIBC_2.0, GLIBC_2.2.5
+strsep: GLIBC_2.0, GLIBC_2.2.5
+strsignal: GLIBC_2.0, GLIBC_2.2.5
+strspn: GLIBC_2.0, GLIBC_2.2.5
+strstr: GLIBC_2.0, GLIBC_2.2.5
+strtok: GLIBC_2.0, GLIBC_2.2.5
+strtok_r: GLIBC_2.0, GLIBC_2.2.5
+strtol: GLIBC_2.0, GLIBC_2.2.5
+strtoul: GLIBC_2.0, GLIBC_2.2.5
+strtoull: GLIBC_2.0, GLIBC_2.2.5
+strxfrm: GLIBC_2.0, GLIBC_2.2.5
+symlink: GLIBC_2.0, GLIBC_2.2.5
+syscall: GLIBC_2.0, GLIBC_2.2.5
+sysconf: GLIBC_2.0, GLIBC_2.2.5
+sysctl: GLIBC_2.0, GLIBC_2.2.5
+sysinfo: GLIBC_2.0, GLIBC_2.2.5
+system: GLIBC_2.0, GLIBC_2.2.5
+tan: GLIBC_2.0, GLIBC_2.2.5
+tanf: GLIBC_2.2.5
+tanh: GLIBC_2.0, GLIBC_2.2.5
+textdomain: GLIBC_2.2.5
+time: GLIBC_2.0, GLIBC_2.2.5
+tolower: GLIBC_2.0, GLIBC_2.2.5
+toupper: GLIBC_2.0, GLIBC_2.2.5
+towlower: GLIBC_2.0, GLIBC_2.2.5
+towupper: GLIBC_2.0, GLIBC_2.2.5
+truncate: GLIBC_2.0, GLIBC_2.2.5
+umask: GLIBC_2.2.5
+uname: GLIBC_2.0, GLIBC_2.2.5
+ungetc: GLIBC_2.0, GLIBC_2.2.5
+ungetwc: GLIBC_2.2, GLIBC_2.2.5
+unlink: GLIBC_2.0, GLIBC_2.2.5
+usleep: GLIBC_2.0, GLIBC_2.2.5
+vasprintf: GLIBC_2.0, GLIBC_2.2.5
+vfprintf: GLIBC_2.0, GLIBC_2.2.5
+vsnprintf: GLIBC_2.0, GLIBC_2.2.5
+vsprintf: GLIBC_2.0, GLIBC_2.2.5
+wait: GLIBC_2.0, GLIBC_2.2.5
+waitpid: GLIBC_2.0, GLIBC_2.2.5
+wcrtomb: GLIBC_2.0, GLIBC_2.2.5
+wcscmp: GLIBC_2.2.5
+wcscoll: GLIBC_2.0, GLIBC_2.2.5
+wcsftime: GLIBC_2.2, GLIBC_2.2.5
+wcslen: GLIBC_2.0, GLIBC_2.2.5
+wcsnrtombs: GLIBC_2.2.5
+wcstombs: GLIBC_2.0, GLIBC_2.2.5
+wcsxfrm: GLIBC_2.0, GLIBC_2.2.5
+wctob: GLIBC_2.0, GLIBC_2.2.5
+wctype: GLIBC_2.0, GLIBC_2.2.5
+wmemchr: GLIBC_2.0, GLIBC_2.2.5
+wmemcmp: GLIBC_2.0, GLIBC_2.2.5
+wmemcpy: GLIBC_2.0, GLIBC_2.2.5
+wmemmove: GLIBC_2.0, GLIBC_2.2.5
+wmemset: GLIBC_2.0, GLIBC_2.2.5
+write: GLIBC_2.0, GLIBC_2.2.5
+writev: GLIBC_2.0, GLIBC_2.2.5
+xdr_enum: GLIBC_2.0, GLIBC_2.2.5
+xdr_int: GLIBC_2.0, GLIBC_2.2.5

@@ -1,0 +1,7 @@
+{
+  "file_format_version" : "1.0.0",
+  "ICD": {
+    "library_path": "libGL.so.1",
+    "api_version" : "0.0.0"
+  }
+}
