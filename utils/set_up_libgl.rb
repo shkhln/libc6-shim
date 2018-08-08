@@ -88,6 +88,12 @@ def with_file(path)
   IO.binwrite(path, file)
 end
 
+# Apparently, libGL.so expects the .init section to be called with argc and argv arguments,
+# FreeBSD's dynamic linker doesn't quite agree with that.
+# https://sourceware.org/git/?p=glibc.git;a=blob;f=elf/dl-init.c;h=3e72fa3013a6aaeda05fe61a0ae7af5d46640826;hb=HEAD#l58
+# https://github.com/freebsd/freebsd/blob/b0b07656b594066e09c0526aef09dc1e9703e27d/libexec/rtld-elf/rtld.c#L2655
+# https://github.com/freebsd/freebsd/blob/35326d3159b53afb3e64a9926a953b32e27852c9/libexec/rtld-elf/amd64/rtld_machdep.h#L50
+
 with_file("#{lib64_dir}/libGL.so.#{driver_version}") do |lib|
   case driver_version
     when '390.77'
