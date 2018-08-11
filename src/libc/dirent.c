@@ -91,3 +91,7 @@ int shim_closedir_impl(DIR* dirp) {
 
   return closedir(dirp);
 }
+
+int shim_alphasort_impl(const struct dirent** d1, const struct dirent** d2) {
+  UNIMPLEMENTED();
+}

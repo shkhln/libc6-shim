@@ -26,6 +26,29 @@ SUBSTITUTIONS = {
   statfs64:        'statfs'
 }
 
+STRUCT_COMPATIBILITY = {
+  cmsghdr:     false, # compatible on i386
+  dirent:      false,
+  in_addr:     true,
+  iovec:       true,
+  msghdr:      false, # compatible on i386
+  option:      true,
+  pollfd:      true,
+  rlimit:      false, # compatible on x86_64
+  rusage:      true,
+  sembuf:      true,
+  sched_param: true,
+  shmid_ds:    false,
+  sockaddr:    false,
+  stat:        false,
+  statfs:      false,
+  tm:          true,
+  timespec:    true,
+  timeval:     true,
+  timezone:    true,
+  utsname:     false
+}
+
 def format_specifier(decl)
 
   return '...' if decl['name'] == '...'
@@ -50,6 +73,8 @@ def format_specifier(decl)
       '%u'
     when 'size_t'
       '%zu'
+    when 'ssize_t'
+      '%zd'
     when 'float', 'double'
       '%f'
     else
@@ -89,8 +114,24 @@ end
 def generate_wrapper(function, impl_exists)
 
   args = function['args']
-
   args = [] if args.size == 1 && args.first['type'] == 'void'
+
+  for arg in args
+    if arg['type'] =~ /^(:?const )struct (\w+)/
+      struct = $2.to_sym
+
+      if not STRUCT_COMPATIBILITY.keys.include?(struct)
+        STDERR.puts "\e[31m#{$PROGRAM_NAME}: unknown struct #{struct}, skipping function #{function['name']}\e[0m"
+        return
+      end
+
+      compatible = STRUCT_COMPATIBILITY[struct]
+      if !compatible && !impl_exists
+        STDERR.puts "\e[31m#{$PROGRAM_NAME}: found binary incompatible struct #{struct}, explicit shim impl required for function #{function['name']}\e[0m"
+        return
+      end
+    end
+  end
 
   puts function['prototype'].sub(function['name'] + '(', 'shim_' + function['name'] + '(') + ' {'
 
