@@ -3,6 +3,7 @@
 
 SHA256 = {
   'NVIDIA-Linux-x86_64-390.77.run': 'e51c5784520e73c179a57cf0dcd3a4c673d8142b28415a060066d83633637282',
+  'NVIDIA-Linux-x86_64-390.87.run': '38290a0b19e86037112f22397e02be9cdd6bcd677dd926b2977bbd49119e611e',
   'NVIDIA-Linux-x86_64-396.45.run': '30c2e29a45794227079730eac7c452da5290ea8f336ed2286dafd488e3695f20',
   'NVIDIA-Linux-x86_64-396.51.run': '6add8c3782bdf276b4a5a5bcea102ceff8e90cf3fc2439dde9d5e60d557ac0d6',
   'NVIDIA-Linux-x86_64-396.54.run': '7c3e3c9ca6aea31ad2613ef9cb6a4510d95d61b698f084e55adcc0611ee9eec3'
@@ -99,6 +100,8 @@ with_file("#{lib64_dir}/libGL.so.#{driver_version}") do |lib|
   case driver_version
     when '390.77'
       lib[708608] = RET
+    when '390.87'
+      lib[708608] = RET
     when '396.45'
       lib[708240] = RET
     when '396.51'
@@ -113,6 +116,8 @@ end
 with_file("#{lib32_dir}/libGL.so.#{driver_version}") do |lib|
   case driver_version
     when '390.77'
+      lib[689440] = RET
+    when '390.87'
       lib[689440] = RET
     when '396.45'
       lib[690576] = RET
