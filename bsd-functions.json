@@ -18258,6 +18258,72 @@
   "EXEC(3)": {
     "functions": [
       {
+        "prototype": "int execl(const char *path, const char *arg, ..., /*, (char *)0, */)",
+        "name": "execl",
+        "type": "int",
+        "args": [
+          {
+            "name": "path",
+            "type": "const char *"
+          },
+          {
+            "name": "arg",
+            "type": "const char *"
+          },
+          {
+            "name": "...",
+            "type": null
+          }
+        ],
+        "includes": [
+          "#include <unistd.h>"
+        ]
+      },
+      {
+        "prototype": "int execlp(const char *file, const char *arg, ..., /*, (char *)0, */)",
+        "name": "execlp",
+        "type": "int",
+        "args": [
+          {
+            "name": "file",
+            "type": "const char *"
+          },
+          {
+            "name": "arg",
+            "type": "const char *"
+          },
+          {
+            "name": "...",
+            "type": null
+          }
+        ],
+        "includes": [
+          "#include <unistd.h>"
+        ]
+      },
+      {
+        "prototype": "int execle(const char *path, const char *arg, ..., /* (char *)0 char *const envp[] */)",
+        "name": "execle",
+        "type": "int",
+        "args": [
+          {
+            "name": "path",
+            "type": "const char *"
+          },
+          {
+            "name": "arg",
+            "type": "const char *"
+          },
+          {
+            "name": "...",
+            "type": null
+          }
+        ],
+        "includes": [
+          "#include <unistd.h>"
+        ]
+      },
+      {
         "prototype": "int exect(const char *path, char *const argv[], char *const envp[])",
         "name": "exect",
         "type": "int",

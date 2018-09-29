@@ -30,7 +30,6 @@ PROTOTYPE_BLACKLIST = [
   /const char *malloc_conf/,
   /real\-floating/,
   /easier to read typedef\'d version/,
-  /int exec(l|lp|le)\(/, # comments
   /scandir_b/, # unbalanced parens
   /void \(\*malloc_message\)\(void \*cbopaque, const char \*s\)/
 ]

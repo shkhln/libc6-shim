@@ -153,7 +153,7 @@ def generate_wrapper(function, shim_impl_exists)
     puts function['prototype'].gsub(function['name'], 'shim_' + function['name'] + '_impl').gsub('...', 'va_list') + ';'
   end
 
-  puts '/* ' + function['prototype'] + ' */'
+  puts '// ' + function['prototype']
 
   args = function['args']
   args = [] if args.size == 1 && args.first['type'] == 'void'

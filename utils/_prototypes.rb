@@ -12,7 +12,7 @@ def split_prototype(prototype)
   depth = 0
   decl  = ''
 
-  prototype.chars.each_with_index do |char, i|
+  prototype.gsub(/\/\*.*?\*\//, '').chars.each_with_index do |char, i|
     case char
       when '('
         if depth == 0
