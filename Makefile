@@ -1,7 +1,7 @@
 
-CFLAGS   =-std=c99 -shared -fPIC -lm -pthread -Wl,--version-script=src/shim.map -I/usr/local/include
-SOURCES  =${:!find src -name \*.c!}
-BUILD_DIR=build
+CFLAGS    = -std=c99 -shared -fPIC -lm -pthread -Wl,--version-script=src/shim.map -I/usr/include -I/usr/local/include
+SOURCES   = ${:!find src -name \*.c!}
+BUILD_DIR = build
 
 all: clean build
 
@@ -13,7 +13,7 @@ build_dir:
 
 $(BUILD_DIR)/wrappers.c: build_dir
 	cc $(CFLAGS) -o $(BUILD_DIR)/shim.tmp $(SOURCES)
-	./utils/wrappergen.rb required_symbols.396.24 $(BUILD_DIR)/shim.tmp > $(BUILD_DIR)/wrappers.c
+	./utils/wrappergen.rb glibc-2.17-symbols $(BUILD_DIR)/shim.tmp > $(BUILD_DIR)/wrappers.c
 	rm $(BUILD_DIR)/shim.tmp
 
 $(BUILD_DIR)/lib64/nvshim.so:       build_dir $(BUILD_DIR)/wrappers.c

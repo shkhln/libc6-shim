@@ -1926,7 +1926,8 @@
         ],
         "includes": [
           "#include <sys/param.h>",
-          "#include <sys/mount.h>"
+          "#include <sys/mount.h>",
+          "#include <sys/stat.h>"
         ]
       },
       {
@@ -2563,7 +2564,8 @@
         ],
         "includes": [
           "#include <sys/param.h>",
-          "#include <sys/ucred.h>"
+          "#include <sys/ucred.h>",
+          "#include <sys/mount.h>"
         ]
       }
     ]
@@ -2973,7 +2975,8 @@
         ],
         "includes": [
           "#include <sys/types.h>",
-          "#include <sys/time.h>"
+          "#include <sys/time.h>",
+          "#include <sys/resource.h>"
         ]
       },
       {
@@ -3344,101 +3347,6 @@
       }
     ]
   },
-  "KQUEUE(2)": {
-    "functions": [
-      {
-        "prototype": "int kqueue(void)",
-        "name": "kqueue",
-        "type": "int",
-        "args": [
-          {
-            "name": null,
-            "type": "void"
-          }
-        ],
-        "includes": [
-          "#include <sys/types.h>",
-          "#include <sys/event.h>"
-        ]
-      },
-      {
-        "prototype": "int kevent(int kq, const struct kevent *changelist, int nchanges, struct kevent *eventlist, int nevents, const struct timespec *timeout)",
-        "name": "kevent",
-        "type": "int",
-        "args": [
-          {
-            "name": "kq",
-            "type": "int"
-          },
-          {
-            "name": "changelist",
-            "type": "const struct kevent *"
-          },
-          {
-            "name": "nchanges",
-            "type": "int"
-          },
-          {
-            "name": "eventlist",
-            "type": "struct kevent *"
-          },
-          {
-            "name": "nevents",
-            "type": "int"
-          },
-          {
-            "name": "timeout",
-            "type": "const struct timespec *"
-          }
-        ],
-        "includes": [
-          "#include <sys/types.h>",
-          "#include <sys/event.h>",
-          "#include <sys/time.h>"
-        ]
-      },
-      {
-        "prototype": "EV_SET(kev, ident, filter, flags, fflags, data, udata)",
-        "name": "V_SET",
-        "type": "E",
-        "args": [
-          {
-            "name": "ev",
-            "type": "k"
-          },
-          {
-            "name": "dent",
-            "type": "i"
-          },
-          {
-            "name": "ilter",
-            "type": "f"
-          },
-          {
-            "name": "lags",
-            "type": "f"
-          },
-          {
-            "name": "flags",
-            "type": "f"
-          },
-          {
-            "name": "ata",
-            "type": "d"
-          },
-          {
-            "name": "data",
-            "type": "u"
-          }
-        ],
-        "includes": [
-          "#include <sys/types.h>",
-          "#include <sys/event.h>",
-          "#include <sys/time.h>"
-        ]
-      }
-    ]
-  },
   "KILL(2)": {
     "functions": [
       {
@@ -3675,7 +3583,9 @@
         ],
         "includes": [
           "#include <sys/param.h>",
-          "#include <sys/time.h>"
+          "#include <sys/time.h>",
+          "#include <sys/uio.h>",
+          "#include <sys/ktrace.h>"
         ]
       }
     ]
@@ -4361,7 +4271,8 @@
         ],
         "includes": [
           "#include <sys/types.h>",
-          "#include <sys/ipc.h>"
+          "#include <sys/ipc.h>",
+          "#include <sys/msg.h>"
         ]
       }
     ]
@@ -4418,7 +4329,8 @@
         ],
         "includes": [
           "#include <sys/types.h>",
-          "#include <sys/ipc.h>"
+          "#include <sys/ipc.h>",
+          "#include <sys/msg.h>"
         ]
       }
     ]
@@ -4449,7 +4361,8 @@
         ],
         "includes": [
           "#include <sys/types.h>",
-          "#include <sys/ipc.h>"
+          "#include <sys/ipc.h>",
+          "#include <sys/msg.h>"
         ]
       }
     ]
@@ -4520,7 +4433,11 @@
         ],
         "includes": [
           "#include <sys/param.h>",
-          "#include <sys/mount.h>"
+          "#include <sys/mount.h>",
+          "#include <sys/time.h>",
+          "#include <nfs/rpcv2.h>",
+          "#include <nfsserver/nfs.h>",
+          "#include <unistd.h>"
         ]
       }
     ]
@@ -5901,7 +5818,8 @@
         ],
         "includes": [
           "#include <sys/types.h>",
-          "#include <sys/socket.h>"
+          "#include <sys/socket.h>",
+          "#include <netinet/sctp.h>"
         ]
       }
     ]
@@ -5944,7 +5862,8 @@
         ],
         "includes": [
           "#include <sys/types.h>",
-          "#include <sys/socket.h>"
+          "#include <sys/socket.h>",
+          "#include <netinet/sctp.h>"
         ]
       },
       {
@@ -6003,7 +5922,8 @@
         ],
         "includes": [
           "#include <sys/types.h>",
-          "#include <sys/socket.h>"
+          "#include <sys/socket.h>",
+          "#include <netinet/sctp.h>"
         ]
       }
     ]
@@ -6068,7 +5988,8 @@
         ],
         "includes": [
           "#include <sys/types.h>",
-          "#include <sys/ipc.h>"
+          "#include <sys/ipc.h>",
+          "#include <sys/sem.h>"
         ]
       }
     ]
@@ -6121,7 +6042,8 @@
         ],
         "includes": [
           "#include <sys/types.h>",
-          "#include <sys/ipc.h>"
+          "#include <sys/ipc.h>",
+          "#include <sys/sem.h>"
         ]
       }
     ]
@@ -6280,7 +6202,8 @@
         ],
         "includes": [
           "#include <sys/types.h>",
-          "#include <sys/socket.h>"
+          "#include <sys/socket.h>",
+          "#include <sys/uio.h>"
         ]
       }
     ]
@@ -6510,7 +6433,8 @@
         ],
         "includes": [
           "#include <sys/types.h>",
-          "#include <sys/mman.h>"
+          "#include <sys/mman.h>",
+          "#include <fcntl.h>"
         ]
       },
       {
@@ -6553,7 +6477,8 @@
         ],
         "includes": [
           "#include <sys/types.h>",
-          "#include <sys/ipc.h>"
+          "#include <sys/ipc.h>",
+          "#include <sys/shm.h>"
         ]
       },
       {
@@ -6596,7 +6521,8 @@
         ],
         "includes": [
           "#include <sys/types.h>",
-          "#include <sys/ipc.h>"
+          "#include <sys/ipc.h>",
+          "#include <sys/shm.h>"
         ]
       }
     ]
@@ -7323,7 +7249,9 @@
         ],
         "includes": [
           "#include <sys/param.h>",
-          "#include <sys/time.h>"
+          "#include <sys/time.h>",
+          "#include <sys/uio.h>",
+          "#include <sys/ktrace.h>"
         ]
       }
     ]
@@ -9451,7 +9379,9 @@
         ],
         "includes": [
           "#include <sys/types.h>",
-          "#include <sys/socket.h>"
+          "#include <sys/socket.h>",
+          "#include <netinet/in.h>",
+          "#include <arpa/inet.h>"
         ]
       },
       {
@@ -10564,8 +10494,7 @@
           }
         ],
         "includes": [
-          "#include <stdio.h>",
-          "#include <stdarg.h>"
+          "#include <stdio.h>"
         ]
       },
       {
@@ -11752,7 +11681,6 @@
         ],
         "includes": [
           "#include <wchar.h>",
-          "#include <wchar.h>",
           "#include <xlocale.h>"
         ]
       },
@@ -11771,7 +11699,6 @@
           }
         ],
         "includes": [
-          "#include <wchar.h>",
           "#include <wchar.h>",
           "#include <xlocale.h>"
         ]
@@ -15971,7 +15898,9 @@
         ],
         "includes": [
           "#include <sys/types.h>",
-          "#include <netinet/in.h>"
+          "#include <netinet/in.h>",
+          "#include <arpa/nameser.h>",
+          "#include <resolv.h>"
         ]
       },
       {
@@ -17959,8 +17888,7 @@
           }
         ],
         "includes": [
-          "#include <err.h>",
-          "#include <stdarg.h>"
+          "#include <err.h>"
         ]
       },
       {
@@ -18121,7 +18049,8 @@
         ],
         "includes": [
           "#include <sys/types.h>",
-          "#include <sys/socket.h>"
+          "#include <sys/socket.h>",
+          "#include <net/ethernet.h>"
         ]
       },
       {
@@ -19633,8 +19562,7 @@
           }
         ],
         "includes": [
-          "#include <stdio.h>",
-          "#include <sys/types.h>"
+          "#include <stdio.h>"
         ]
       },
       {
@@ -20585,7 +20513,8 @@
         ],
         "includes": [
           "#include <sys/types.h>",
-          "#include <sys/socket.h>"
+          "#include <sys/socket.h>",
+          "#include <netdb.h>"
         ]
       },
       {
@@ -21376,8 +21305,8 @@
             "type": "FILE * restrict"
           },
           {
-            "name": "restrict",
-            "type": "const wchar_t *"
+            "name": "_arg_2",
+            "type": "const wchar_t * restrict"
           },
           {
             "name": "ap",
@@ -22225,7 +22154,8 @@
         ],
         "includes": [
           "#include <sys/param.h>",
-          "#include <sys/ucred.h>"
+          "#include <sys/ucred.h>",
+          "#include <sys/mount.h>"
         ]
       }
     ]
@@ -23422,7 +23352,9 @@
         ],
         "includes": [
           "#include <sys/types.h>",
-          "#include <sys/socket.h>"
+          "#include <sys/socket.h>",
+          "#include <netinet/in.h>",
+          "#include <arpa/inet.h>"
         ]
       },
       {
@@ -25055,8 +24987,8 @@
             "type": "wint_t"
           },
           {
-            "name": "ctrans_t",
-            "type": "w"
+            "name": "_arg_2",
+            "type": "wctrans_t"
           },
           {
             "name": "loc",
@@ -25491,7 +25423,8 @@
         ],
         "includes": [
           "#include <sys/types.h>",
-          "#include <sys/socket.h>"
+          "#include <sys/socket.h>",
+          "#include <net/if_dl.h>"
         ]
       },
       {
@@ -26798,8 +26731,7 @@
           }
         ],
         "includes": [
-          "#include <stdlib.h>",
-          "#include <sys/types.h>"
+          "#include <stdlib.h>"
         ]
       },
       {
@@ -26973,8 +26905,7 @@
           }
         ],
         "includes": [
-          "#include <stdlib.h>",
-          "#include <unistd.h>"
+          "#include <stdlib.h>"
         ]
       },
       {
@@ -27503,7 +27434,8 @@
         ],
         "includes": [
           "#include <sys/types.h>",
-          "#include <stdarg.h>"
+          "#include <stdarg.h>",
+          "#include <nsswitch.h>"
         ]
       }
     ]
@@ -32134,7 +32066,8 @@
         ],
         "includes": [
           "#include <sys/types.h>",
-          "#include <sys/time.h>"
+          "#include <sys/time.h>",
+          "#include <netinet/in.h>"
         ]
       }
     ]
@@ -32277,7 +32210,8 @@
         ],
         "includes": [
           "#include <sys/types.h>",
-          "#include <sys/socket.h>"
+          "#include <sys/socket.h>",
+          "#include <netinet/sctp.h>"
         ]
       }
     ]
@@ -32308,7 +32242,8 @@
         ],
         "includes": [
           "#include <sys/types.h>",
-          "#include <sys/socket.h>"
+          "#include <sys/socket.h>",
+          "#include <netinet/sctp.h>"
         ]
       }
     ]
@@ -32327,7 +32262,8 @@
         ],
         "includes": [
           "#include <sys/types.h>",
-          "#include <sys/socket.h>"
+          "#include <sys/socket.h>",
+          "#include <netinet/sctp.h>"
         ]
       },
       {
@@ -32362,7 +32298,8 @@
         ],
         "includes": [
           "#include <sys/types.h>",
-          "#include <sys/socket.h>"
+          "#include <sys/socket.h>",
+          "#include <netinet/sctp.h>"
         ]
       }
     ]
@@ -32385,7 +32322,8 @@
         ],
         "includes": [
           "#include <sys/types.h>",
-          "#include <sys/socket.h>"
+          "#include <sys/socket.h>",
+          "#include <netinet/sctp.h>"
         ]
       }
     ]
@@ -32412,7 +32350,8 @@
         ],
         "includes": [
           "#include <sys/types.h>",
-          "#include <sys/socket.h>"
+          "#include <sys/socket.h>",
+          "#include <netinet/sctp.h>"
         ]
       },
       {
@@ -32471,7 +32410,8 @@
         ],
         "includes": [
           "#include <sys/types.h>",
-          "#include <sys/socket.h>"
+          "#include <sys/socket.h>",
+          "#include <netinet/sctp.h>"
         ]
       }
     ]
@@ -32514,7 +32454,8 @@
         ],
         "includes": [
           "#include <sys/types.h>",
-          "#include <sys/socket.h>"
+          "#include <sys/socket.h>",
+          "#include <netinet/sctp.h>"
         ]
       }
     ]
@@ -32549,7 +32490,8 @@
         ],
         "includes": [
           "#include <sys/types.h>",
-          "#include <sys/socket.h>"
+          "#include <sys/socket.h>",
+          "#include <netinet/sctp.h>"
         ]
       },
       {
@@ -32644,7 +32586,8 @@
         ],
         "includes": [
           "#include <sys/types.h>",
-          "#include <sys/socket.h>"
+          "#include <sys/socket.h>",
+          "#include <netinet/sctp.h>"
         ]
       },
       {
@@ -33594,7 +33537,6 @@
         ],
         "includes": [
           "#include <strings.h>",
-          "#include <strings.h>",
           "#include <xlocale.h>"
         ]
       },
@@ -33621,7 +33563,6 @@
           }
         ],
         "includes": [
-          "#include <strings.h>",
           "#include <strings.h>",
           "#include <xlocale.h>"
         ]
@@ -33707,7 +33648,6 @@
           }
         ],
         "includes": [
-          "#include <string.h>",
           "#include <string.h>",
           "#include <xlocale.h>"
         ]
@@ -34666,7 +34606,6 @@
         ],
         "includes": [
           "#include <time.h>",
-          "#include <time.h>",
           "#include <xlocale.h>"
         ]
       }
@@ -34819,9 +34758,9 @@
           }
         ],
         "includes": [
+          "#include <inttypes.h>",
           "#include <stdlib.h>",
-          "#include <limits.h>",
-          "#include <inttypes.h>"
+          "#include <limits.h>"
         ]
       },
       {
@@ -34843,8 +34782,6 @@
           }
         ],
         "includes": [
-          "#include <stdlib.h>",
-          "#include <limits.h>",
           "#include <inttypes.h>",
           "#include <sys/types.h>",
           "#include <stdlib.h>",
@@ -34964,9 +34901,9 @@
           }
         ],
         "includes": [
+          "#include <inttypes.h>",
           "#include <stdlib.h>",
-          "#include <limits.h>",
-          "#include <inttypes.h>"
+          "#include <limits.h>"
         ]
       },
       {
@@ -34988,8 +34925,6 @@
           }
         ],
         "includes": [
-          "#include <stdlib.h>",
-          "#include <limits.h>",
           "#include <inttypes.h>",
           "#include <sys/types.h>",
           "#include <stdlib.h>",

@@ -5,6 +5,7 @@ require 'json'
 require 'open3'
 
 PAGE_BLACKLIST = [
+  'KQUEUE(2)',
   'NTP_ADJTIME(2)',
   'RPC_SVC_REG(3)',
   'SIGACTION(2)',
@@ -86,14 +87,19 @@ FUNCTION_POINTER_DECL = /^(.+)?\([\*\^](\w+)\)\s*(\([^\)]+\))$/
 
 def parse_synopsis(synopsis)
 
-  includes  = synopsis.split(/\n/)       .map(&:strip).map{|e| e.gsub(/\s+/, ' ')}.to_enum.with_index.find_all{|(entry, *_)| entry =~ /#include/}
-  functions = synopsis.split(/(\n\n+|;)/).map(&:strip).map{|e| e.gsub(/\s+/, ' ')}.to_enum.with_index.find_all{|(entry, *_)| is_function_prototype(entry)}
+  includes  = synopsis.split(/\n/)       .map(&:strip).map{|e| e.gsub(/\s+/, ' ')}.find_all{|entry| entry =~ /#include/}
+  functions = synopsis.split(/(\n\n+|;)/).map(&:strip).map{|e| e.gsub(/\s+/, ' ')}.find_all(&method(:is_function_prototype))
 
-  functions = functions.find_all{|(line, *_)| !PROTOTYPE_BLACKLIST.any?{|pattern| line =~ pattern}}
+  functions = functions.find_all{|str| !PROTOTYPE_BLACKLIST.any?{|pattern| str =~ pattern}}
 
-  functions.map do |prototype, i|
+  positions = {}
+  for str in includes + functions
+    positions[str] = synopsis.gsub(/\s+/, ' ').index(str)
+  end
 
-    fn_includes = includes.find_all{|_, j| j < i}.map{|(include, *_)| include}
+  functions.map do |prototype|
+
+    fn_includes = includes.find_all{|include| positions[include] < positions[prototype]}
 
     fn_type_name, *args = split_prototype(prototype).select{|p| !p.empty?}.to_enum.with_index.map do |decl, i|
       begin
@@ -101,11 +107,16 @@ def parse_synopsis(synopsis)
         type = nil
 
         case decl
-          when /\*$/
+          when /\*$/, /\*\srestrict$/
             name = "_arg_#{i}"
             type = decl
           when 'void'
             type = 'void'
+          when '...'
+            name = '...'
+          when /^[^\s]+$/
+            name = "_arg_#{i}"
+            type = decl
           when FUNCTION_POINTER_DECL
             name = $2
             type = $1 + '(*)' + $3
@@ -115,8 +126,6 @@ def parse_synopsis(synopsis)
           when /^(.+?)(\w+)(\[(\d*|restrict)\])$/
             name = $2
             type = $1 + $3
-          when '...'
-            name = '...'
           else
             raise "Unknown decl #{decl.inspect}"
         end
@@ -128,7 +137,7 @@ def parse_synopsis(synopsis)
       end
     end
 
-    {prototype: prototype, name: fn_type_name[:name],type: fn_type_name[:type], args: args, includes: fn_includes}
+    {prototype: prototype, name: fn_type_name[:name],type: fn_type_name[:type], args: args, includes: fn_includes.reverse.uniq.reverse}
   end
 end
 

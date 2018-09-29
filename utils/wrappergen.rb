@@ -3,16 +3,43 @@
 
 require 'json'
 
+IMPL_BLACKLIST = [
+  'quick_exit',
+  'iswctype_l',
+  'rtime',
+
+  'makecontext',
+  'openat',
+  'sem_open',
+  'strfmon',
+  'strfmon_l',
+  'ulimit',
+
+  'tmpnam',
+  'tempnam',
+  'gets',
+  'mktemp',
+
+  'cacoshl',
+  'cacosl',
+  'casinhl',
+  'casinl',
+  'catanhl',
+  'catanl'
+]
+
 SUBSTITUTIONS = {
   __ctype_toupper: 'toupper',
   __ctype_tolower: 'tolower',
   __getdelim:      'getdelim',
+  __isoc99_sscanf: 'sscanf',
   __sigsetjmp:     'sigsetjmp',
   __strdup:        'strdup',
   __strndup:       'strndup',
   _exit:           'exit',
   _IO_getc:        'getc',
   _IO_putc:        'putc',
+  alphasort64:     'alphasort',
   ftello64:        'ftello',
   fseeko64:        'fseeko',
   fopen64:         'fopen',
@@ -23,7 +50,10 @@ SUBSTITUTIONS = {
   open64:          'open',
   pread64:         'pread',
   pwrite64:        'pwrite',
-  statfs64:        'statfs'
+  readdir64:       'readdir',
+  scandir64:       'scandir',
+  statfs64:        'statfs',
+  statvfs64:       'statvfs'
 }
 
 STRUCT_COMPATIBILITY = {
@@ -111,7 +141,19 @@ def is_variadic(function)
   function['args'].size > 1 && function['args'].last['name'] == '...'
 end
 
-def generate_wrapper(function, impl_exists)
+FUNCTION_POINTER_TYPE = /^(.+)?\(([\*\^])\)\s*(\([^\)]+\))$/
+
+def generate_wrapper(function, shim_impl_exists)
+
+  for include in function['includes']
+    puts include
+  end
+
+  if shim_impl_exists
+    puts function['prototype'].gsub(function['name'], 'shim_' + function['name'] + '_impl').gsub('...', 'va_list') + ';'
+  end
+
+  puts '/* ' + function['prototype'] + ' */'
 
   args = function['args']
   args = [] if args.size == 1 && args.first['type'] == 'void'
@@ -126,14 +168,25 @@ def generate_wrapper(function, impl_exists)
       end
 
       compatible = STRUCT_COMPATIBILITY[struct]
-      if !compatible && !impl_exists
+      if !compatible && !shim_impl_exists
         STDERR.puts "\e[31m#{$PROGRAM_NAME}: found binary incompatible struct #{struct}, explicit shim impl required for function #{function['name']}\e[0m"
         return
       end
     end
   end
 
-  puts function['prototype'].sub(function['name'] + '(', 'shim_' + function['name'] + '(') + ' {'
+  def to_decl(arg)
+    case arg['type']
+      when /^(.+?)(\[(\d*|restrict)\])$/
+        "#{$1} #{arg['name']}#{$2}"
+      when FUNCTION_POINTER_TYPE
+        "#{$1}(#{$2}#{arg['name']})#{$3}"
+      else
+      "#{arg['type']} #{arg['name']}"
+    end
+  end
+
+  puts function['type'] + ' shim_' + function['name'] + '(' + function['args'].map(&method(:to_decl)).join(', ') + ') {'
 
   puts '  ' + log_args(args)
 
@@ -146,7 +199,7 @@ def generate_wrapper(function, impl_exists)
     puts "  #{function['type']} _ret_ = "
   end
 
-  if impl_exists
+  if shim_impl_exists
     print "  shim_#{function['name']}_impl"
   else
     print '  '
@@ -185,28 +238,12 @@ for _, synopsis in JSON.parse(IO.read(__dir__ + '/../functions.json', {mode: 'r:
   end
 end
 
-required_symbols = {}
+symbols = {}
 
 for line in IO.read(ARGV[0]).lines
   sym, versions = line.strip.split(': ')
-  required_symbols[sym] = versions.split(', ')
+  symbols[sym] = versions.split(', ')
 end
-
-includes = []
-
-for sym, _ in required_symbols
-  function = functions[sym]
-  includes << function['includes'] if function
-end
-
-puts '#include <stdarg.h>'
-
-for include in includes.uniq
-  puts include
-end
-
-puts '#include "../src/shim.h"'
-puts
 
 implemented_wrappers = {}
 implemented_shims    = {}
@@ -218,23 +255,17 @@ for line in `readelf -s #{ARGV[1]} | grep -v UND`.lines
   end
 end
 
-for fun in implemented_shims.keys
-  function = functions[fun]
-  if function
-    puts function['prototype'].gsub(fun, 'shim_' + fun + '_impl').gsub('...', 'va_list') + ';'
-  end
-end
-
+puts '#define _WITH_GETLINE'
+puts '#include <stdarg.h>'
+puts '#include "../src/shim.h"'
 puts
 
-for sym in required_symbols.keys
+for sym in symbols.keys
 
   function = functions[SUBSTITUTIONS[sym.to_sym] || sym]
-  if function
+  if function && !(IMPL_BLACKLIST.include?(function['name']) || function['name'] =~ /iconv/)
 
-    puts '/* ' + function['prototype'] + ' */'
-
-    for version in required_symbols[sym]
+    for version in symbols[sym]
       puts "__asm__(\".symver shim_#{function['name']},#{sym}@#{version}\");"
     end
 
