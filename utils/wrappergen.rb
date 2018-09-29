@@ -232,7 +232,7 @@ end
 
 functions = {}
 
-for _, synopsis in JSON.parse(IO.read(__dir__ + '/../functions.json', {mode: 'r:UTF-8'}))
+for _, synopsis in JSON.parse(IO.read(__dir__ + '/../bsd-functions.json', {mode: 'r:UTF-8'}))
   for function in synopsis['functions']
     functions[function['name']] = function
   end
