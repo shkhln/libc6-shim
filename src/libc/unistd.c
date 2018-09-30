@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <errno.h>
+#include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
@@ -20,11 +21,17 @@ ssize_t shim_readlink_impl(const char* path, char* buf, size_t bufsize) {
   return readlink(path, buf, bufsize);
 }
 
-int shim_execle(const char* path, const char* arg, ...) {
+int shim_execl_impl(const char* path, const char* arg, va_list args) {
   UNIMPLEMENTED();
 }
 
-SYM_EXPORT(shim_execle, execle);
+int shim_execle_impl(const char* path, const char* arg, va_list args) {
+  UNIMPLEMENTED();
+}
+
+int shim_execlp_impl(const char* file, const char* arg, va_list args) {
+  UNIMPLEMENTED();
+}
 
 #define GLIBC_SC_PAGESIZE         30
 #define GLIBC_SC_NPROCESSORS_ONLN 84
@@ -41,9 +48,3 @@ long shim_sysconf_impl(int name) {
 
   UNIMPLEMENTED_ARGS("%d", name);
 }
-
-int shim_execl(const char *path, const char *arg, ...) {
-  UNIMPLEMENTED();
-}
-
-SYM_EXPORT(shim_execl, execl);

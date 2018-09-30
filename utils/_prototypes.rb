@@ -104,6 +104,6 @@ def parse_synopsis(synopsis)
       end
     end
 
-    {prototype: prototype, name: fn_type_name[:name],type: fn_type_name[:type], args: args, includes: fn_includes.reverse.uniq.reverse}
+    {prototype: prototype, name: fn_type_name[:name], type: fn_type_name[:type], args: args, includes: fn_includes.reverse.uniq.reverse}
   end
 end

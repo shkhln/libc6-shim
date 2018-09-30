@@ -2,6 +2,8 @@
 #include <string.h>
 #include "../shim.h"
 
+__asm__(".symver shim_memalign,memalign@GLIBC_2.0");
+__asm__(".symver shim_memalign,memalign@GLIBC_2.2.5");
 void* shim_memalign(size_t alignment, size_t size) {
   LOG_ARGS("%zu, %zu", alignment, size);
   void* p = NULL;
@@ -10,40 +12,30 @@ void* shim_memalign(size_t alignment, size_t size) {
   return p;
 }
 
-SYM_EXPORT(shim_memalign, memalign);
-
-long shim_glibc_strtol(char* nptr, char** endptr, int base, int group) {
+long shim___strtol_internal_impl(char* nptr, char** endptr, int base, int group) {
   return strtol(nptr, endptr, base);
 }
 
-long shim_glibc_strtoll(char* nptr, char** endptr, int base, int group) {
+long shim___strtoll_internal_impl(char* nptr, char** endptr, int base, int group) {
   return strtoll(nptr, endptr, base);
 }
 
-unsigned long shim_glibc_strtoul(char* nptr, char** endptr, int base, int group) {
+unsigned long shim___strtoul_internal_impl(char* nptr, char** endptr, int base, int group) {
   return strtoul(nptr, endptr, base);
 }
 
-unsigned long shim_glibc_strtoull(char* nptr, char** endptr, int base, int group) {
+unsigned long shim___strtoull_internal_impl(char* nptr, char** endptr, int base, int group) {
   return strtoull(nptr, endptr, base);
 }
 
-float shim_glibc_strtof(char* nptr, char** endptr, int group) {
+float shim___strtof_internal_impl(char* nptr, char** endptr, int group) {
   return strtof(nptr, endptr);
 }
 
-double shim_glibc_strtod(char* nptr, char** endptr, int group) {
+double shim___strtod_internal_impl(char* nptr, char** endptr, int group) {
   return strtod(nptr, endptr);
 }
 
-long double shim_glibc_strtold(char* nptr, char** endptr, int group) {
+long double shim___strtold_internal_impl(char* nptr, char** endptr, int group) {
   return strtold(nptr, endptr);
 }
-
-SYM_EXPORT(shim_glibc_strtol,   __strtol_internal);
-SYM_EXPORT(shim_glibc_strtoll,  __strtoll_internal);
-SYM_EXPORT(shim_glibc_strtoul,  __strtoul_internal);
-SYM_EXPORT(shim_glibc_strtoull, __strtoull_internal);
-SYM_EXPORT(shim_glibc_strtof,   __strtof_internal);
-SYM_EXPORT(shim_glibc_strtod,   __strtod_internal);
-SYM_EXPORT(shim_glibc_strtold,  __strtold_internal);

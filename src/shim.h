@@ -2,13 +2,6 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-#define SYM_EXPORT(in, out)                        \
-  __asm__(".symver " #in "," #out "@GLIBC_2.0");   \
-  __asm__(".symver " #in "," #out "@GLIBC_2.1");   \
-  __asm__(".symver " #in "," #out "@GLIBC_2.2");   \
-  __asm__(".symver " #in "," #out "@GLIBC_2.1.3"); \
-  __asm__(".symver " #in "," #out "@GLIBC_2.2.5");
-
 #define __HEAD(head, ...) head
 #define __TAIL(head, ...) __VA_ARGS__
 

@@ -3,12 +3,10 @@
 #include <ctype.h>
 #include "../shim.h"
 
-const unsigned short* shim_b = (void*)0x4242; // ?
+__asm__(".symver shim_ctype_b,__ctype_b@GLIBC_2.0");
+__asm__(".symver shim_ctype_b,__ctype_b@GLIBC_2.2.5");
+const unsigned short* shim_ctype_b = (void*)0x4242; // ?
 
-SYM_EXPORT(shim_b, __ctype_b);
-
-size_t shim_get_mb_cur_max() {
+size_t shim___ctype_get_mb_cur_max_impl() {
   UNIMPLEMENTED();
 }
-
-SYM_EXPORT(shim_get_mb_cur_max, __ctype_get_mb_cur_max);

@@ -35,7 +35,7 @@ for header in [
   for i in (spec.index(header) + 1)...(spec.length)
     line = spec[i]
     break if line != '' && indent_level(line) == 0
-    functions << $1 if line =~ /([\w\d_]+)\s--/i
+    functions << $1 if line =~ /([\w_]+)\s--/i
   end
 
   header.strip!
@@ -55,7 +55,7 @@ for header in [
         case line
           when 'Name', 'Synopsis', 'Description'
             section = line
-          when /^([\w\d_]+)$/i
+          when /^([\w_]+)$/i
             break
           else
             if section == 'Synopsis'

@@ -4,15 +4,26 @@
 
 #include "shim.h"
 
+__asm__(".symver shim_stdin,stdin@GLIBC_2.0");
+__asm__(".symver shim_stdin,stdin@GLIBC_2.2.5");
+__asm__(".symver shim_stdin,_IO_stdin_@GLIBC_2.0");
+__asm__(".symver shim_stdin,_IO_2_1_stdin_@GLIBC_2.1");
+__asm__(".symver shim_stdin,_IO_2_1_stdin_@GLIBC_2.2.5");
 FILE* shim_stdin  = NULL;
+
+__asm__(".symver shim_stdout,stdout@GLIBC_2.0");
+__asm__(".symver shim_stdout,stdout@GLIBC_2.2.5");
+__asm__(".symver shim_stdout,_IO_stdout_@GLIBC_2.0");
+__asm__(".symver shim_stdout,_IO_2_1_stdout_@GLIBC_2.1");
+__asm__(".symver shim_stdout,_IO_2_1_stdout_@GLIBC_2.2.5");
 FILE* shim_stdout = NULL;
+
+__asm__(".symver shim_stderr,stderr@GLIBC_2.0");
+__asm__(".symver shim_stderr,stderr@GLIBC_2.2.5");
+__asm__(".symver shim_stderr,_IO_stderr_@GLIBC_2.0");
+__asm__(".symver shim_stderr,_IO_2_1_stderr_@GLIBC_2.1");
+__asm__(".symver shim_stderr,_IO_2_1_stderr_@GLIBC_2.2.5");
 FILE* shim_stderr = NULL;
-
-SYM_EXPORT(shim_stdin,  stdin);
-SYM_EXPORT(shim_stdout, stdout);
-SYM_EXPORT(shim_stderr, stderr);
-
-SYM_EXPORT(shim_stdout, _IO_2_1_stdout_);
 
 __attribute__((constructor))
 void shim_init() {
@@ -24,24 +35,17 @@ void shim_init() {
   shim_stderr = stderr;
 }
 
-char* shim_gnu_get_libc_version() {
-  LOG("%s()\n", __func__);
-  return "2.17"; //"2.5.5";
+char* shim_gnu_get_libc_version_impl() {
+  return "2.17";
 }
 
-SYM_EXPORT(shim_gnu_get_libc_version, gnu_get_libc_version);
-
-void shim_cxa_finalize(void* d) {
-  LOG_ARGS("%p", d);
+void shim___cxa_finalize_impl(void* d) {
+  // do nothing
 }
 
-int shim_cxa_atexit(void (*cb)(void*), void* arg, void* dso_handle) {
-  LOG_ARGS("%p, %p, %p", cb, arg, dso_handle);
+int shim___cxa_atexit_impl(void (*cb)(void*), void* arg, void* dso_handle) {
   return 0;
 }
-
-SYM_EXPORT(shim_cxa_finalize, __cxa_finalize);
-SYM_EXPORT(shim_cxa_atexit,   __cxa_atexit);
 
 /*#include <link.h>
 

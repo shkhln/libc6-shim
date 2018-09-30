@@ -31,6 +31,7 @@ IMPL_BLACKLIST = [
 SUBSTITUTIONS = {
   __ctype_toupper: 'toupper',
   __ctype_tolower: 'tolower',
+  __fxstat64:      '__fxstat', # ?
   __getdelim:      'getdelim',
   __isoc99_sscanf: 'sscanf',
   __sigsetjmp:     'sigsetjmp',
@@ -145,15 +146,13 @@ FUNCTION_POINTER_TYPE = /^(.+)?\(([\*\^])\)\s*(\([^\)]+\))$/
 
 def generate_wrapper(function, shim_impl_exists)
 
-  for include in function['includes']
-    puts include
+  if function[:lsb] && !shim_impl_exists
+    puts '// ' + function['prototype']
+    puts 'void shim_' + function['name'] + '() {'
+    puts '  UNIMPLEMENTED();'
+    puts '}'
+    return
   end
-
-  if shim_impl_exists
-    puts function['prototype'].gsub(function['name'], 'shim_' + function['name'] + '_impl').gsub('...', 'va_list') + ';'
-  end
-
-  puts '// ' + function['prototype']
 
   args = function['args']
   args = [] if args.size == 1 && args.first['type'] == 'void'
@@ -186,6 +185,15 @@ def generate_wrapper(function, shim_impl_exists)
     end
   end
 
+  for include in function['includes']
+    puts include
+  end
+
+  if shim_impl_exists
+    puts function['type'] + ' shim_' + function['name'] + '_impl(' + function['args'].map(&method(:to_decl)).join(', ').gsub('...', 'va_list') + ');'
+  end
+
+  puts '// ' + function['prototype']
   puts function['type'] + ' shim_' + function['name'] + '(' + function['args'].map(&method(:to_decl)).join(', ') + ') {'
 
   puts '  ' + log_args(args)
@@ -238,6 +246,33 @@ for _, synopsis in JSON.parse(IO.read(__dir__ + '/../bsd-functions.json', {mode:
   end
 end
 
+LINUX_INCLUDES = [
+  '#include <argz.h>',
+  '#include <envz.h>',
+  '#include <error.h>',
+  '#include <utmp.h>',
+  '#include <gnu/libc-version.h>',
+  '#include <sys/epoll.h>',
+  '#include <sys/sendfile.h>',
+  '#include <sys/statfs.h>'
+]
+
+for _, synopsis in JSON.parse(IO.read(__dir__ + '/../lsb-functions.json', {mode: 'r:UTF-8'}))
+  for function in synopsis['functions']
+
+    next if functions[function['name']]
+
+    functions[function['name']] = {
+      'prototype' => function['prototype'],
+      'name'      => function['name'],
+      'type'      => function['type'],
+      'args'      => function['args'],
+      'includes'  => function['includes'].find_all{|str| !LINUX_INCLUDES.include?(str)},
+      :lsb        => true
+    }
+  end
+end
+
 symbols = {}
 
 for line in IO.read(ARGV[0]).lines
@@ -250,8 +285,8 @@ implemented_shims    = {}
 
 for line in `readelf -s #{ARGV[1]} | grep -v UND`.lines
   case line
-    when /shim_(\w+)_impl/ then implemented_shims[$1]    = true
-    when /shim_(\w+)/      then implemented_wrappers[$1] = true
+    when /shim_([\w_]+)_impl/ then implemented_shims[$1]    = true
+    when /shim_([\w_]+)/      then implemented_wrappers[$1] = true
   end
 end
 
@@ -259,6 +294,13 @@ puts '#define _WITH_GETLINE'
 puts '#include <stdarg.h>'
 puts '#include "../src/shim.h"'
 puts
+
+puts 'struct stat64 {};'
+puts 'typedef void* __dispatch_fn_t;'
+puts 'typedef void _IO_FILE;'
+puts 'typedef void cpu_set_t;'
+puts 'typedef void glob64_t;'
+puts 'typedef int error_t;'
 
 for sym in symbols.keys
 

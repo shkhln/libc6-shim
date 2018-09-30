@@ -6,14 +6,13 @@
 #include <pthread.h>
 #include "../shim.h"
 
+__asm__(".symver shim_dladdr1,dladdr1@GLIBC_2.3.3");
 int shim_dladdr1(void* address, Dl_info* info, void** extra_info, int flags) {
   LOG_ARGS("%p, %p, %p, %d", address, info, extra_info, flags);
   int err = dladdr(address, info);
   LOG_RES("%d", err);
   return err;
 }
-
-SYM_EXPORT(shim_dladdr1, dladdr1);
 
 #define GLIBC_RTLD_NEXT    ((void*)-1)
 #define GLIBC_RTLD_DEFAULT ((void*) 0)
@@ -62,11 +61,6 @@ void* shim_dlsym_impl(void* handle, const char* symbol) {
   return dlsym(handle, symbol);
 }
 
-void* shim_dlvsym(void* handle, const char* symbol, const char* version) {
-  LOG_ARGS("%p, \"%s\", \"%s\"", handle, symbol, version);
-  void* addr = shim_dlsym_impl(handle, symbol);
-  LOG_RES("%p", addr);
-  return addr;
+void* shim_dlvsym_impl(void* handle, const char* symbol, const char* version) {
+  return shim_dlsym_impl(handle, symbol);
 }
-
-SYM_EXPORT(shim_dlvsym, dlvsym);

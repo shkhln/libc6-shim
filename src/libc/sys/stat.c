@@ -113,7 +113,7 @@ void copy_stat_buf(struct linux_stat* dst, struct stat* src) {
   dst->st_ctim.tv_nsec = src->st_ctim.tv_nsec;
 }
 
-int shim_xstat_impl(int ver, const char* path, struct linux_stat* stat_buf) {
+int shim___xstat_impl(int ver, const char* path, struct linux_stat* stat_buf) {
 
   struct stat sb;
 
@@ -143,16 +143,7 @@ int shim_xstat_impl(int ver, const char* path, struct linux_stat* stat_buf) {
   return err;
 }
 
-int shim_xstat(int ver, const char* path, struct linux_stat* stat_buf) {
-  LOG_ARGS("%d, \"%s\", %p", ver, path, stat_buf);
-  int err = shim_xstat_impl(ver, path, stat_buf);
-  LOG_RES("%d", err);
-  return err;
-}
-
-SYM_EXPORT(shim_xstat, __xstat);
-
-int shim_fxstat_impl(int ver, int fd, struct linux_stat* stat_buf) {
+int shim___fxstat_impl(int ver, int fd, struct linux_stat* stat_buf) {
 
   struct stat sb;
 
@@ -164,30 +155,11 @@ int shim_fxstat_impl(int ver, int fd, struct linux_stat* stat_buf) {
   return err;
 }
 
-int shim_fxstat(int ver, int fd, struct linux_stat* stat_buf) {
-  LOG_ARGS("%d, %d, %p", ver, fd, stat_buf);
-  int err = shim_fxstat_impl(ver, fd, stat_buf);
-  LOG_RES("%d", err);
-  return err;
-}
-
-SYM_EXPORT(shim_fxstat, __fxstat);
-SYM_EXPORT(shim_fxstat, __fxstat64);
-
 int shim_chmod_impl(const char* path, mode_t mode) {
   assert(!str_starts_with(path, "/dev/"));
   return chmod(path, mode);
 }
 
-int shim_xmknod_impl(int ver, const char* path, mode_t mode, dev_t* dev) {
+int shim___xmknod_impl(int ver, const char* path, mode_t mode, dev_t* dev) {
   UNIMPLEMENTED();
 }
-
-int shim_xmknod(int ver, const char* path, mode_t mode, dev_t* dev) {
-  LOG_ARGS("%d, \"%s\", %d, %p", ver, path, mode, dev);
-  int err = shim_xmknod_impl(ver, path, mode, dev);
-  LOG_RES("%d", err);
-  return err;
-}
-
-SYM_EXPORT(shim_xmknod, __xmknod);
