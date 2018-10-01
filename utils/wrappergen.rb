@@ -144,31 +144,37 @@ end
 
 FUNCTION_POINTER_TYPE = /^(.+)?\(([\*\^])\)\s*(\([^\)]+\))$/
 
+def generate_stub(function)
+  puts '// ' + function['prototype']
+  puts 'void shim_' + function['name'] + '() {'
+  puts '  UNIMPLEMENTED();'
+  puts '}'
+end
+
 def generate_wrapper(function, shim_impl_exists)
 
   if function[:lsb] && !shim_impl_exists
-    puts '// ' + function['prototype']
-    puts 'void shim_' + function['name'] + '() {'
-    puts '  UNIMPLEMENTED();'
-    puts '}'
+    generate_stub(function)
     return
   end
 
   args = function['args']
   args = [] if args.size == 1 && args.first['type'] == 'void'
 
-  for arg in args
-    if arg['type'] =~ /^(:?const )struct (\w+)/
+  for type in args.map{|arg| arg['type']} + [function['type']]
+    if type =~ /^(const |)struct (\w+)/
       struct = $2.to_sym
 
       if not STRUCT_COMPATIBILITY.keys.include?(struct)
         STDERR.puts "\e[31m#{$PROGRAM_NAME}: unknown struct #{struct}, skipping function #{function['name']}\e[0m"
+        generate_stub(function)
         return
       end
 
       compatible = STRUCT_COMPATIBILITY[struct]
       if !compatible && !shim_impl_exists
         STDERR.puts "\e[31m#{$PROGRAM_NAME}: found binary incompatible struct #{struct}, explicit shim impl required for function #{function['name']}\e[0m"
+        generate_stub(function)
         return
       end
     end
@@ -292,6 +298,7 @@ end
 
 puts '#define _WITH_GETLINE'
 puts '#include <stdarg.h>'
+puts '#include <stdint.h>'
 puts '#include "../src/shim.h"'
 puts
 
