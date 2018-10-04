@@ -5,15 +5,100 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/un.h>
+#include <netinet/in.h>
+
 #include "../../shim.h"
 
-#define LINUX_SOL_SOCKET 1
+#define LINUX_SOL_IP      0
+#define LINUX_SOL_SOCKET  1
+#define LINUX_SOL_TCP     6
+#define LINUX_SOL_UDP    17
 
 #define LINUX_SCM_RIGHTS 1
+
+#define LINUX_SOCK_STREAM   0x00001
+#define LINUX_SOCK_DGRAM    0x00002
+#define LINUX_SOCK_NONBLOCK 0x00800
+#define LINUX_SOCK_CLOEXEC  0x80000
+
+#define KNOWN_LINUX_SOCKET_TYPES ( \
+  LINUX_SOCK_STREAM   |            \
+  LINUX_SOCK_DGRAM    |            \
+  LINUX_SOCK_NONBLOCK |            \
+  LINUX_SOCK_CLOEXEC               \
+)
+
+#define LINUX_SO_DEBUG       1
+#define LINUX_SO_REUSEADDR   2
+#define LINUX_SO_TYPE        3
+#define LINUX_SO_ERROR       4
+#define LINUX_SO_DONTROUTE   5
+#define LINUX_SO_BROADCAST   6
+#define LINUX_SO_SNDBUF      7
+#define LINUX_SO_RCVBUF      8
+#define LINUX_SO_KEEPALIVE   9
+#define LINUX_SO_OOBINLINE  10
+#define LINUX_SO_LINGER     13
+#define LINUX_SO_REUSEPORT  15
+#define LINUX_SO_RCVLOWAT   18
+#define LINUX_SO_SNDLOWAT   19
+#define LINUX_SO_RCVTIMEO   20
+#define LINUX_SO_SNDTIMEO   21
+#define LINUX_SO_TIMESTAMP  29
+#define LINUX_SO_ACCEPTCONN 30
+#define LINUX_SO_PROTOCOL   38
+
+#define LINUX_MSG_OOB          0x00000001
+#define LINUX_MSG_PEEK         0x00000002
+#define LINUX_MSG_DONTROUTE    0x00000004
+#define LINUX_MSG_CTRUNC       0x00000008
+#define LINUX_MSG_TRUNC        0x00000020
+#define LINUX_MSG_DONTWAIT     0x00000040
+#define LINUX_MSG_EOR          0x00000080
+#define LINUX_MSG_WAITALL      0x00000100
+#define LINUX_MSG_NOSIGNAL     0x00004000
+#define LINUX_MSG_WAITFORONE   0x00010000
+#define LINUX_MSG_CMSG_CLOEXEC 0x40000000
+
+#define KNOWN_LINUX_MSG_FLAGS ( \
+  LINUX_MSG_OOB          |      \
+  LINUX_MSG_PEEK         |      \
+  LINUX_MSG_DONTROUTE    |      \
+  LINUX_MSG_CTRUNC       |      \
+  LINUX_MSG_TRUNC        |      \
+  LINUX_MSG_DONTWAIT     |      \
+  LINUX_MSG_EOR          |      \
+  LINUX_MSG_WAITALL      |      \
+  LINUX_MSG_NOSIGNAL     |      \
+  LINUX_MSG_WAITFORONE   |      \
+  LINUX_MSG_CMSG_CLOEXEC        \
+)
+
+#define KNOWN_NATIVE_MSG_FLAGS ( \
+  MSG_OOB          |             \
+  MSG_PEEK         |             \
+  MSG_DONTROUTE    |             \
+  MSG_CTRUNC       |             \
+  MSG_TRUNC        |             \
+  MSG_DONTWAIT     |             \
+  MSG_EOR          |             \
+  MSG_EOF          |             \
+  MSG_WAITALL      |             \
+  MSG_NOSIGNAL     |             \
+  MSG_WAITFORONE   |             \
+  MSG_CMSG_CLOEXEC               \
+)
 
 struct linux_sockaddr {
   uint16_t sa_family;
   char     sa_data[14];
+};
+
+struct linux_sockaddr_in {
+  uint16_t       sin_family;
+  uint16_t       sin_port;
+  struct in_addr sin_addr;
+  uint8_t        sin_zero[8];
 };
 
 struct linux_msghdr {
@@ -33,121 +118,306 @@ struct linux_cmsghdr {
   // unsigned char cmsg_data[];
 };
 
-void linux_to_native_sockaddr(struct sockaddr_un* dest, const struct linux_sockaddr* src, socklen_t addrlen) {
-
-  assert(sizeof(*dest) >= addrlen);
-
-  //memset(&addr, 0, sizeof(addr));
-
-  dest->sun_len    = 0;
-  dest->sun_family = src->sa_family;
-
-  if (src->sa_data[0] == 0 /* abstract socket address */) {
-    snprintf(dest->sun_path, sizeof(dest->sun_path), "/var/run/%s", &src->sa_data[1]);
-  } else {
-    strncpy(dest->sun_path, src->sa_data, sizeof(dest->sun_path));
+static int linux_to_native_sock_level(int level) {
+  switch (level) {
+    case LINUX_SOL_SOCKET: return SOL_SOCKET;
+    case LINUX_SOL_IP:     return IPPROTO_IP;
+    case LINUX_SOL_TCP:    return IPPROTO_TCP;
+    case LINUX_SOL_UDP:    return IPPROTO_UDP;
+    default:
+      assert(0);
   }
 }
 
-int shim_accept_impl(int s, struct sockaddr* restrict addr, socklen_t* restrict addrlen) {
-  UNIMPLEMENTED();
+static int native_to_linux_sock_level(int level) {
+  switch (level) {
+    case SOL_SOCKET:  return LINUX_SOL_SOCKET;
+    case IPPROTO_IP:  return LINUX_SOL_IP;
+    case IPPROTO_TCP: return LINUX_SOL_TCP;
+    case IPPROTO_UDP: return LINUX_SOL_UDP;
+    default:
+      assert(0);
+  }
+}
+
+static int linux_to_native_sock_type(int linux_type) {
+
+  assert((linux_type & KNOWN_LINUX_SOCKET_TYPES) == linux_type);
+
+  int type = 0;
+
+  if (linux_type & LINUX_SOCK_STREAM)   type |= SOCK_STREAM;
+  if (linux_type & LINUX_SOCK_DGRAM)    type |= SOCK_DGRAM;
+  if (linux_type & LINUX_SOCK_NONBLOCK) type |= SOCK_NONBLOCK;
+  if (linux_type & LINUX_SOCK_CLOEXEC)  type |= SOCK_CLOEXEC;
+
+  return type;
+}
+
+static int linux_to_native_msg_flags(int linux_flags) {
+
+  assert((linux_flags & KNOWN_LINUX_MSG_FLAGS) == linux_flags);
+
+  int flags = 0;
+
+  if (linux_flags & LINUX_MSG_OOB)          flags |= MSG_OOB;
+  if (linux_flags & LINUX_MSG_PEEK)         flags |= MSG_PEEK;
+  if (linux_flags & LINUX_MSG_DONTROUTE)    flags |= MSG_DONTROUTE;
+  if (linux_flags & LINUX_MSG_CTRUNC)       flags |= MSG_CTRUNC;
+  if (linux_flags & LINUX_MSG_TRUNC)        flags |= MSG_TRUNC;
+  if (linux_flags & LINUX_MSG_DONTWAIT)     flags |= MSG_DONTWAIT;
+  if (linux_flags & LINUX_MSG_EOR)          flags |= MSG_EOR;
+  if (linux_flags & LINUX_MSG_WAITALL)      flags |= MSG_WAITALL;
+  if (linux_flags & LINUX_MSG_NOSIGNAL)     flags |= MSG_NOSIGNAL;
+  if (linux_flags & LINUX_MSG_WAITFORONE)   flags |= MSG_WAITFORONE;
+  if (linux_flags & LINUX_MSG_CMSG_CLOEXEC) flags |= MSG_CMSG_CLOEXEC;
+
+  return flags;
+}
+
+static int native_to_linux_msg_flags(int flags) {
+
+  assert((flags & KNOWN_NATIVE_MSG_FLAGS) == flags);
+
+  int linux_flags = 0;
+
+  if (flags & MSG_EOF) {
+    assert(0);
+  }
+
+  if (flags & MSG_OOB)          linux_flags |= LINUX_MSG_OOB;
+  if (flags & MSG_PEEK)         linux_flags |= LINUX_MSG_PEEK;
+  if (flags & MSG_DONTROUTE)    linux_flags |= LINUX_MSG_DONTROUTE;
+  if (flags & MSG_CTRUNC)       linux_flags |= LINUX_MSG_CTRUNC;
+  if (flags & MSG_TRUNC)        linux_flags |= LINUX_MSG_TRUNC;
+  if (flags & MSG_DONTWAIT)     linux_flags |= LINUX_MSG_DONTWAIT;
+  if (flags & MSG_EOR)          linux_flags |= LINUX_MSG_EOR;
+  if (flags & MSG_WAITALL)      linux_flags |= LINUX_MSG_WAITALL;
+  if (flags & MSG_NOSIGNAL)     linux_flags |= LINUX_MSG_NOSIGNAL;
+  if (flags & MSG_WAITFORONE)   linux_flags |= LINUX_MSG_WAITFORONE;
+  if (flags & MSG_CMSG_CLOEXEC) linux_flags |= LINUX_MSG_CMSG_CLOEXEC;
+
+  return linux_flags;
+}
+
+static void linux_to_native_sockaddr(struct sockaddr* dest, const struct linux_sockaddr* src, socklen_t addrlen) {
+
+  switch (src->sa_family) {
+
+    case PF_UNIX:
+      {
+        assert(addrlen <= sizeof(struct sockaddr_un));
+
+        struct sockaddr_un* d = (struct sockaddr_un*)dest;
+        memset(d, 0, sizeof(struct sockaddr_un));
+
+        d->sun_len    = 0;
+        d->sun_family = src->sa_family;
+
+        if (src->sa_data[0] == 0 /* abstract socket address */) {
+          snprintf(d->sun_path, sizeof(d->sun_path), "/var/run/%s", &src->sa_data[1]);
+        } else {
+          strlcpy(d->sun_path, src->sa_data, sizeof(d->sun_path));
+        }
+      }
+
+      break;
+
+    case PF_INET:
+      {
+        assert(addrlen <= sizeof(struct sockaddr_in));
+
+        struct sockaddr_in* d = (struct sockaddr_in*)dest;
+        memset(d, 0, sizeof(struct sockaddr_in));
+
+        struct linux_sockaddr_in* s = src;
+
+        d->sin_len    = 0;
+        d->sin_family = s->sin_family;
+        d->sin_port   = s->sin_port;
+        d->sin_addr   = s->sin_addr;
+
+        memcpy(d->sin_zero, s->sin_zero, sizeof(d->sin_zero));
+      }
+
+      break;
+
+    default:
+      assert(0);
+  }
+}
+
+int shim_socket_impl(int domain, int type, int protocol) {
+  assert(domain == PF_UNIX || domain == PF_INET);
+  return socket(domain, linux_to_native_sock_type(type), protocol);
 }
 
 int shim_bind_impl(int s, const struct linux_sockaddr* linux_addr, socklen_t addrlen) {
 
-  assert(linux_addr->sa_family == 1);
-  assert(linux_addr->sa_data[0] == 0 && str_starts_with(&linux_addr->sa_data[1], "nvidia"));
+  switch (linux_addr->sa_family) {
 
-  struct sockaddr_un addr;
+    case PF_UNIX:
+      {
+        struct sockaddr_un addr;
+        linux_to_native_sockaddr(&addr, linux_addr, addrlen);
 
-  linux_to_native_sockaddr(&addr, linux_addr, addrlen);
+        int err = bind(s, (struct sockaddr*)&addr, sizeof(addr));
+        if (err == 0) {
+          // unlink(addr.sun_path); ?
+        }
 
-  int err = bind(s, (struct sockaddr*)&addr, sizeof(addr));
-  if (err == 0) {
-    unlink(addr.sun_path);
-  } else {
-    perror(__func__);
+        return err;
+      }
+
+    case PF_INET:
+      {
+        struct sockaddr_in addr;
+        linux_to_native_sockaddr(&addr, linux_addr, addrlen);
+        return bind(s, (struct sockaddr*)&addr, sizeof(addr));
+      }
+
+    default:
+      assert(0);
   }
-
-  return err;
 }
 
 int shim_connect_impl(int s, const struct linux_sockaddr* linux_name, socklen_t namelen) {
 
-  assert(linux_name->sa_family == 1);
-  //assert(str_starts_with(&linux_name->sa_data[0], "/var/run/nvidia"));
+  switch (linux_name->sa_family) {
 
-  return -1; // ?
+    case PF_UNIX:
+      {
+        struct sockaddr_un addr;
+        linux_to_native_sockaddr(&addr, linux_name, namelen);
+        LOG("%s: path = %s\n", __func__, addr.sun_path);
+        return connect(s, (struct sockaddr*)&addr, sizeof(addr));
+      }
 
-  /*struct sockaddr_un name;
-  linux_to_native_sockaddr(&name, linux_name, namelen);
+    case PF_INET:
+      {
+        struct sockaddr_in addr;
+        linux_to_native_sockaddr(&addr, linux_name, namelen);
+        return connect(s, (struct sockaddr*)&addr, sizeof(addr));
+      }
 
-  return connect(s, (struct sockaddr*)&name, sizeof(name));*/
-}
-
-int shim_getsockname_impl(int s, struct sockaddr* restrict name, socklen_t* restrict namelen) {
-  UNIMPLEMENTED();
-}
-
-void linux_to_native_msghdr(struct msghdr* dest, struct cmsghdr* cdest, int cdestlen, const struct linux_msghdr* src) {
-
-  dest->msg_name       = src->msg_name;
-  dest->msg_namelen    = src->msg_namelen;
-  dest->msg_iov        = src->msg_iov;
-  dest->msg_iovlen     = src->msg_iovlen;
-  dest->msg_controllen = src->msg_controllen;
-  dest->msg_flags      = src->msg_flags;
-
-  if (src->msg_controllen > 0) {
-
-    assert(cdest != NULL);
-    assert(cdestlen >= src->msg_controllen);
-
-    struct linux_cmsghdr* csrc = (struct linux_cmsghdr*)src->msg_control;
-
-    assert(csrc->cmsg_level == LINUX_SOL_SOCKET);
-    assert(csrc->cmsg_type  == LINUX_SCM_RIGHTS);
-
-    cdest->cmsg_len   = csrc->cmsg_len;
-    cdest->cmsg_level = SOL_SOCKET;
-    cdest->cmsg_type  = SCM_RIGHTS;
-
-    memcpy((char*)cdest + sizeof(struct cmsghdr), (char*)csrc + sizeof(struct linux_cmsghdr), src->msg_controllen - sizeof(struct linux_cmsghdr));
-
-    dest->msg_control = (struct cmsghdr*)cdest;
-  } else {
-    dest->msg_control = src->msg_control;
+    default:
+      assert(0);
   }
 }
 
-void native_to_linux_msghdr(struct linux_msghdr* dest, const struct msghdr* src) {
+static void linux_to_native_msghdr(struct msghdr* msg, const struct linux_msghdr* linux_msg) {
 
-  dest->msg_name       = src->msg_name;
-  dest->msg_namelen    = src->msg_namelen;
-  dest->msg_iov        = src->msg_iov;
-  dest->msg_iovlen     = src->msg_iovlen;
-  dest->msg_controllen = src->msg_controllen;
-  dest->msg_flags      = src->msg_flags;
+  msg->msg_name    = linux_msg->msg_name;
+  msg->msg_namelen = linux_msg->msg_namelen;
+  msg->msg_iov     = linux_msg->msg_iov;
+  msg->msg_iovlen  = linux_msg->msg_iovlen;
+  msg->msg_flags   = linux_to_native_msg_flags(linux_msg->msg_flags);
 
-  if (src->msg_controllen > 0) {
-    assert(0);
+  if (linux_msg->msg_controllen > 0) {
+
+    assert(msg->msg_controllen >= linux_msg->msg_controllen);
+    msg->msg_controllen = linux_msg->msg_controllen;
+
+    memset(msg->msg_control, 0, linux_msg->msg_controllen);
+
+    struct linux_cmsghdr* linux_cmsg = CMSG_FIRSTHDR(linux_msg);
+    while (linux_cmsg != NULL) {
+      struct cmsghdr* cmsg = (uint8_t*)msg->msg_control + ((uint64_t)linux_cmsg - (uint64_t)linux_msg->msg_control);
+
+      assert(linux_cmsg->cmsg_type == LINUX_SCM_RIGHTS);
+
+      cmsg->cmsg_len   = linux_cmsg->cmsg_len;
+      cmsg->cmsg_level = linux_to_native_sock_level(linux_cmsg->cmsg_level);
+      cmsg->cmsg_type  = SCM_RIGHTS;
+
+#ifdef __x86_64__
+      memcpy((uint8_t*)cmsg + 16, (uint8_t*)linux_cmsg + 16, linux_cmsg->cmsg_len - 16);
+#elif  __i386__
+      memcpy((uint8_t*)cmsg + 12, (uint8_t*)linux_cmsg + 12, linux_cmsg->cmsg_len - 12);
+#else
+  #error
+#endif
+
+      linux_cmsg = CMSG_NXTHDR(linux_msg, linux_cmsg);
+    }
   } else {
-    dest->msg_control = dest->msg_control;
+    msg->msg_control    = NULL;
+    msg->msg_controllen = 0;
   }
 }
 
-ssize_t shim_sendmsg_impl(int s, const struct linux_msghdr* linux_msg, int flags) {
-  struct msghdr msg;
-  char control[32];
-  linux_to_native_msghdr(&msg, (struct cmsghdr*)control, sizeof(control), linux_msg);
-  return sendmsg(s, &msg, flags);
+static void native_to_linux_msghdr(struct linux_msghdr* linux_msg, const struct msghdr* msg) {
+
+  linux_msg->msg_name    = msg->msg_name;
+  linux_msg->msg_namelen = msg->msg_namelen;
+  linux_msg->msg_iov     = msg->msg_iov;
+  linux_msg->msg_iovlen  = msg->msg_iovlen;
+  linux_msg->msg_flags   = native_to_linux_msg_flags(msg->msg_flags);
+
+  if (msg->msg_controllen > 0) {
+
+    assert(linux_msg->msg_controllen >= msg->msg_controllen);
+    linux_msg->msg_controllen = msg->msg_controllen;
+
+    memset(linux_msg->msg_control, 0, msg->msg_controllen);
+
+    struct cmsghdr* cmsg = CMSG_FIRSTHDR(msg);
+    while (cmsg != NULL) {
+      struct linux_cmsghdr* linux_cmsg = (uint8_t*)linux_msg->msg_control + ((uint64_t)cmsg - (uint64_t)msg->msg_control);
+
+      assert(cmsg->cmsg_type == SCM_RIGHTS);
+
+      linux_cmsg->cmsg_len   = cmsg->cmsg_len;
+      linux_cmsg->cmsg_level = native_to_linux_sock_level(cmsg->cmsg_level);
+      linux_cmsg->cmsg_type  = LINUX_SCM_RIGHTS;
+
+#ifdef __x86_64__
+      memcpy((uint8_t*)linux_cmsg + 16, (uint8_t*)cmsg + 16, cmsg->cmsg_len - 16);
+#elif  __i386__
+      memcpy((uint8_t*)linux_cmsg + 12, (uint8_t*)cmsg + 12, cmsg->cmsg_len - 12);
+#else
+  #error
+#endif
+
+      cmsg = CMSG_NXTHDR(msg, cmsg);
+    }
+
+  } else {
+    linux_msg->msg_control    = NULL;
+    linux_msg->msg_controllen = 0;
+  }
 }
 
-ssize_t shim_recvmsg_impl(int s, struct linux_msghdr* linux_msg, int flags) {
+ssize_t shim_sendmsg_impl(int s, const struct linux_msghdr* linux_msg, int linux_flags) {
+
   struct msghdr msg;
-  int err = recvmsg(s, &msg, flags);
+  uint8_t buf[linux_msg->msg_controllen];
+
+  msg.msg_control    = &buf;
+  msg.msg_controllen = sizeof(buf);
+
+  linux_to_native_msghdr(&msg, linux_msg);
+
+  return sendmsg(s, &msg, linux_to_native_msg_flags(linux_flags));
+}
+
+ssize_t shim_recvmsg_impl(int s, struct linux_msghdr* linux_msg, int linux_flags) {
+
+  struct msghdr msg;
+  uint8_t buf[linux_msg->msg_controllen];
+
+  msg.msg_name       = linux_msg->msg_name;
+  msg.msg_namelen    = linux_msg->msg_namelen;
+  msg.msg_iov        = linux_msg->msg_iov;
+  msg.msg_iovlen     = linux_msg->msg_iovlen;
+  msg.msg_control    = &buf;
+  msg.msg_controllen = sizeof(buf);
+  msg.msg_flags      = linux_to_native_msg_flags(linux_msg->msg_flags);
+
+  int err = recvmsg(s, &msg, linux_to_native_msg_flags(linux_flags));
   if (err != -1) {
     native_to_linux_msghdr(linux_msg, &msg);
   }
+
   return err;
 }
