@@ -67,7 +67,7 @@ struct linux_dirent* shim_readdir_impl(DIR* dirp) {
   e2->d_reclen = entry->d_reclen;
   e2->d_type   = entry->d_type;
 
-  strncpy(e2->d_name, entry->d_name, sizeof(e2->d_name));
+  strlcpy(e2->d_name, entry->d_name, sizeof(e2->d_name));
 
   return e2;
 }
