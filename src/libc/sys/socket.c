@@ -230,7 +230,7 @@ static void linux_to_native_sockaddr(struct sockaddr* dest, const struct linux_s
         struct sockaddr_in* d = (struct sockaddr_in*)dest;
         memset(d, 0, sizeof(struct sockaddr_in));
 
-        struct linux_sockaddr_in* s = src;
+        struct linux_sockaddr_in* s = (struct linux_sockaddr_in*)src;
 
         d->sin_len    = 0;
         d->sin_family = s->sin_family;
@@ -259,7 +259,7 @@ int shim_bind_impl(int s, const struct linux_sockaddr* linux_addr, socklen_t add
     case PF_UNIX:
       {
         struct sockaddr_un addr;
-        linux_to_native_sockaddr(&addr, linux_addr, addrlen);
+        linux_to_native_sockaddr((struct sockaddr*)&addr, linux_addr, addrlen);
 
         int err = bind(s, (struct sockaddr*)&addr, sizeof(addr));
         if (err == 0) {
@@ -272,7 +272,7 @@ int shim_bind_impl(int s, const struct linux_sockaddr* linux_addr, socklen_t add
     case PF_INET:
       {
         struct sockaddr_in addr;
-        linux_to_native_sockaddr(&addr, linux_addr, addrlen);
+        linux_to_native_sockaddr((struct sockaddr*)&addr, linux_addr, addrlen);
         return bind(s, (struct sockaddr*)&addr, sizeof(addr));
       }
 
@@ -288,7 +288,7 @@ int shim_connect_impl(int s, const struct linux_sockaddr* linux_name, socklen_t 
     case PF_UNIX:
       {
         struct sockaddr_un addr;
-        linux_to_native_sockaddr(&addr, linux_name, namelen);
+        linux_to_native_sockaddr((struct sockaddr*)&addr, linux_name, namelen);
         LOG("%s: path = %s\n", __func__, addr.sun_path);
         return connect(s, (struct sockaddr*)&addr, sizeof(addr));
       }
@@ -296,7 +296,7 @@ int shim_connect_impl(int s, const struct linux_sockaddr* linux_name, socklen_t 
     case PF_INET:
       {
         struct sockaddr_in addr;
-        linux_to_native_sockaddr(&addr, linux_name, namelen);
+        linux_to_native_sockaddr((struct sockaddr*)&addr, linux_name, namelen);
         return connect(s, (struct sockaddr*)&addr, sizeof(addr));
       }
 
@@ -320,9 +320,9 @@ static void linux_to_native_msghdr(struct msghdr* msg, const struct linux_msghdr
 
     memset(msg->msg_control, 0, linux_msg->msg_controllen);
 
-    struct linux_cmsghdr* linux_cmsg = CMSG_FIRSTHDR(linux_msg);
+    struct linux_cmsghdr* linux_cmsg = (struct linux_cmsghdr*)CMSG_FIRSTHDR(linux_msg);
     while (linux_cmsg != NULL) {
-      struct cmsghdr* cmsg = (uint8_t*)msg->msg_control + ((uint64_t)linux_cmsg - (uint64_t)linux_msg->msg_control);
+      struct cmsghdr* cmsg = (struct cmsghdr*)((uint8_t*)msg->msg_control + ((uint64_t)linux_cmsg - (uint64_t)linux_msg->msg_control));
 
       assert(linux_cmsg->cmsg_type == LINUX_SCM_RIGHTS);
 
@@ -338,7 +338,7 @@ static void linux_to_native_msghdr(struct msghdr* msg, const struct linux_msghdr
   #error
 #endif
 
-      linux_cmsg = CMSG_NXTHDR(linux_msg, linux_cmsg);
+      linux_cmsg = (struct linux_cmsghdr*)CMSG_NXTHDR(linux_msg, linux_cmsg);
     }
   } else {
     msg->msg_control    = NULL;
@@ -363,7 +363,7 @@ static void native_to_linux_msghdr(struct linux_msghdr* linux_msg, const struct 
 
     struct cmsghdr* cmsg = CMSG_FIRSTHDR(msg);
     while (cmsg != NULL) {
-      struct linux_cmsghdr* linux_cmsg = (uint8_t*)linux_msg->msg_control + ((uint64_t)cmsg - (uint64_t)msg->msg_control);
+      struct linux_cmsghdr* linux_cmsg = (struct linux_cmsghdr*)((uint8_t*)linux_msg->msg_control + ((uint64_t)cmsg - (uint64_t)msg->msg_control));
 
       assert(cmsg->cmsg_type == SCM_RIGHTS);
 
