@@ -63,9 +63,9 @@ skip = IO.read(installer).lines[0..17].find{|line| line =~ /^skip=\d+$/}.strip.s
 `mkdir #{lib32_dir}` if not File.exists?(lib32_dir)
 
 libs64 = [
-  'libGL.so.'            + driver_version,
-  'libnvidia-glcore.so.' + driver_version,
-  'libnvidia-tls.so.'    + driver_version
+  'libGL.so.'             + driver_version,
+  'libnvidia-glcore.so.'  + driver_version,
+  'tls/libnvidia-tls.so.' + driver_version
 ]
 
 if driver_version.split('.').first.to_i >= 396

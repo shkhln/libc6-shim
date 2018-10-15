@@ -27,8 +27,8 @@ end
 
 ENV['LD_LIBMAP']          = libmap
 ENV['LD_32_LIBMAP']       = libmap
-ENV['LD_LIBRARY_PATH']    = [__dir__ + '/build/lib64', __dir__ + '/nvidia/lib64', ENV['LD_LIBRARY_PATH']   ].compact.join(':')
-ENV['LD_32_LIBRARY_PATH'] = [__dir__ + '/build/lib32', __dir__ + '/nvidia/lib32', ENV['LD_32_LIBRARY_PATH']].compact.join(':')
+ENV['LD_LIBRARY_PATH']    = [__dir__ + '/build/lib64', __dir__ + '/nvidia/lib64/tls', __dir__ + '/nvidia/lib64', ENV['LD_LIBRARY_PATH']   ].compact.join(':')
+ENV['LD_32_LIBRARY_PATH'] = [__dir__ + '/build/lib32', __dir__ + '/nvidia/lib32/tls', __dir__ + '/nvidia/lib32', ENV['LD_32_LIBRARY_PATH']].compact.join(':')
 
 ENV['VK_ICD_FILENAMES']   = __dir__ + '/nv_vk_icd.json'
 
