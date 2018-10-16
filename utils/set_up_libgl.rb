@@ -7,7 +7,8 @@ SHA256 = {
   'NVIDIA-Linux-x86_64-396.45.run': '30c2e29a45794227079730eac7c452da5290ea8f336ed2286dafd488e3695f20',
   'NVIDIA-Linux-x86_64-396.51.run': '6add8c3782bdf276b4a5a5bcea102ceff8e90cf3fc2439dde9d5e60d557ac0d6',
   'NVIDIA-Linux-x86_64-396.54.run': '7c3e3c9ca6aea31ad2613ef9cb6a4510d95d61b698f084e55adcc0611ee9eec3',
-  'NVIDIA-Linux-x86_64-410.57.run': '5c3c2e1fef0615c0002946c586c815a77676f4683304cc17d5bf323e7626a320'
+  'NVIDIA-Linux-x86_64-410.57.run': '5c3c2e1fef0615c0002946c586c815a77676f4683304cc17d5bf323e7626a320',
+  'NVIDIA-Linux-x86_64-410.66.run': '8fb6ad857fa9a93307adf3f44f5decddd0bf8587a7ad66c6bfb33e07e4feb217'
 }
 
 fetch_dir = __dir__ + '/../nvidia'
@@ -111,6 +112,8 @@ with_file("#{lib64_dir}/libGL.so.#{driver_version}") do |lib|
       lib[708352] = RET
     when '410.57'
       lib[708720] = RET
+    when '410.66'
+      lib[708720] = RET
     else
       raise
   end
@@ -129,6 +132,8 @@ with_file("#{lib32_dir}/libGL.so.#{driver_version}") do |lib|
     when '396.54'
       lib[690576] = RET
     when '410.57'
+      lib[689904] = RET
+    when '410.66'
       lib[689904] = RET
     else
       raise
