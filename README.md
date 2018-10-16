@@ -1,6 +1,6 @@
 Requirements:
 
-FreeBSD 11.2; nvidia-driver 390.77, 396.45 or 396.51; ruby.
+FreeBSD 11.2; nvidia-driver 390.87 / 410.66; ruby.
 
 Usage:
 
