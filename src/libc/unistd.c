@@ -1,9 +1,13 @@
 #include <assert.h>
 #include <errno.h>
+#include <limits.h>
 #include <stdarg.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <sys/param.h>
+#include <sys/sysctl.h>
 #include "../shim.h"
 
 int shim_chown_impl(const char* path, uid_t owner, gid_t group) {
@@ -13,7 +17,49 @@ int shim_chown_impl(const char* path, uid_t owner, gid_t group) {
 
 ssize_t shim_readlink_impl(const char* path, char* buf, size_t bufsize) {
 
-  if (str_starts_with(path, "/proc/") || str_starts_with(path, "/sys/")) {
+  if (str_starts_with(path, "/proc/")) {
+
+    char* p = strdup(&path[sizeof("/proc/") - 1]);
+    assert(p != NULL);
+
+    char* s = p;
+    char* node  = strsep(&s, "/");
+    char* entry = strsep(&s, "/");
+
+    if (strcmp(entry, "exe") == 0) {
+
+      int pid;
+      if (strcmp(node, "self") == 0) {
+        pid = -1;
+      } else {
+        pid = strtoul(node, NULL, 10);
+        assert(pid > 0);
+      }
+
+      int name[] = {
+        CTL_KERN,
+        KERN_PROC,
+        KERN_PROC_PATHNAME,
+        pid
+      };
+
+      int err = sysctl(name, nitems(name), buf, &bufsize, NULL, 0);
+      assert(err == 0);
+
+      free(p);
+
+      return bufsize;
+
+    } else {
+
+      free(p);
+
+      errno = EACCES;
+      return -1;
+    }
+  }
+
+  if (str_starts_with(path, "/sys/")) {
     errno = EACCES;
     return -1;
   }
