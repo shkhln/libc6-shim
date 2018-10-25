@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <string.h>
 #include <sys/param.h>
 #include <sys/mount.h>
 
