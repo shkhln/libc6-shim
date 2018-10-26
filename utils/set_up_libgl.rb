@@ -80,64 +80,88 @@ run("tail -n +#{skip} #{installer} | xz -d | tar -C #{lib32_dir} -xf - --strip-c
 
 puts 'Applying patches...'
 
-def bin(str)
-  str.force_encoding('BINARY')
-end
-
-RET = bin("\xC3")
-
-def with_file(path)
-  file = IO.binread(path)
-  yield file
-  IO.binwrite(path, file)
-end
-
 # Apparently, libGL.so expects the .init section to be called with argc and argv arguments,
 # FreeBSD's dynamic linker doesn't quite agree with that.
 # https://sourceware.org/git/?p=glibc.git;a=blob;f=elf/dl-init.c;h=3e72fa3013a6aaeda05fe61a0ae7af5d46640826;hb=HEAD#l58
 # https://github.com/freebsd/freebsd/blob/b0b07656b594066e09c0526aef09dc1e9703e27d/libexec/rtld-elf/rtld.c#L2655
 # https://github.com/freebsd/freebsd/blob/35326d3159b53afb3e64a9926a953b32e27852c9/libexec/rtld-elf/amd64/rtld_machdep.h#L50
 
-with_file("#{lib64_dir}/libGL.so.#{driver_version}") do |lib|
-  case driver_version
-    when '390.77'
-      lib[708608] = RET
-    when '390.87'
-      lib[708608] = RET
-    when '396.45'
-      lib[708240] = RET
-    when '396.51'
-      lib[708352] = RET
-    when '396.54'
-      lib[708352] = RET
-    when '410.57'
-      lib[708720] = RET
-    when '410.66'
-      lib[708720] = RET
-    else
-      raise
+DT_INIT = 12
+DT_FINI = 13
+
+def patch_init(path)
+
+  def to_number(slice)
+    case slice.length
+      when 8 then slice.unpack('Q<')[0]
+      when 4 then slice.unpack('L<')[0]
+      else
+        raise
+    end
   end
+
+  def to_slice(number, wordsize)
+    case wordsize
+      when 8 then [number].pack('Q<')
+      when 4 then [number].pack('L<')
+      else
+        raise
+    end
+  end
+
+  def read_dynamic_section(obj, section_offset, wordsize)
+
+    entries = []
+
+    i = 0
+    while true
+      pos = section_offset + wordsize * 2 * i
+      tag = to_number(obj[ pos            ...(pos + wordsize    )]);
+      val = to_number(obj[(pos + wordsize)...(pos + wordsize * 2)]);
+
+      entries << {offset: pos, tag: tag, val: val}
+
+      break if tag == 0
+
+      i += 1
+    end
+
+    entries
+  end
+
+  def wwrite(obj, offset, number, wordsize)
+    pos = offset
+    for char in to_slice(number, wordsize).chars
+      obj[pos] = char
+      pos += 1
+    end
+  end
+
+  headers = `readelf --headers --wide "#{path}"`
+
+  headers =~ /Class:\s+(ELF32|ELF64)/
+  wordsize = $1 == 'ELF64' ? 8 : 4
+
+  headers =~ /.dynamic\s+DYNAMIC\s+\w+\s(\w+)/
+  section_offset = $1.to_i(16)
+
+  obj = IO.binread(path)
+
+  dynamic = read_dynamic_section(obj, section_offset, wordsize)
+
+  init = dynamic.find{|e| e[:tag] == DT_INIT}
+  fini = dynamic.find{|e| e[:tag] == DT_FINI}
+
+  if init[:offset] < fini[:offset]
+    wwrite(obj, init[:offset], DT_FINI, wordsize)
+  else
+    raise
+  end
+
+  IO.binwrite(path, obj)
 end
 
-with_file("#{lib32_dir}/libGL.so.#{driver_version}") do |lib|
-  case driver_version
-    when '390.77'
-      lib[689440] = RET
-    when '390.87'
-      lib[689440] = RET
-    when '396.45'
-      lib[690576] = RET
-    when '396.51'
-      lib[690576] = RET
-    when '396.54'
-      lib[690576] = RET
-    when '410.57'
-      lib[689904] = RET
-    when '410.66'
-      lib[689904] = RET
-    else
-      raise
-  end
-end
+patch_init("#{lib64_dir}/libGL.so.#{driver_version}")
+patch_init("#{lib32_dir}/libGL.so.#{driver_version}")
 
 puts 'Done'

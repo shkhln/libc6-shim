@@ -1,8 +1,11 @@
 #include <assert.h>
+#include <dlfcn.h>
 #include <limits.h>
+#include <link.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/elf.h>
 
 #include "shim.h"
 
@@ -46,10 +49,11 @@ __asm__(".symver shim_progname,__progname@GLIBC_2.0");
 __asm__(".symver shim_progname,__progname@GLIBC_2.2.5");
 char* shim_progname = "<progname>";
 
-int    shim_argc = 0;
-char** shim_argv = NULL;
+static int    shim_argc = 0;
+static char** shim_argv = NULL;
 
-__attribute__((constructor))
+
+__attribute__((constructor(1)))
 void shim_init(int argc, char** argv, char** env) {
 
   fprintf(stderr, "shim init\n");
@@ -68,6 +72,45 @@ void shim_init(int argc, char** argv, char** env) {
 
   shim_argc = argc;
   shim_argv = argv;
+}
+
+__attribute__((constructor(2)))
+void shim_libgl_init(int argc, char** argv, char** env) {
+
+  void* libgl = dlopen("libGL.so.1", RTLD_LAZY);
+  assert(libgl != NULL);
+
+  Link_map* map;
+
+  int err = dlinfo(libgl, RTLD_DI_LINKMAP, &map);
+  assert(err == 0);
+
+  while (map != NULL) {
+
+    int dt_fini_count = 0;
+    for (const Elf_Dyn* dyn = map->l_ld; dyn->d_tag != DT_NULL; dyn++) {
+      if (dyn->d_tag == DT_FINI) {
+        dt_fini_count++;
+      }
+    }
+
+    if (dt_fini_count == 2) {
+
+      for (const Elf_Dyn* dyn = map->l_ld; dyn->d_tag != DT_NULL; dyn++) {
+        if (dyn->d_tag == DT_FINI) {
+
+          LOG("%s: calling init function for %s\n", __func__, map->l_name);
+
+          void (*init)(int, char**, char**) = (void*)(map->l_addr + dyn->d_un.d_ptr);
+          init(argc, argv, env);
+
+          break;
+        }
+      }
+    }
+
+    map = map->l_next;
+  }
 }
 
 __asm__(".symver shim_libc_start_main,__libc_start_main@GLIBC_2.0");
