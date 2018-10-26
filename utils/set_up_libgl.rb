@@ -8,7 +8,8 @@ SHA256 = {
   'NVIDIA-Linux-x86_64-396.51.run': '6add8c3782bdf276b4a5a5bcea102ceff8e90cf3fc2439dde9d5e60d557ac0d6',
   'NVIDIA-Linux-x86_64-396.54.run': '7c3e3c9ca6aea31ad2613ef9cb6a4510d95d61b698f084e55adcc0611ee9eec3',
   'NVIDIA-Linux-x86_64-410.57.run': '5c3c2e1fef0615c0002946c586c815a77676f4683304cc17d5bf323e7626a320',
-  'NVIDIA-Linux-x86_64-410.66.run': '8fb6ad857fa9a93307adf3f44f5decddd0bf8587a7ad66c6bfb33e07e4feb217'
+  'NVIDIA-Linux-x86_64-410.66.run': '8fb6ad857fa9a93307adf3f44f5decddd0bf8587a7ad66c6bfb33e07e4feb217',
+  'NVIDIA-Linux-x86_64-410.73.run': 'bebc9cf781201beb5ec1a1dde7672db68609b8af0aa5ff32daa3ebb533c2ff1e'
 }
 
 fetch_dir = __dir__ + '/../nvidia'
