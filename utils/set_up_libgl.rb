@@ -9,7 +9,8 @@ SHA256 = {
   'NVIDIA-Linux-x86_64-396.54.run': '7c3e3c9ca6aea31ad2613ef9cb6a4510d95d61b698f084e55adcc0611ee9eec3',
   'NVIDIA-Linux-x86_64-410.57.run': '5c3c2e1fef0615c0002946c586c815a77676f4683304cc17d5bf323e7626a320',
   'NVIDIA-Linux-x86_64-410.66.run': '8fb6ad857fa9a93307adf3f44f5decddd0bf8587a7ad66c6bfb33e07e4feb217',
-  'NVIDIA-Linux-x86_64-410.73.run': 'bebc9cf781201beb5ec1a1dde7672db68609b8af0aa5ff32daa3ebb533c2ff1e'
+  'NVIDIA-Linux-x86_64-410.73.run': 'bebc9cf781201beb5ec1a1dde7672db68609b8af0aa5ff32daa3ebb533c2ff1e',
+  'NVIDIA-Linux-x86_64-415.13.run': '2ad26d77b848e12a72b6fece320cb867a07a36096bd2e21f4a0c8fa40a51645a'
 }
 
 fetch_dir = __dir__ + '/../nvidia'
@@ -67,11 +68,16 @@ skip = IO.read(installer).lines[0..17].find{|line| line =~ /^skip=\d+$/}.strip.s
 libs64 = [
   'libGL.so.'             + driver_version,
   'libnvidia-glcore.so.'  + driver_version,
-  'tls/libnvidia-tls.so.' + driver_version
 ]
 
 if driver_version.split('.').first.to_i >= 396
   libs64 << 'libnvidia-glvkspirv.so.' + driver_version
+end
+
+if driver_version.split('.').first.to_i >= 415
+  libs64 << 'libnvidia-tls.so.' + driver_version
+else
+  libs64 << 'tls/libnvidia-tls.so.' + driver_version
 end
 
 libs32 = libs64.map{|lib| '32/' + lib}

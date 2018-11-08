@@ -3,6 +3,12 @@
 #include <signal.h>
 #include "../shim.h"
 
+__asm__(".symver shim_signal,signal@GLIBC_2.0");
+__asm__(".symver shim_signal,signal@GLIBC_2.2.5");
+sig_t shim_signal(int sig, sig_t func) {
+  return 0;
+}
+
 int shim___libc_current_sigrtmin_impl() {
   UNIMPLEMENTED();
 }
