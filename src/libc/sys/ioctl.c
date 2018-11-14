@@ -10,9 +10,6 @@
 
 #define NV_ERR_NOT_SUPPORTED 0x56
 
-#define NV_ESC_SYS_PARAMS 214
-#define NV_ESC_NUMA_INFO  215
-
 struct NvUvmInitParams
 {
   uint64_t flags __attribute__((aligned(8)));
@@ -31,22 +28,5 @@ int shim_ioctl_impl(int fd, unsigned long request, va_list args) {
     return 0;
   }
 
-  switch (request & 0xff) {
-
-    case NV_ESC_SYS_PARAMS:
-      return 0;
-
-    case NV_ESC_NUMA_INFO:
-      return 0;
-
-    default: {
-
-      int err = ioctl(fd, request, va_arg(args, void*));
-      if (err == -1) {
-        perror(__func__);
-      }
-
-      return err;
-    }
-  }
+  return ioctl(fd, request, va_arg(args, void*));
 }

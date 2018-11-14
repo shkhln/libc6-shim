@@ -59,38 +59,6 @@ struct linux_stat {
 
 #endif
 
-enum DEV_FILE_TYPE {
-  DEV_NV,
-  DEV_NV_CTL,
-  DEV_NV_MODESET,
-  DEV_OTHER
-};
-
-enum DEV_FILE_TYPE path_to_dev_type(const char* path) {
-
-  if (strcmp(path, "/dev/nvidia0") == 0) {
-    return DEV_NV;
-  }
-
-  if (strcmp(path, "/dev/nvidiactl") == 0) {
-    return DEV_NV_CTL;
-  }
-
-  if (strcmp(path, "/dev/nvidia-modeset") == 0) {
-    return DEV_NV_MODESET;
-  }
-
-  return DEV_OTHER;
-}
-
-uint64_t linux_makedev(uint32_t major, uint32_t minor) {
-  return
-    (((uint64_t)(major & 0x00000fffu)) <<  8) |
-    (((uint64_t)(major & 0xfffff000u)) << 32) |
-    (((uint64_t)(minor & 0x000000ffu)) <<  0) |
-    (((uint64_t)(minor & 0xffffff00u)) << 12);
-}
-
 void copy_stat_buf(struct linux_stat* dst, struct stat* src) {
 
   memset(dst, 0, sizeof(struct linux_stat));
@@ -119,25 +87,7 @@ int shim___xstat_impl(int ver, const char* path, struct linux_stat* stat_buf) {
 
   int err = stat(path, &sb);
   if (err == 0) {
-
     copy_stat_buf(stat_buf, &sb);
-
-    switch (path_to_dev_type(path)) {
-
-      case DEV_NV:
-        stat_buf->st_rdev = linux_makedev(195, 0);
-        break;
-
-      case DEV_NV_CTL:
-        stat_buf->st_rdev = linux_makedev(195, 255);
-        break;
-
-      case DEV_NV_MODESET:
-        stat_buf->st_rdev = linux_makedev(195, 254);
-        break;
-
-      default: ; // do nothing
-    }
   }
 
   return err;
