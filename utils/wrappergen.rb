@@ -25,7 +25,10 @@ IMPL_BLACKLIST = [
   'casinhl',
   'casinl',
   'catanhl',
-  'catanl'
+  'catanl',
+
+  'freelocale',
+  'setgrent',
 ]
 
 SUBSTITUTIONS = {
