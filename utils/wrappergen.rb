@@ -29,6 +29,10 @@ IMPL_BLACKLIST = [
 
   'freelocale',
   'setgrent',
+
+  'setjmp',
+  '_setjmp',
+  '__sigsetjmp'
 ]
 
 SUBSTITUTIONS = {
@@ -37,7 +41,6 @@ SUBSTITUTIONS = {
   __fxstat64:      '__fxstat', # ?
   __getdelim:      'getdelim',
   __isoc99_sscanf: 'sscanf',
-  __sigsetjmp:     'sigsetjmp',
   __strdup:        'strdup',
   __strndup:       'strndup',
   _exit:           'exit',
