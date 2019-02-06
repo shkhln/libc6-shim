@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <sys/mman.h>
 #include "../../shim.h"
@@ -20,7 +21,15 @@
  LINUX_MAP_NORESERVE             \
 )
 
-void* shim_mmap_impl(void *addr, size_t len, int prot, int linux_flags, int fd, off_t offset) {
+#ifdef __i386__
+typedef uint32_t linux_off_t;
+#endif
+
+#ifdef __x86_64__
+typedef uint64_t linux_off_t;
+#endif
+
+void* shim_mmap_impl(void *addr, size_t len, int prot, int linux_flags, int fd, linux_off_t offset) {
 
   assert((linux_flags & KNOWN_LINUX_MMAP_FLAGS) == linux_flags);
 
