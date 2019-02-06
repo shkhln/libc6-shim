@@ -11,8 +11,15 @@
 #define LINUX_F_GETFL 3
 #define LINUX_F_SETFL 4
 
-#define LINUX_O_RDWR     0x002
-#define LINUX_O_NONBLOCK 0x800
+#define LINUX_O_RDONLY   0x00000
+#define LINUX_O_WRONLY   0x00001
+#define LINUX_O_RDWR     0x00002
+#define LINUX_O_CREAT    0x00040
+#define LINUX_O_TRUNC    0x00200
+#define LINUX_O_NONBLOCK 0x00800
+#define LINUX_O_CLOEXEC  0x80000
+
+#define KNOWN_LINUX_OPEN_FLAGS (LINUX_O_RDONLY | LINUX_O_WRONLY | LINUX_O_RDWR | LINUX_O_CREAT | LINUX_O_TRUNC | LINUX_O_NONBLOCK | LINUX_O_CLOEXEC)
 
 int shim_fcntl_impl(int fd, int cmd, va_list args) {
 
@@ -54,12 +61,23 @@ int shim_fcntl_impl(int fd, int cmd, va_list args) {
   UNIMPLEMENTED_ARGS("%d, %d, ...", fd, cmd);
 }
 
-int shim_open_impl(const char* path, int flags, va_list args) {
+int shim_open_impl(const char* path, int linux_flags, va_list args) {
 
   if (str_starts_with(path, "/proc/") || str_starts_with(path, "/sys/")) {
     errno = EACCES;
     return -1;
   }
+
+  assert((linux_flags & KNOWN_LINUX_OPEN_FLAGS) == linux_flags);
+
+  int flags = 0;
+
+  if (linux_flags & LINUX_O_WRONLY)   flags |= O_WRONLY;
+  if (linux_flags & LINUX_O_RDWR)     flags |= O_RDWR;
+  if (linux_flags & LINUX_O_CREAT)    flags |= O_CREAT;
+  if (linux_flags & LINUX_O_TRUNC)    flags |= O_TRUNC;
+  if (linux_flags & LINUX_O_NONBLOCK) flags |= O_NONBLOCK;
+  if (linux_flags & LINUX_O_CLOEXEC)  flags |= O_CLOEXEC;
 
   mode_t mode = 0;
 
