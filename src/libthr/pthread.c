@@ -20,12 +20,14 @@ int shim_register_atfork(void (*prepare)(void), void (*parent)(void), void (*chi
   return err;
 }
 
-/*int shim_pthread_mutexattr_setpshared(pthread_mutexattr_t *attr, int pshared) {
+__asm__(".symver shim_pthread_mutexattr_setpshared,pthread_mutexattr_setpshared@GLIBC_2.0");
+__asm__(".symver shim_pthread_mutexattr_setpshared,pthread_mutexattr_setpshared@GLIBC_2.2.5");
+int shim_pthread_mutexattr_setpshared(pthread_mutexattr_t *attr, int pshared) {
   LOG_ARGS("%p, %d",  attr, pshared);
   int err = pthread_mutexattr_setpshared(attr, pshared);
   LOG_RES("%d", err);
   return err;
-}*/
+}
 
 #include <signal.h>
 

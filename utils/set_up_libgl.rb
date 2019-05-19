@@ -91,6 +91,13 @@ end
 
 libs32 = libs64.map{|lib| '32/' + lib}
 
+if driver_version.split('.').first.to_i >= 410
+  libs64 << 'libnvidia-cbl.so.'             + driver_version
+  libs64 << 'libnvidia-fatbinaryloader.so.' + driver_version
+  libs64 << 'libnvidia-ptxjitcompiler.so.'  + driver_version
+  libs64 << 'libnvidia-rtcore.so.'          + driver_version
+end
+
 run("tail -n +#{skip} #{installer} | xz -d | tar -C #{lib64_dir} -xf -                      #{libs64.join(' ')}")
 run("tail -n +#{skip} #{installer} | xz -d | tar -C #{lib32_dir} -xf - --strip-components 2 #{libs32.join(' ')}")
 

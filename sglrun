@@ -11,13 +11,19 @@ raise if not driver_version
 libmap = <<~E
   libGL.so   libGL.so.#{driver_version}
   libGL.so.1 libGL.so.#{driver_version}
+
+  libnvidia-ptxjitcompiler.so.1 libnvidia-ptxjitcompiler.so.#{driver_version}
 E
 
 for lib in [
-  'libGL.so.'               + driver_version,
-  'libnvidia-glcore.so.'    + driver_version,
-  'libnvidia-glvkspirv.so.' + driver_version,
-  'libnvidia-tls.so.'       + driver_version
+  'libGL.so.'                     + driver_version,
+  'libnvidia-glcore.so.'          + driver_version,
+  'libnvidia-glvkspirv.so.'       + driver_version,
+  'libnvidia-tls.so.'             + driver_version,
+  'libnvidia-cbl.so.'             + driver_version,
+  'libnvidia-fatbinaryloader.so.' + driver_version,
+  'libnvidia-ptxjitcompiler.so.'  + driver_version,
+  'libnvidia-rtcore.so.'          + driver_version
 ]
   libmap += "\n[#{lib}]\n"
   for mapped_lib in ['libc.so.6', 'libm.so.6', 'libdl.so.2', 'librt.so.1', 'libpthread.so.0']

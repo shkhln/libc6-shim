@@ -41,3 +41,14 @@ int shim_remove_impl(const char* path) {
   assert(!str_starts_with(path, "/dev/"));
   return remove(path);
 }
+
+__asm__(".symver shim___isoc99_fscanf,__isoc99_fscanf@GLIBC_2.7");
+int shim___isoc99_fscanf(FILE* restrict stream, const char* restrict format, ...) {
+  LOG("%s(%p, \"%.100s\", ...)\n", __func__, stream, format);
+  va_list args;
+  va_start(args, format);
+  int nitems = vfscanf(stream, format, args);
+  va_end(args);
+  LOG("%s -> %d\n", __func__, nitems);
+  return nitems;
+}
