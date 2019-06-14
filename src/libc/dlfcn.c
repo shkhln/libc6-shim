@@ -6,6 +6,43 @@
 #include <pthread.h>
 #include "../shim.h"
 
+#define LINUX_RTLD_LOCAL    RTLD_LOCAL
+#define LINUX_RTLD_LAZY     RTLD_LAZY
+#define LINUX_RTLD_NOW      RTLD_NOW
+#define LINUX_RTLD_NOLOAD   0x4
+#define LINUX_RTLD_GLOBAL   RTLD_GLOBAL
+#define LINUX_RTLD_NODELETE RTLD_NODELETE
+
+#define KNOWN_LINUX_DLOPEN_MODE_FLAGS ( \
+ LINUX_RTLD_LOCAL    |                  \
+ LINUX_RTLD_LAZY     |                  \
+ LINUX_RTLD_NOW      |                  \
+ LINUX_RTLD_NOLOAD   |                  \
+ LINUX_RTLD_GLOBAL   |                  \
+ LINUX_RTLD_NODELETE                    \
+)
+
+void* shim_dlopen_impl(const char* path, int linux_mode) {
+
+  assert((linux_mode & KNOWN_LINUX_DLOPEN_MODE_FLAGS) == linux_mode);
+
+  int mode = linux_mode & ~LINUX_RTLD_NOLOAD;
+
+  if (linux_mode & LINUX_RTLD_NOLOAD) {
+    mode |= RTLD_NOLOAD;
+  }
+
+  void* p = dlopen(path, mode);
+
+#ifdef DEBUG
+  if (p == NULL) {
+    fprintf(stderr, "%s: %s\n", __func__, dlerror());
+  }
+#endif
+
+  return p;
+}
+
 __asm__(".symver shim_dladdr1,dladdr1@GLIBC_2.3.3");
 int shim_dladdr1(void* address, Dl_info* info, void** extra_info, int flags) {
   LOG_ARGS("%p, %p, %p, %d", address, info, extra_info, flags);
