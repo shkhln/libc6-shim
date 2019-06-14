@@ -1,5 +1,5 @@
 
-CFLAGS    = -std=c99 -shared -fPIC -lm -pthread -lrt -Wl,--version-script=src/shim.map -I/usr/include -I/usr/local/include
+CFLAGS    = -std=c99 -shared -fPIC -lm -pthread -Wl,--version-script=src/shim.map -I/usr/include -I/usr/local/include
 SOURCES   = ${:!find src -name \*.c!}
 BUILD_DIR = build
 

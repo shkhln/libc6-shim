@@ -188,4 +188,12 @@ end
 patch_init("#{lib64_dir}/libGL.so.#{driver_version}")
 patch_init("#{lib32_dir}/libGL.so.#{driver_version}")
 
+for path in [
+  "#{lib64_dir}/libnvidia-cbl.so.#{driver_version}",
+  "#{lib64_dir}/libnvidia-glvkspirv.so.#{driver_version}",
+]
+  IO.binwrite(path, IO.binread(path)
+    .gsub(Regexp.new("librt.so.1\0".force_encoding('BINARY'), Regexp::FIXEDENCODING), "librt.so.x\0"))
+end
+
 puts 'Done'

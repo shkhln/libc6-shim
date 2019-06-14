@@ -18,7 +18,7 @@ libmap = <<~E
   libdl.so.2      #{SHIM_LIB}
   libm.so.6       #{SHIM_LIB}
   libpthread.so.0 #{SHIM_LIB}
-  librt.so.1      #{SHIM_LIB}
+  librt.so.x      #{SHIM_LIB}
 E
 
 ENV['LD_LIBMAP']          = libmap
