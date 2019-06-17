@@ -2,6 +2,7 @@
 #include <dlfcn.h>
 #include <limits.h>
 #include <link.h>
+#include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -52,9 +53,8 @@ char* shim_progname = "<progname>";
 static int    shim_argc = 0;
 static char** shim_argv = NULL;
 
-
-__attribute__((constructor(1)))
-void shim_init(int argc, char** argv, char** env) {
+__attribute__((constructor(101)))
+static void shim_init(int argc, char** argv, char** env) {
 
   fprintf(stderr, "shim init\n");
 
@@ -74,13 +74,13 @@ void shim_init(int argc, char** argv, char** env) {
   shim_argv = argv;
 }
 
-__attribute__((constructor(2)))
-void shim_libgl_init(int argc, char** argv, char** env) {
+__attribute__((constructor(102)))
+static void shim_libgl_init(int argc, char** argv, char** env) {
 
   void* libgl = dlopen("libGL.so.1", RTLD_LAZY);
   assert(libgl != NULL);
 
-  Link_map* map;
+  Link_map* map = NULL;
 
   int err = dlinfo(libgl, RTLD_DI_LINKMAP, &map);
   assert(err == 0);
@@ -162,3 +162,7 @@ void shim___stack_chk_fail_impl() {
 int shim_dl_iterate_phdr_impl(int (*callback)(struct dl_phdr_info*, size_t, void*), void* data) {
   UNIMPLEMENTED();
 }*/
+
+int shim___register_atfork_impl(void (*prepare)(void), void (*parent)(void), void (*child)(void), void* dso_handle) {
+  return pthread_atfork(prepare, parent, child);
+}

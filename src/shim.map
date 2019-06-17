@@ -1,4 +1,4 @@
-GLIBC_2.0   { local: shim_*; };
+GLIBC_2.0   { global: shim_*; local: *; };
 GLIBC_2.1   {} GLIBC_2.0;
 GLIBC_2.1.1 {} GLIBC_2.0;
 GLIBC_2.1.2 {} GLIBC_2.0;
