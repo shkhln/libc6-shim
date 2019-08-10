@@ -77,7 +77,8 @@ skip = IO.read(installer).lines[0..17].find{|line| line =~ /^skip=\d+$/}.strip.s
 `mkdir #{lib32_dir}` if not File.exists?(lib32_dir)
 
 libs64 = [
-  'libGL.so.'             + driver_version,
+  'libGL.so.'             + driver_version, # legacy
+  'libGLX_nvidia.so.'     + driver_version, # glvnd
   'libnvidia-glcore.so.'  + driver_version,
 ]
 
@@ -186,8 +187,13 @@ def patch_init(path)
   IO.binwrite(path, obj)
 end
 
+# legacy
 patch_init("#{lib64_dir}/libGL.so.#{driver_version}")
 patch_init("#{lib32_dir}/libGL.so.#{driver_version}")
+
+# glvnd
+patch_init("#{lib64_dir}/libGLX_nvidia.so.#{driver_version}")
+patch_init("#{lib32_dir}/libGLX_nvidia.so.#{driver_version}")
 
 for path in [
   "#{lib64_dir}/libnvidia-cbl.so.#{driver_version}",

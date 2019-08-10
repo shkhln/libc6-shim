@@ -8,9 +8,20 @@ driver_version = $1
 
 raise if not driver_version
 
-libmap = <<~E
-  libGL.so   libGL.so.#{driver_version}
-  libGL.so.1 libGL.so.#{driver_version}
+libmap = if ENV['SHIM_MODE'] == 'glvnd'
+  <<~E
+    libGLX_nvidia.so.0 libGLX_nvidia.so.#{driver_version}
+    nvidia_vulkan.so   libGLX_nvidia.so.#{driver_version}
+  E
+else
+  <<~E
+    libGL.so           libGL.so.#{driver_version}
+    libGL.so.1         libGL.so.#{driver_version}
+    nvidia_vulkan.so   libGL.so.#{driver_version}
+  E
+end
+
+libmap += <<~E
 
   libnvidia-ptxjitcompiler.so.1 libnvidia-ptxjitcompiler.so.#{driver_version}
 

@@ -77,7 +77,15 @@ static void shim_init(int argc, char** argv, char** env) {
 __attribute__((constructor(102)))
 static void shim_libgl_init(int argc, char** argv, char** env) {
 
-  void* libgl = dlopen("libGL.so.1", RTLD_LAZY);
+  void* libgl = NULL;
+
+  char* mode = getenv("SHIM_MODE");
+  if (mode && strcmp(mode, "glvnd") == 0) {
+    libgl = dlopen("libGLX_nvidia.so.0", RTLD_LAZY);
+  } else {
+    libgl = dlopen("libGL.so.1", RTLD_LAZY);
+  }
+
   assert(libgl != NULL);
 
   Link_map* map = NULL;
