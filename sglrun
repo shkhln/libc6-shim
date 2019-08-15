@@ -1,36 +1,33 @@
 #!/usr/bin/env ruby
 # encoding: UTF-8
 
-SHIM_LIB = ENV['SHIM_DEBUG'] ? 'nvshim.debug.so' : 'nvshim.so'
-
 `sysctl hw.nvidia.version` =~ /^hw.nvidia.version: NVIDIA UNIX x86_64 Kernel Module  ([\d\.+]+)/
 driver_version = $1
 
 raise if not driver_version
 
-libmap = if ENV['SHIM_MODE'] == 'glvnd'
-  <<~E
-    libGLX_nvidia.so.0 libGLX_nvidia.so.#{driver_version}
-    nvidia_vulkan.so   libGLX_nvidia.so.#{driver_version}
-  E
+libgl_nvidia = if ENV['SHIM_GLVND'] || driver_version.split('.').first.to_i >= 435
+  "libGLX_nvidia.so.#{driver_version}"
 else
-  <<~E
-    libGL.so           libGL.so.#{driver_version}
-    libGL.so.1         libGL.so.#{driver_version}
-    nvidia_vulkan.so   libGL.so.#{driver_version}
-  E
+  "libGL.so.#{driver_version}"
 end
 
-libmap += <<~E
+shim_lib = ENV['SHIM_DEBUG'] ? 'nvshim.debug.so' : 'nvshim.so'
 
-  libnvidia-ptxjitcompiler.so.1 libnvidia-ptxjitcompiler.so.#{driver_version}
-
-  libc.so.6       #{SHIM_LIB}
-  libdl.so.2      #{SHIM_LIB}
-  libm.so.6       #{SHIM_LIB}
-  libpthread.so.0 #{SHIM_LIB}
-  librt.so.x      #{SHIM_LIB}
-E
+libmap = [
+   "libgl_nvidia #{libgl_nvidia}",
+  ("libGL.so     #{libgl_nvidia}" if not ENV['SHIM_GLVND']),
+  ("libGL.so.1   #{libgl_nvidia}" if not ENV['SHIM_GLVND']),
+  '',
+  "libGLX_nvidia.so.0            libGLX_nvidia.so.#{driver_version}",
+  "libnvidia-ptxjitcompiler.so.1 libnvidia-ptxjitcompiler.so.#{driver_version}",
+  '',
+  "libc.so.6       #{shim_lib}",
+  "libdl.so.2      #{shim_lib}",
+  "libm.so.6       #{shim_lib}",
+  "libpthread.so.0 #{shim_lib}",
+  "librt.so.x      #{shim_lib}"
+].compact.join("\n")
 
 ENV['LD_LIBMAP']          = libmap
 ENV['LD_32_LIBMAP']       = libmap

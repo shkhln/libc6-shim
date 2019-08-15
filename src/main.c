@@ -77,15 +77,7 @@ static void shim_init(int argc, char** argv, char** env) {
 __attribute__((constructor(102)))
 static void shim_libgl_init(int argc, char** argv, char** env) {
 
-  void* libgl = NULL;
-
-  char* mode = getenv("SHIM_MODE");
-  if (mode && strcmp(mode, "glvnd") == 0) {
-    libgl = dlopen("libGLX_nvidia.so.0", RTLD_LAZY);
-  } else {
-    libgl = dlopen("libGL.so.1", RTLD_LAZY);
-  }
-
+  void* libgl = dlopen("libgl_nvidia", RTLD_LAZY);
   assert(libgl != NULL);
 
   Link_map* map = NULL;
@@ -164,12 +156,6 @@ int shim___cxa_atexit_impl(void (*cb)(void*), void* arg, void* dso_handle) {
 void shim___stack_chk_fail_impl() {
   assert(0);
 }
-
-/*#include <link.h>
-
-int shim_dl_iterate_phdr_impl(int (*callback)(struct dl_phdr_info*, size_t, void*), void* data) {
-  UNIMPLEMENTED();
-}*/
 
 int shim___register_atfork_impl(void (*prepare)(void), void (*parent)(void), void (*child)(void), void* dso_handle) {
   return pthread_atfork(prepare, parent, child);

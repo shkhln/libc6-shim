@@ -21,7 +21,8 @@ SHA256 = {
   'NVIDIA-Linux-x86_64-430.09.run': '2565e5f0b0da5f16f1675f67bb05e2fa397d581d8ed9acb23248282f2954a94c',
   'NVIDIA-Linux-x86_64-430.14.run': '00d46ffaf3e1e430081ddbd68b74cc361cd1328e8944224dfe69630dd8540f17',
   'NVIDIA-Linux-x86_64-430.26.run': '66ab94a94436732e6e9e8a95a0f5418759a4c2abd2ede65a9472a8de08edcee6',
-  'NVIDIA-Linux-x86_64-430.40.run': 'f700899f48ba711b7e1598014e8db9a93537d7baa3d6a64067ed08578387dfd7'
+  'NVIDIA-Linux-x86_64-430.40.run': 'f700899f48ba711b7e1598014e8db9a93537d7baa3d6a64067ed08578387dfd7',
+  'NVIDIA-Linux-x86_64-435.17.run': 'a71cecb5b8f0af35ed9a2d4023652a0537271457ef570c5f21dccd5067d9e9a6'
 }
 
 fetch_dir = __dir__ + '/../nvidia'
@@ -76,23 +77,29 @@ skip = IO.read(installer).lines[0..17].find{|line| line =~ /^skip=\d+$/}.strip.s
 `mkdir #{lib64_dir}` if not File.exists?(lib64_dir)
 `mkdir #{lib32_dir}` if not File.exists?(lib32_dir)
 
-libs64 = [
-  'libGL.so.'             + driver_version, # legacy
-  'libGLX_nvidia.so.'     + driver_version, # glvnd
-  'libnvidia-glcore.so.'  + driver_version,
+libs = []
+
+if driver_version.split('.').first.to_i < 435
+  libs << 'libGL.so.' + driver_version # legacy
+end
+
+libs += [
+  'libGLX_nvidia.so.'    + driver_version, # glvnd
+  'libnvidia-glcore.so.' + driver_version
 ]
 
 if driver_version.split('.').first.to_i >= 396
-  libs64 << 'libnvidia-glvkspirv.so.' + driver_version
+  libs << 'libnvidia-glvkspirv.so.' + driver_version
 end
 
 if driver_version.split('.').first.to_i >= 415
-  libs64 << 'libnvidia-tls.so.' + driver_version
+  libs << 'libnvidia-tls.so.' + driver_version
 else
-  libs64 << 'tls/libnvidia-tls.so.' + driver_version
+  libs << 'tls/libnvidia-tls.so.' + driver_version
 end
 
-libs32 = libs64.map{|lib| '32/' + lib}
+libs64 = libs.dup
+libs32 = libs.map{|lib| '32/' + lib}
 
 if driver_version.split('.').first.to_i >= 410
   libs64 << 'libnvidia-cbl.so.'             + driver_version
@@ -188,8 +195,10 @@ def patch_init(path)
 end
 
 # legacy
-patch_init("#{lib64_dir}/libGL.so.#{driver_version}")
-patch_init("#{lib32_dir}/libGL.so.#{driver_version}")
+if driver_version.split('.').first.to_i < 435
+  patch_init("#{lib64_dir}/libGL.so.#{driver_version}")
+  patch_init("#{lib32_dir}/libGL.so.#{driver_version}")
+end
 
 # glvnd
 patch_init("#{lib64_dir}/libGLX_nvidia.so.#{driver_version}")

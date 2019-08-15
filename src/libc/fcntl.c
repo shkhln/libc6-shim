@@ -91,3 +91,9 @@ int shim_open_impl(const char* path, int linux_flags, va_list args) {
 
   return open(path, flags, mode);
 }
+
+typedef off_t linux_off64_t;
+
+int shim_posix_fallocate64_impl(int fd, linux_off64_t offset, linux_off64_t len) {
+  return posix_fallocate(fd, offset, len);
+}

@@ -1,7 +1,7 @@
 {
   "file_format_version" : "1.0.0",
   "ICD": {
-    "library_path": "nvidia_vulkan.so",
+    "library_path": "libgl_nvidia",
     "api_version" : "0.0.0"
   }
 }
