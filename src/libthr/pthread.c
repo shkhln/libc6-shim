@@ -95,7 +95,7 @@ int shim_pthread_mutexattr_setpshared(pthread_mutexattr_t* attr, int pshared) {
 
 __asm__(".symver shim___pthread_key_create,__pthread_key_create@GLIBC_2.0");
 __asm__(".symver shim___pthread_key_create,__pthread_key_create@GLIBC_2.2.5");
-shim___pthread_key_create(pthread_key_t* key, void (*destructor)(void*)) {
+int shim___pthread_key_create(pthread_key_t* key, void (*destructor)(void*)) {
   LOG_ARGS("%p, %p", key, destructor);
   int err = pthread_key_create(key, destructor);
   LOG_RES("%d", err);
