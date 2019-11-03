@@ -7,7 +7,7 @@ LIBS      = $(BUILD_DIR)/lib64/nvshim.so \
             $(BUILD_DIR)/lib32/nvshim.debug.so
 
 CFLAGS    = -std=c99 -Wall -Wextra -Wno-unused-parameter -Wno-incompatible-pointer-types-discards-qualifiers \
- -shared -fPIC -lm -pthread -Wl,--version-script=src/shim.map -I/usr/local/include
+ -shared -fPIC -Wl,--version-script=src/shim.map -I/usr/local/include
 
 build: $(LIBS)
 
@@ -20,11 +20,11 @@ $(BUILD_DIR)/wrappers.c:
 
 $(BUILD_DIR)/lib$(b)/nvshim.so:       $(SOURCES) $(BUILD_DIR)/wrappers.c
 	mkdir -p $(BUILD_DIR)/lib$(b)
-	cc -O3     -m$(b) $(CFLAGS) -o $(.TARGET) $(SOURCES) $(BUILD_DIR)/wrappers.c
+	clang60 -O3     -m$(b) $(CFLAGS) -o $(.TARGET) $(SOURCES) $(BUILD_DIR)/wrappers.c -lm -pthread
 
 $(BUILD_DIR)/lib$(b)/nvshim.debug.so: $(SOURCES) $(BUILD_DIR)/wrappers.c
 	mkdir -p $(BUILD_DIR)/lib$(b)
-	cc -DDEBUG -m$(b) $(CFLAGS) -o $(.TARGET) $(SOURCES) $(BUILD_DIR)/wrappers.c
+	clang60 -DDEBUG -m$(b) $(CFLAGS) -o $(.TARGET) $(SOURCES) $(BUILD_DIR)/wrappers.c -lm -pthread
 
 .endfor
 
