@@ -46,7 +46,6 @@ SUBSTITUTIONS = {
   _exit:           'exit',
   _IO_getc:        'getc',
   _IO_putc:        'putc',
-  alphasort64:     'alphasort',
   ftello64:        'ftello',
   fseeko64:        'fseeko',
   fopen64:         'fopen',
@@ -57,8 +56,6 @@ SUBSTITUTIONS = {
   open64:          'open',
   pread64:         'pread',
   pwrite64:        'pwrite',
-  readdir64:       'readdir',
-  scandir64:       'scandir',
   statfs64:        'statfs',
   statvfs64:       'statvfs'
 }

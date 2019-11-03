@@ -1,9 +1,11 @@
 #include <assert.h>
 #include <dirent.h>
+#include <pthread.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/queue.h>
 #include "../shim.h"
 
 #ifdef __i386__
@@ -30,68 +32,124 @@ struct linux_dirent {
 
 #endif
 
-struct dir_dirent {
-  DIR* dirp;
-  struct linux_dirent* direntp;
+struct shim_directory {
+  DIR* dir;
+  SLIST_HEAD(shim_dir_entry_list, shim_dir_entry) head;
+  pthread_mutex_t mutex;
 };
 
-#define DIRENT_POOL_SIZE 1000
+struct shim_dir_entry {
+  SLIST_ENTRY(shim_dir_entry) entries;
+  struct linux_dirent* linux_entry;
+};
 
-static struct dir_dirent opened_entries[DIRENT_POOL_SIZE];
+static struct shim_directory* create_shim_dir(DIR* dir) {
 
-struct linux_dirent* shim_readdir_impl(DIR* dirp) {
+  struct shim_directory* shim_dir = malloc(sizeof(struct shim_directory));
 
-  struct dirent* entry = readdir(dirp);
+  shim_dir->dir = dir;
 
-  if (entry == NULL)
-    return NULL;
+  SLIST_INIT(&shim_dir->head);
 
-  struct linux_dirent* e2 = NULL;
+  int err = pthread_mutex_init(&shim_dir->mutex, NULL);
+  assert(err == 0);
 
-  for (int i = 0; i < DIRENT_POOL_SIZE; i++) {
-
-    if (opened_entries[i].dirp == NULL) {
-
-      e2 = malloc(sizeof(struct linux_dirent));
-
-      opened_entries[i].dirp    = dirp;
-      opened_entries[i].direntp = e2;
-
-      break;
-    }
-  }
-
-  assert(e2 != NULL);
-
-  e2->d_ino    = entry->d_ino;
-  e2->d_reclen = entry->d_reclen;
-  e2->d_type   = entry->d_type;
-
-  strlcpy(e2->d_name, entry->d_name, sizeof(e2->d_name));
-
-  return e2;
+  return shim_dir;
 }
 
-int shim_readdir_r_impl(DIR* dirp, struct dirent* entry, struct dirent** result) {
+static void destroy_shim_dir(struct shim_directory* shim_dir) {
+
+  pthread_mutex_lock(&shim_dir->mutex);
+
+  struct shim_dir_entry *shim_entry, *temp;
+  SLIST_FOREACH_SAFE(shim_entry, &shim_dir->head, entries, temp) {
+
+    SLIST_REMOVE(&shim_dir->head, shim_entry, shim_dir_entry, entries);
+
+    free(shim_entry->linux_entry);
+    free(shim_entry);
+  }
+
+  pthread_mutex_unlock(&shim_dir->mutex);
+
+  int err = pthread_mutex_destroy(&shim_dir->mutex);
+  assert(err == 0);
+
+  free(shim_dir);
+}
+
+static struct linux_dirent* insert_entry(struct shim_directory* shim_dir, struct dirent* entry) {
+
+  struct linux_dirent* linux_entry = malloc(sizeof(struct linux_dirent));
+
+  linux_entry->d_ino    = entry->d_ino;
+  linux_entry->d_reclen = entry->d_reclen;
+  linux_entry->d_type   = entry->d_type;
+
+  strlcpy(linux_entry->d_name, entry->d_name, sizeof(linux_entry->d_name));
+
+  struct shim_dir_entry* shim_entry = malloc(sizeof(struct shim_dir_entry));
+  shim_entry->linux_entry = linux_entry;
+
+  pthread_mutex_lock(&shim_dir->mutex);
+
+  SLIST_INSERT_HEAD(&shim_dir->head, shim_entry, entries);
+
+  pthread_mutex_unlock(&shim_dir->mutex);
+
+  return linux_entry;
+}
+
+struct shim_directory* shim_fdopendir_impl(int fd) {
+  DIR* dir = fdopendir(fd);
+  return dir != NULL ? create_shim_dir(dir) : NULL;
+}
+
+struct shim_directory* shim_opendir_impl(const char* filename) {
+  DIR* dir = opendir(filename);
+  return dir != NULL ? create_shim_dir(dir) : NULL;
+}
+
+struct linux_dirent* shim_readdir_impl(struct shim_directory* shim_dir) {
+  struct dirent* entry = readdir(shim_dir->dir);
+  return entry != NULL ? insert_entry(shim_dir, entry) : NULL;
+}
+
+int shim_closedir_impl(struct shim_directory* shim_dir) {
+  int err = closedir(shim_dir->dir);
+  destroy_shim_dir(shim_dir);
+  return err;
+}
+
+int shim_dirfd_impl(struct shim_directory* shim_dir) {
+  return dirfd(shim_dir->dir);
+}
+
+void shim_rewinddir_impl(struct shim_directory* shim_dir) {
+  rewinddir(shim_dir->dir);
+}
+
+void shim_seekdir_impl(struct shim_directory* shim_dir, long loc) {
+  seekdir(shim_dir->dir, loc);
+}
+
+long shim_telldir_impl(struct shim_directory* shim_dir) {
+  return telldir(shim_dir->dir);
+}
+
+int shim_alphasort_impl(const struct linux_dirent** d1, const struct linux_dirent** d2) {
   UNIMPLEMENTED();
 }
 
-int shim_closedir_impl(DIR* dirp) {
-
-  for (int i = 0; i < DIRENT_POOL_SIZE; i++) {
-
-    if (opened_entries[i].dirp != NULL) {
-
-      free(opened_entries[i].direntp);
-
-      opened_entries[i].dirp    = NULL;
-      opened_entries[i].direntp = NULL;
-    }
-  }
-
-  return closedir(dirp);
+int shim_readdir_r_impl(struct shim_directory* shim_dir, struct linux_dirent* linux_entry, struct linux_dirent** linux_result) {
+  UNIMPLEMENTED();
 }
 
-int shim_alphasort_impl(const struct dirent** d1, const struct dirent** d2) {
+int shim_scandir_impl(
+  const char* dirname,
+  struct linux_dirent*** namelist,
+  int (*select)(const struct linux_dirent*),
+  int (*compar)(const struct linux_dirent**, const struct linux_dirent**)
+) {
   UNIMPLEMENTED();
 }
