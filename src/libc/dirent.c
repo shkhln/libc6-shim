@@ -12,10 +12,18 @@
 
 struct linux_dirent {
   uint32_t  d_ino;
-  uint32_t  _pad1;
+  uint32_t  d_off; //TODO: lseek?
   uint16_t  d_reclen;
   uint8_t   d_type;
   char      d_name[256];
+};
+
+struct linux_dirent64 {
+  uint64_t d_ino;
+  uint64_t d_off;
+  uint16_t d_reclen;
+  uint8_t  d_type;
+  char d_name[256];
 };
 
 #endif
@@ -24,7 +32,15 @@ struct linux_dirent {
 
 struct linux_dirent {
   uint64_t  d_ino;
-  uint64_t  _pad1;
+  uint64_t  d_off;
+  uint16_t  d_reclen;
+  uint8_t   d_type;
+  char      d_name[256];
+};
+
+struct linux_dirent64 {
+  uint64_t  d_ino;
+  uint64_t  d_off;
   uint16_t  d_reclen;
   uint8_t   d_type;
   char      d_name[256];
@@ -40,7 +56,8 @@ struct shim_directory {
 
 struct shim_dir_entry {
   SLIST_ENTRY(shim_dir_entry) entries;
-  struct linux_dirent* linux_entry;
+  struct linux_dirent*   linux_entry;
+  struct linux_dirent64* linux_entry64;
 };
 
 static struct shim_directory* create_shim_dir(DIR* dir) {
@@ -66,7 +83,14 @@ static void destroy_shim_dir(struct shim_directory* shim_dir) {
 
     SLIST_REMOVE(&shim_dir->head, shim_entry, shim_dir_entry, entries);
 
-    free(shim_entry->linux_entry);
+    if (shim_entry->linux_entry != NULL) {
+      free(shim_entry->linux_entry);
+    }
+
+    if (shim_entry->linux_entry64 != NULL) {
+      free(shim_entry->linux_entry64);
+    }
+
     free(shim_entry);
   }
 
@@ -83,13 +107,15 @@ static struct linux_dirent* insert_entry(struct shim_directory* shim_dir, struct
   struct linux_dirent* linux_entry = malloc(sizeof(struct linux_dirent));
 
   linux_entry->d_ino    = entry->d_ino;
+  linux_entry->d_off    = entry->d_off;
   linux_entry->d_reclen = entry->d_reclen;
   linux_entry->d_type   = entry->d_type;
 
   strlcpy(linux_entry->d_name, entry->d_name, sizeof(linux_entry->d_name));
 
   struct shim_dir_entry* shim_entry = malloc(sizeof(struct shim_dir_entry));
-  shim_entry->linux_entry = linux_entry;
+  shim_entry->linux_entry   = linux_entry;
+  shim_entry->linux_entry64 = NULL;
 
   pthread_mutex_lock(&shim_dir->mutex);
 
@@ -98,6 +124,30 @@ static struct linux_dirent* insert_entry(struct shim_directory* shim_dir, struct
   pthread_mutex_unlock(&shim_dir->mutex);
 
   return linux_entry;
+}
+
+static struct linux_dirent64* insert_entry64(struct shim_directory* shim_dir, struct dirent* entry) {
+
+  struct linux_dirent64* linux_entry64 = malloc(sizeof(struct linux_dirent64));
+
+  linux_entry64->d_ino    = entry->d_ino;
+  linux_entry64->d_off    = entry->d_off;
+  linux_entry64->d_reclen = entry->d_reclen;
+  linux_entry64->d_type   = entry->d_type;
+
+  strlcpy(linux_entry64->d_name, entry->d_name, sizeof(linux_entry64->d_name));
+
+  struct shim_dir_entry* shim_entry = malloc(sizeof(struct shim_dir_entry));
+  shim_entry->linux_entry   = NULL;
+  shim_entry->linux_entry64 = linux_entry64;
+
+  pthread_mutex_lock(&shim_dir->mutex);
+
+  SLIST_INSERT_HEAD(&shim_dir->head, shim_entry, entries);
+
+  pthread_mutex_unlock(&shim_dir->mutex);
+
+  return linux_entry64;
 }
 
 struct shim_directory* shim_fdopendir_impl(int fd) {
@@ -113,6 +163,18 @@ struct shim_directory* shim_opendir_impl(const char* filename) {
 struct linux_dirent* shim_readdir_impl(struct shim_directory* shim_dir) {
   struct dirent* entry = readdir(shim_dir->dir);
   return entry != NULL ? insert_entry(shim_dir, entry) : NULL;
+}
+
+struct linux_dirent64* shim_readdir64_impl(struct shim_directory* shim_dir) {
+  struct dirent* entry = readdir(shim_dir->dir);
+  return entry != NULL ? insert_entry64(shim_dir, entry) : NULL;
+}
+
+struct linux_dirent64* shim_readdir64(struct shim_directory* shim_dir) {
+  LOG_ARGS("%p", shim_dir);
+  struct linux_dirent64* entry = shim_readdir64_impl(shim_dir);
+  LOG_RES("%p", entry);
+  return entry;
 }
 
 int shim_closedir_impl(struct shim_directory* shim_dir) {
