@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <pthread_np.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <time.h>
@@ -10,17 +11,19 @@
 
 #ifdef __i386__
 #define LINUX_GETPID         20
+#define LINUX_GETTID        224
 #define LINUX_CLOCK_GETTIME 265
 #endif
 
 #ifdef __x86_64__
 #define LINUX_GETPID         39
+#define LINUX_GETTID        186
 #define LINUX_CLOCK_GETTIME 228
 #endif
 
 #define LINUX_CLOCK_MONOTONIC 1
 
-int shim_syscall_impl(int number, va_list args) {
+long shim_syscall_impl(int number, va_list args) {
 
   if (number == LINUX_GETPID) {
 
@@ -30,6 +33,16 @@ int shim_syscall_impl(int number, va_list args) {
     LOG("%s: getpid -> %d\n", __func__, pid);
 
     return pid;
+  }
+
+  if (number == LINUX_GETTID) {
+
+    LOG("%s: gettid()\n", __func__);
+
+    int tid = pthread_getthreadid_np();
+    LOG("%s: gettid -> %d\n", __func__, tid);
+
+    return tid;
   }
 
   if (number == LINUX_CLOCK_GETTIME) {
