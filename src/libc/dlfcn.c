@@ -72,8 +72,6 @@ void* shim_dlsym_impl(void* handle, const char* symbol) {
   return dlsym(handle, symbol);
 }
 
-__asm__(".symver shim_dlvsym,dlvsym@GLIBC_2.1");
-__asm__(".symver shim_dlvsym,dlvsym@GLIBC_2.2.5");
 void* shim_dlvsym(void* handle, const char* name, const char* version) {
   LOG_ARGS("%p, \"%s\", \"%s\"", handle, name, version);
   void* p = shim_dlsym_impl(handle, name);
@@ -81,7 +79,6 @@ void* shim_dlvsym(void* handle, const char* name, const char* version) {
   return p;
 }
 
-__asm__(".symver shim_dladdr1,dladdr1@GLIBC_2.3.3");
 int shim_dladdr1(void* address, Dl_info* info, void** extra_info, int flags) {
   LOG_ARGS("%p, %p, %p, %d", address, info, extra_info, flags);
   int err = dladdr(address, info);

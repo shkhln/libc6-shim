@@ -2,8 +2,6 @@
 #include <string.h>
 #include "../shim.h"
 
-__asm__(".symver shim_memalign,memalign@GLIBC_2.0");
-__asm__(".symver shim_memalign,memalign@GLIBC_2.2.5");
 void* shim_memalign(size_t alignment, size_t size) {
   LOG_ARGS("%zu, %zu", alignment, size);
   void* p = NULL;

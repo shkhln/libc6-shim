@@ -11,6 +11,9 @@ CFLAGS    = -std=c99 -Wall -Wextra -Wno-unused-parameter -Wno-incompatible-point
 
 build: $(LIBS)
 
+$(BUILD_DIR)/versions.h:
+	./utils/symver.rb glibc-2.17-symbols > $(BUILD_DIR)/versions.h
+
 $(BUILD_DIR)/wrappers.c:
 	mkdir -p $(BUILD_DIR)
 	cc $(CFLAGS) -o $(BUILD_DIR)/shim.tmp $(SOURCES)
@@ -18,18 +21,18 @@ $(BUILD_DIR)/wrappers.c:
 
 .for b in 32 64
 
-$(BUILD_DIR)/lib$(b)/nvshim.so:       $(SOURCES) $(BUILD_DIR)/wrappers.c
+$(BUILD_DIR)/lib$(b)/nvshim.so:       $(SOURCES) $(BUILD_DIR)/wrappers.c $(BUILD_DIR)/versions.h
 	mkdir -p $(BUILD_DIR)/lib$(b)
-	clang60 -O3     -m$(b) $(CFLAGS) -o $(.TARGET) $(SOURCES) $(BUILD_DIR)/wrappers.c -lm -pthread
+	clang60 -O2     -m$(b) $(CFLAGS) -o $(.TARGET) $(SOURCES) -include $(BUILD_DIR)/versions.h $(BUILD_DIR)/wrappers.c -lm -pthread
 
-$(BUILD_DIR)/lib$(b)/nvshim.debug.so: $(SOURCES) $(BUILD_DIR)/wrappers.c
+$(BUILD_DIR)/lib$(b)/nvshim.debug.so: $(SOURCES) $(BUILD_DIR)/wrappers.c $(BUILD_DIR)/versions.h
 	mkdir -p $(BUILD_DIR)/lib$(b)
-	clang60 -DDEBUG -m$(b) $(CFLAGS) -o $(.TARGET) $(SOURCES) $(BUILD_DIR)/wrappers.c -lm -pthread
+	clang60 -DDEBUG -m$(b) $(CFLAGS) -o $(.TARGET) $(SOURCES) -include $(BUILD_DIR)/versions.h $(BUILD_DIR)/wrappers.c -lm -pthread
 
 .endfor
 
 clean:
-.for f in $(LIBS) $(BUILD_DIR)/shim.tmp $(BUILD_DIR)/wrappers.c
+.for f in $(LIBS) $(BUILD_DIR)/shim.tmp $(BUILD_DIR)/wrappers.c $(BUILD_DIR)/versions.h
 .  if exists($f)
 	rm $f
 .  endif

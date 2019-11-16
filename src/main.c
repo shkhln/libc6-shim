@@ -10,20 +10,14 @@
 
 #include "shim.h"
 
-__asm__(".symver shim_stdin,stdin@GLIBC_2.0");
-__asm__(".symver shim_stdin,stdin@GLIBC_2.2.5");
 __asm__(".symver shim_stdin,_IO_stdin_@GLIBC_2.0");
 __asm__(".symver shim_stdin,_IO_2_1_stdin_@GLIBC_2.1");
 __asm__(".symver shim_stdin,_IO_2_1_stdin_@GLIBC_2.2.5");
 
-__asm__(".symver shim_stdout,stdout@GLIBC_2.0");
-__asm__(".symver shim_stdout,stdout@GLIBC_2.2.5");
 __asm__(".symver shim_stdout,_IO_stdout_@GLIBC_2.0");
 __asm__(".symver shim_stdout,_IO_2_1_stdout_@GLIBC_2.1");
 __asm__(".symver shim_stdout,_IO_2_1_stdout_@GLIBC_2.2.5");
 
-__asm__(".symver shim_stderr,stderr@GLIBC_2.0");
-__asm__(".symver shim_stderr,stderr@GLIBC_2.2.5");
 __asm__(".symver shim_stderr,_IO_stderr_@GLIBC_2.0");
 __asm__(".symver shim_stderr,_IO_2_1_stderr_@GLIBC_2.1");
 __asm__(".symver shim_stderr,_IO_2_1_stderr_@GLIBC_2.2.5");
@@ -46,9 +40,7 @@ __asm__(".symver shim_env,__environ@GLIBC_2.2.5");
 static char* _shim_env[MAX_SHIM_ENV_ENTRIES];
 char** shim_env = _shim_env;
 
-__asm__(".symver shim_progname,__progname@GLIBC_2.0");
-__asm__(".symver shim_progname,__progname@GLIBC_2.2.5");
-char* shim_progname = "<progname>";
+char* shim___progname = "<progname>";
 
 static int    shim_argc = 0;
 static char** shim_argv = NULL;
@@ -113,9 +105,7 @@ static void shim_libgl_init(int argc, char** argv, char** env) {
   }
 }
 
-__asm__(".symver shim_libc_start_main,__libc_start_main@GLIBC_2.0");
-__asm__(".symver shim_libc_start_main,__libc_start_main@GLIBC_2.2.5");
-int shim_libc_start_main(
+int shim___libc_start_main(
   int (*main)(int, char**, char**),
   int argc,
   char** ubp_av,

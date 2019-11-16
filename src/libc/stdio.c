@@ -42,7 +42,6 @@ int shim_remove_impl(const char* path) {
   return remove(path);
 }
 
-__asm__(".symver shim___isoc99_fscanf,__isoc99_fscanf@GLIBC_2.7");
 int shim___isoc99_fscanf(FILE* restrict stream, const char* restrict format, ...) {
   LOG("%s(%p, \"%.100s\", ...)\n", __func__, stream, format);
   va_list args;
