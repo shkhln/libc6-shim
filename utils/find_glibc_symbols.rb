@@ -5,8 +5,7 @@ symbols = {}
 
 libs = []
 for lib in ['libc.so.6', 'libm.so.6', 'libdl.so.2', 'librt.so.1', 'libpthread.so.0']
-  libs << "/compat/linux/lib/#{lib}"
-  libs << "/compat/linux/lib64/#{lib}"
+  libs << (ARGV.include?('-32') ? "/compat/linux/lib/#{lib}" : "/compat/linux/lib64/#{lib}")
 end
 
 for lib in libs
