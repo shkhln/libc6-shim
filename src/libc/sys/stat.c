@@ -3,61 +3,7 @@
 #include <string.h>
 #include <sys/stat.h>
 #include "../../shim.h"
-
-#ifdef __i386__
-
-struct linux_timespec {
-  uint32_t tv_sec;
-  uint32_t tv_nsec;
-};
-
-struct linux_stat {
-  uint64_t              st_dev;
-  uint8_t               _pad1[4];
-  uint32_t              st_ino;
-  uint32_t              st_mode;
-  uint32_t              st_nlink;
-  uint32_t              st_uid;
-  uint32_t              st_gid;
-  uint64_t              st_rdev;
-  uint8_t               _pad2[4];
-  uint32_t              st_size ;
-  uint32_t              st_blksize;
-  uint32_t              st_blocks;
-  struct linux_timespec st_atim;
-  struct linux_timespec st_mtim;
-  struct linux_timespec st_ctim;
-  uint8_t               _pad3[8];
-};
-
-#endif
-
-#ifdef __x86_64__
-
-struct linux_timespec {
-  uint64_t tv_sec;
-  uint64_t tv_nsec;
-};
-
-struct linux_stat {
-  uint64_t              st_dev;
-  uint64_t              st_ino;
-  uint64_t              st_nlink;
-  uint32_t              st_mode;
-  uint32_t              st_uid;
-  uint32_t              st_gid;
-  uint8_t               _pad1[4];
-  uint64_t              st_rdev;
-  uint64_t              st_size;
-  uint64_t              st_blksize;
-  uint64_t              st_blocks;
-  struct linux_timespec st_atim;
-  struct linux_timespec st_mtim;
-  struct linux_timespec st_ctim;
-  uint8_t               _pad2[24];
-};
-
-#endif
+#include "stat.h"
 
 void copy_stat_buf(struct linux_stat* dst, struct stat* src) {
 

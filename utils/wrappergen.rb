@@ -190,7 +190,7 @@ def generate_wrapper(function, shim_impl_exists)
       when FUNCTION_POINTER_TYPE
         "#{$1}(#{$2}#{arg['name']})#{$3}"
       else
-      "#{arg['type']} #{arg['name']}"
+        "#{arg['type'] ? arg['type'].gsub(/struct\s+/, 'linux_') : ''} #{arg['name']}"
     end
   end
 
@@ -311,6 +311,44 @@ puts 'typedef void _IO_FILE;'
 puts 'typedef void cpu_set_t;'
 puts 'typedef void glob64_t;'
 puts 'typedef int error_t;'
+
+puts <<E
+#include "../src/libc/dirent.h"
+#include "../src/libc/time.h"
+#include "../src/libc/sys/mount.h"
+#include "../src/libc/sys/socket.h"
+#include "../src/libc/sys/stat.h"
+#include "../src/libc/sys/utsname.h"
+
+#include <getopt.h>
+
+typedef struct option linux_option;
+
+#include <sys/types.h>
+#include <sys/time.h>
+#include <sys/resource.h>
+
+typedef struct rusage linux_rusage;
+
+#include <spawn.h>
+
+typedef struct sched_param linux_sched_param;
+
+#include <sys/types.h>
+#include <sys/ipc.h>
+#include <sys/sem.h>
+
+typedef struct sembuf linux_sembuf;
+
+#include <rpc/rpc.h>
+
+typedef struct pollfd linux_pollfd;
+
+struct linux_rlimit {};
+
+typedef struct linux_rlimit linux_rlimit;
+
+E
 
 for sym in symbols.keys
 
