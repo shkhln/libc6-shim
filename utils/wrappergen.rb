@@ -237,40 +237,8 @@ def generate_wrapper(function, shim_impl_exists)
   puts '}'
 end
 
-functions = {}
-
-for _, synopsis in JSON.parse(IO.read(__dir__ + '/../bsd-functions.json', {mode: 'r:UTF-8'}))
-  for function in synopsis['functions']
-    functions[function['name']] = function
-  end
-end
-
-LINUX_INCLUDES = [
-  '#include <argz.h>',
-  '#include <envz.h>',
-  '#include <error.h>',
-  '#include <utmp.h>',
-  '#include <gnu/libc-version.h>',
-  '#include <sys/epoll.h>',
-  '#include <sys/sendfile.h>',
-  '#include <sys/statfs.h>'
-]
-
-for _, synopsis in JSON.parse(IO.read(__dir__ + '/../lsb-functions.json', {mode: 'r:UTF-8'}))
-  for function in synopsis['functions']
-
-    next if functions[function['name']]
-
-    functions[function['name']] = {
-      'prototype' => function['prototype'],
-      'name'      => function['name'],
-      'type'      => function['type'],
-      'args'      => function['args'],
-      'includes'  => function['includes'].find_all{|str| !LINUX_INCLUDES.include?(str)},
-      :lsb        => true
-    }
-  end
-end
+require(__dir__ + '/prototypes.rb')
+functions = $functions
 
 symbols = {}
 
@@ -355,5 +323,28 @@ for sym in symbols.keys
     end
 
     puts
+
+  else
+
+    if not [
+      '_IO_2_1_stderr_',
+      '_IO_2_1_stdin_',
+      '_IO_2_1_stdout_',
+      '_IO_stderr_',
+      '_IO_stdin_',
+      '_IO_stdout_',
+      '__ctype_b',
+      '__environ',
+      '_environ',
+      'environ'
+    ].include?(sym)
+      if not implemented_wrappers[sym]
+        implemented_wrappers[sym] = true
+        puts 'void shim_' + sym + '() {'
+        puts '  UNIMPLEMENTED();'
+        puts '}'
+        puts
+      end
+    end
   end
 end

@@ -52,6 +52,47 @@ end
 
 FUNCTION_POINTER_DECL = /^(.+)?\([\*\^](\w+)\)\s*(\([^\)]+\))$/
 
+def parse_prototype(prototype)
+
+  fn_type_name, *args = split_prototype(prototype).select{|p| !p.empty?}.to_enum.with_index.map do |decl, i|
+    begin
+      name = nil
+      type = nil
+
+      case decl
+        when /\*$/, /\*\srestrict$/
+          name = "_arg_#{i}"
+          type = decl
+        when 'void'
+          type = 'void'
+        when '...'
+          name = '...'
+        when /^[^\s]+$/
+          name = "_arg_#{i}"
+          type = decl
+        when FUNCTION_POINTER_DECL
+          name = $2
+          type = $1 + '(*)' + $3
+        when /^(.+?)(\w+)$/
+          name = $2
+          type = $1.strip
+        when /^(.+?)(\w+)(\[(\d*|restrict)\])$/
+          name = $2
+          type = $1 + $3
+        else
+          raise "Unknown decl #{decl.inspect}"
+      end
+
+      {name: name, type: type}
+    rescue
+      STDERR.puts "in \"#{prototype}\""
+      raise
+    end
+  end
+
+  {prototype: prototype, name: fn_type_name[:name], type: fn_type_name[:type], args: args}
+end
+
 def parse_synopsis(synopsis)
 
   includes  = synopsis.split(/\n/)       .map(&:strip).map{|e| e.gsub(/\s+/, ' ')}.find_all{|entry| entry =~ /#include/}
@@ -65,45 +106,9 @@ def parse_synopsis(synopsis)
   end
 
   functions.map do |prototype|
-
     fn_includes = includes.find_all{|include| positions[include] < positions[prototype]}
-
-    fn_type_name, *args = split_prototype(prototype).select{|p| !p.empty?}.to_enum.with_index.map do |decl, i|
-      begin
-        name = nil
-        type = nil
-
-        case decl
-          when /\*$/, /\*\srestrict$/
-            name = "_arg_#{i}"
-            type = decl
-          when 'void'
-            type = 'void'
-          when '...'
-            name = '...'
-          when /^[^\s]+$/
-            name = "_arg_#{i}"
-            type = decl
-          when FUNCTION_POINTER_DECL
-            name = $2
-            type = $1 + '(*)' + $3
-          when /^(.+?)(\w+)$/
-            name = $2
-            type = $1.strip
-          when /^(.+?)(\w+)(\[(\d*|restrict)\])$/
-            name = $2
-            type = $1 + $3
-          else
-            raise "Unknown decl #{decl.inspect}"
-        end
-
-        {name: name, type: type}
-      rescue
-        STDERR.puts "in \"#{prototype}\""
-        raise
-      end
-    end
-
-    {prototype: prototype, name: fn_type_name[:name], type: fn_type_name[:type], args: args, includes: fn_includes.reverse.uniq.reverse}
+    fn = parse_prototype(prototype)
+    fn[:includes] = fn_includes.reverse.uniq.reverse
+    fn
   end
 end
