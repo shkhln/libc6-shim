@@ -21,15 +21,7 @@
  LINUX_MAP_NORESERVE             \
 )
 
-#ifdef __i386__
-typedef uint32_t linux_off_t;
-#endif
-
-#ifdef __x86_64__
-typedef uint64_t linux_off_t;
-#endif
-
-void* shim_mmap_impl(void *addr, size_t len, int prot, int linux_flags, int fd, linux_off_t offset) {
+void* shim_mmap_impl(void *addr, size_t len, int prot, int linux_flags, int fd, off_t offset) {
 
   assert((linux_flags & KNOWN_LINUX_MMAP_FLAGS) == linux_flags);
 
@@ -57,5 +49,19 @@ void* shim_mmap_impl(void *addr, size_t len, int prot, int linux_flags, int fd, 
     perror(__func__);
   }
 
+  return p;
+}
+
+void* shim_mmap(void* addr, size_t len, int prot, int linux_flags, int fd, linux_off_t offset) {
+  LOG_ARGS("%p, %zu, %d, %d, %d, %jd", addr, len, prot, linux_flags, fd, (off_t)offset);
+  void* p = shim_mmap_impl(addr, len, prot, linux_flags, fd, offset);
+  LOG_RES("%p", p);
+  return p;
+}
+
+void* shim_mmap64(void* addr, size_t len, int prot, int linux_flags, int fd, linux_off64_t offset) {
+  LOG_ARGS("%p, %zu, %d, %d, %d, %jd", addr, len, prot, linux_flags, fd, offset);
+  void* p = shim_mmap_impl(addr, len, prot, linux_flags, fd, offset);
+  LOG_RES("%p", p);
   return p;
 }

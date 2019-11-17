@@ -38,26 +38,16 @@ IMPL_BLACKLIST = [
 SUBSTITUTIONS = {
   __ctype_toupper: 'toupper',
   __ctype_tolower: 'tolower',
-  __fxstat64:      '__fxstat', # ?
   __getdelim:      'getdelim',
   __isoc99_sscanf: 'sscanf',
   __strdup:        'strdup',
   __strndup:       'strndup',
-  _exit:           'exit',
+  _exit:           '_Exit',
   _IO_getc:        'getc',
   _IO_putc:        'putc',
-  ftello64:        'ftello',
-  fseeko64:        'fseeko',
   fopen64:         'fopen',
-  ftruncate64:     'ftruncate',
-  lseek64:         'lseek',
   mkstemp64:       'mkstemp',
-  mmap64:          'mmap',
   open64:          'open',
-  pread64:         'pread',
-  pwrite64:        'pwrite',
-  statfs64:        'statfs',
-  statvfs64:       'statvfs'
 }
 
 STRUCT_COMPATIBILITY = {

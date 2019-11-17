@@ -94,3 +94,14 @@ long shim_sysconf_impl(int name) {
 
   UNIMPLEMENTED_ARGS("%d", name);
 }
+
+int shim_ftruncate64_impl(int fd, linux_off64_t length) {
+  return ftruncate(fd, length);
+}
+
+int shim_ftruncate64(int fd, linux_off64_t length) {
+  LOG_ARGS("%d, %jd", fd, length);
+  int err = shim_ftruncate64_impl(fd, length);
+  LOG_RES("%d", err);
+  return err;
+}
