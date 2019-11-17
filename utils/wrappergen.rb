@@ -70,7 +70,8 @@ STRUCT_COMPATIBILITY = {
   timespec:    true,
   timeval:     true,
   timezone:    true,
-  utsname:     false
+  utsname:     false,
+  stat64:      false
 }
 
 def format_specifier(decl)
