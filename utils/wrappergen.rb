@@ -1,40 +1,6 @@
 #!/usr/bin/env ruby
 # encoding: UTF-8
 
-require 'json'
-
-IMPL_BLACKLIST = [
-  'quick_exit',
-  'iswctype_l',
-  'rtime',
-
-  'makecontext',
-  'openat',
-  'sem_open',
-  'strfmon',
-  'strfmon_l',
-  'ulimit',
-
-  'tmpnam',
-  'tempnam',
-  'gets',
-  'mktemp',
-
-  'cacoshl',
-  'cacosl',
-  'casinhl',
-  'casinl',
-  'catanhl',
-  'catanl',
-
-  'freelocale',
-  'setgrent',
-
-  'setjmp',
-  '_setjmp',
-  '__sigsetjmp'
-]
-
 SUBSTITUTIONS = {
   __ctype_toupper: 'toupper',
   __ctype_tolower: 'tolower',
@@ -76,10 +42,10 @@ STRUCT_COMPATIBILITY = {
 
 def format_specifier(decl)
 
-  return '...' if decl['name'] == '...'
-  return '%p'  if decl['type'] =~ /^.+?\(\*\)\s*\([^\)]+\)$/
+  return '...' if decl[:name] == '...'
+  return '%p'  if decl[:type] =~ /^.+?\(\*\)\s*\([^\)]+\)$/
 
-  case decl['type']
+  case decl[:type]
     when /const char ?\*\*/
       '%p'
     when /const char ?\*[^\*]*/
@@ -115,7 +81,7 @@ def log_args(args)
   for arg in args
     f = format_specifier(arg)
     log_fmt_parts << f
-    log_args      << arg['name'] if f.include?('%')
+    log_args      << arg[:name] if f.include?('%')
   end
 
   fmt_string = '"%s(' + log_fmt_parts.map{|p| p =~ /%[^a-z]*s/ ? "\\\"#{p}\\\"" : p}.join(', ') + ')\\n"'
@@ -133,14 +99,14 @@ def log_result(decl)
 end
 
 def is_variadic(function)
-  function['args'].size > 1 && function['args'].last['name'] == '...'
+  function[:args].size > 1 && function[:args].last[:name] == '...'
 end
 
 FUNCTION_POINTER_TYPE = /^(.+)?\(([\*\^])\)\s*(\([^\)]+\))$/
 
 def generate_stub(function)
-  puts '// ' + function['prototype']
-  puts 'void shim_' + function['name'] + '() {'
+  puts '// ' + function[:prototype]
+  puts 'void shim_' + function[:name] + '() {'
   puts '  UNIMPLEMENTED();'
   puts '}'
 end
@@ -152,22 +118,22 @@ def generate_wrapper(function, shim_impl_exists)
     return
   end
 
-  args = function['args']
-  args = [] if args.size == 1 && args.first['type'] == 'void'
+  args = function[:args]
+  args = [] if args.size == 1 && args.first[:type] == 'void'
 
-  for type in args.map{|arg| arg['type']} + [function['type']]
+  for type in args.map{|arg| arg[:type]} + [function[:type]]
     if type =~ /^(const |)struct (\w+)/
       struct = $2.to_sym
 
       if not STRUCT_COMPATIBILITY.keys.include?(struct)
-        STDERR.puts "\e[31m#{$PROGRAM_NAME}: unknown struct #{struct}, skipping function #{function['name']}\e[0m"
+        STDERR.puts "\e[31m#{$PROGRAM_NAME}: unknown struct #{struct}, skipping function #{function[:name]}\e[0m"
         generate_stub(function)
         return
       end
 
       compatible = STRUCT_COMPATIBILITY[struct]
       if !compatible && !shim_impl_exists
-        STDERR.puts "\e[31m#{$PROGRAM_NAME}: found binary incompatible struct #{struct}, explicit shim impl required for function #{function['name']}\e[0m"
+        STDERR.puts "\e[31m#{$PROGRAM_NAME}: found binary incompatible struct #{struct}, explicit shim impl required for function #{function[:name]}\e[0m"
         generate_stub(function)
         return
       end
@@ -175,53 +141,53 @@ def generate_wrapper(function, shim_impl_exists)
   end
 
   def to_decl(arg)
-    case arg['type']
+    case arg[:type]
       when /^(.+?)(\[(\d*|restrict)\])$/
-        "#{$1} #{arg['name']}#{$2}"
+        "#{$1} #{arg[:name]}#{$2}"
       when FUNCTION_POINTER_TYPE
-        "#{$1}(#{$2}#{arg['name']})#{$3}"
+        "#{$1}(#{$2}#{arg[:name]})#{$3}"
       else
-        "#{arg['type'] ? arg['type'].gsub(/struct\s+/, 'linux_') : ''} #{arg['name']}"
+        "#{arg[:type] ? arg[:type].gsub(/struct\s+/, 'linux_') : ''} #{arg[:name]}"
     end
   end
 
-  for include in function['includes']
+  for include in function[:includes]
     puts include
   end
 
   if shim_impl_exists
-    puts function['type'] + ' shim_' + function['name'] + '_impl(' + function['args'].map(&method(:to_decl)).join(', ').gsub('...', 'va_list') + ');'
+    puts function[:type] + ' shim_' + function[:name] + '_impl(' + function[:args].map(&method(:to_decl)).join(', ').gsub('...', 'va_list') + ');'
   end
 
-  puts '// ' + function['prototype']
-  puts function['type'] + ' shim_' + function['name'] + '(' + function['args'].map(&method(:to_decl)).join(', ') + ') {'
+  puts '// ' + function[:prototype]
+  puts function[:type] + ' shim_' + function[:name] + '(' + function[:args].map(&method(:to_decl)).join(', ') + ') {'
 
   puts '  ' + log_args(args)
 
   if is_variadic(function)
     puts "  va_list _args_;"
-    puts "  va_start(_args_, #{args[-2]['name']});"
+    puts "  va_start(_args_, #{args[-2][:name]});"
   end
 
-  if function['type'] != 'void'
-    puts "  #{function['type']} _ret_ = "
+  if function[:type] != 'void'
+    puts "  #{function[:type]} _ret_ = "
   end
 
   if shim_impl_exists
-    print "  shim_#{function['name']}_impl"
+    print "  shim_#{function[:name]}_impl"
   else
     print '  '
     if is_variadic(function)
       print 'v'
     end
-    print function['name']
+    print function[:name]
   end
   print '('
   print (args.map do |arg|
-    if arg['name'] == '...'
+    if arg[:name] == '...'
       '_args_'
     else
-      arg['name']
+      arg[:name]
     end
   end).join(', ')
   puts ');'
@@ -230,7 +196,7 @@ def generate_wrapper(function, shim_impl_exists)
     puts '  va_end(_args_);'
   end
 
-  if function['type'] != 'void'
+  if function[:type] != 'void'
     puts '  ' + log_result(function)
     puts '  return _ret_;'
   end
@@ -238,14 +204,11 @@ def generate_wrapper(function, shim_impl_exists)
   puts '}'
 end
 
-require(__dir__ + '/prototypes.rb')
-functions = $functions
-
 symbols = {}
 
 for line in IO.read(ARGV[0]).lines
-  sym, versions = line.strip.split(': ')
-  symbols[sym] = versions.split(', ')
+  line.strip =~ /(fun|obj) (\w+): (.+)/
+  symbols[$2] = {type: $1, versions: $3.split(', ')}
 end
 
 implemented_wrappers = {}
@@ -258,94 +221,52 @@ for line in `readelf -s #{ARGV[1]} | grep -v UND`.lines
   end
 end
 
-puts '#define _WITH_GETLINE'
-puts '#include <stdarg.h>'
-puts '#include <stdint.h>'
-puts '#include "../src/shim.h"'
-puts
-
-puts 'struct stat64 {};'
-puts 'typedef void* __dispatch_fn_t;'
-puts 'typedef void _IO_FILE;'
-puts 'typedef void cpu_set_t;'
-puts 'typedef void glob64_t;'
-puts 'typedef int error_t;'
-
 puts <<E
+#define _WITH_GETLINE
+#include <stdarg.h>
+#include <stdint.h>
+#include "../src/shim.h"
+
 #include "../src/libc/dirent.h"
 #include "../src/libc/time.h"
 #include "../src/libc/sys/mount.h"
 #include "../src/libc/sys/socket.h"
 #include "../src/libc/sys/stat.h"
 #include "../src/libc/sys/utsname.h"
-
-#include <getopt.h>
-
-typedef struct option linux_option;
-
-#include <sys/types.h>
-#include <sys/time.h>
-#include <sys/resource.h>
-
-typedef struct rusage linux_rusage;
-
-#include <spawn.h>
-
-typedef struct sched_param linux_sched_param;
-
-#include <sys/types.h>
-#include <sys/ipc.h>
-#include <sys/sem.h>
-
-typedef struct sembuf linux_sembuf;
-
-#include <rpc/rpc.h>
-
-typedef struct pollfd linux_pollfd;
-
-struct linux_rlimit {};
-
-typedef struct linux_rlimit linux_rlimit;
-
 E
+
+require(__dir__ + '/prototypes.rb')
 
 for sym in symbols.keys
 
-  function = functions[SUBSTITUTIONS[sym.to_sym] || sym]
-  if function && !(IMPL_BLACKLIST.include?(function['name']) || function['name'] =~ /iconv/)
+  if SUBSTITUTIONS[sym.to_sym]
 
-    for version in symbols[sym]
-      puts "__asm__(\".symver shim_#{function['name']},#{sym}@#{version}\");"
+    for version in symbols[sym][:versions]
+      puts "__asm__(\".symver shim_#{SUBSTITUTIONS[sym.to_sym]},#{sym}@#{version}\");"
+      puts
     end
-
-    if not implemented_wrappers[function['name']]
-      implemented_wrappers[function['name']] = true
-      puts generate_wrapper(function, implemented_shims[function['name']])
-    end
-
-    puts
 
   else
 
-    if not [
-      '_IO_2_1_stderr_',
-      '_IO_2_1_stdin_',
-      '_IO_2_1_stdout_',
-      '_IO_stderr_',
-      '_IO_stdin_',
-      '_IO_stdout_',
-      '__ctype_b',
-      '__environ',
-      '_environ',
-      'environ'
-    ].include?(sym)
-      if not implemented_wrappers[sym]
+    function = $functions[sym]
+    if function
+
+      if not implemented_wrappers[function[:name]]
+        implemented_wrappers[function[:name]] = true
+        puts generate_wrapper(function, implemented_shims[function[:name]])
+        puts
+      end
+
+    else
+
+      if symbols[sym][:type] == 'fun' && !implemented_wrappers[sym]
         implemented_wrappers[sym] = true
         puts 'void shim_' + sym + '() {'
         puts '  UNIMPLEMENTED();'
         puts '}'
         puts
       end
+
     end
   end
 end

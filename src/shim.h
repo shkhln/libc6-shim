@@ -1,3 +1,5 @@
+#pragma once
+
 #include <assert.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -25,7 +27,7 @@
 
 bool str_starts_with(const char* str, const char* substr);
 
-typedef off_t linux_off64_t;
+typedef int64_t linux_off64_t;
 
 #ifdef __i386__
 typedef int32_t linux_off_t;
@@ -34,3 +36,31 @@ typedef int32_t linux_off_t;
 #ifdef __x86_64__
 typedef int64_t linux_off_t;
 #endif
+
+#include <getopt.h>
+
+typedef struct option linux_option;
+
+#include <sys/types.h>
+#include <sys/time.h>
+#include <sys/resource.h>
+
+typedef struct rusage linux_rusage;
+
+#include <spawn.h>
+
+typedef struct sched_param linux_sched_param;
+
+#include <sys/types.h>
+#include <sys/ipc.h>
+#include <sys/sem.h>
+
+typedef struct sembuf linux_sembuf;
+
+#include <rpc/rpc.h>
+
+typedef struct pollfd linux_pollfd;
+
+struct linux_rlimit {};
+
+typedef struct linux_rlimit linux_rlimit;

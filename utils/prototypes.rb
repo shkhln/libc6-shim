@@ -1,7 +1,92 @@
 # encoding: utf-8
 
-require 'json'
-require(__dir__ + '/_prototypes.rb')
+def split_prototype(prototype)
+
+  parts = []
+
+  depth = 0
+  decl  = ''
+
+  prototype.gsub(/\/\*.*?\*\//, '').chars.each_with_index do |char, i|
+    case char
+      when '('
+        if depth == 0
+          parts << decl
+          decl = ''
+        else
+          decl += '('
+        end
+        depth += 1
+      when ')'
+        depth -= 1
+        if depth == 0
+          parts << decl
+        else
+          decl += ')'
+        end
+      when ','
+        if depth == 1
+          parts << decl
+          decl = ''
+        else
+          decl += ','
+        end
+      when /[\w\s\*\^\[\]\.\+]/i
+        decl += char
+      else
+        if char.ord == 0xa0
+          decl += ' '
+        else
+          raise "Unexpected character '#{char}' (0x#{'%x' % char.ord}) at pos #{i + 1} in #{prototype.inspect}"
+        end
+    end
+  end
+
+  parts.map(&:strip)
+end
+
+FUNCTION_POINTER_DECL = /^(.+)?\([\*\^](\w+)\)\s*(\([^\)]+\))$/
+
+def parse_prototype(prototype)
+
+  fn_type_name, *args = split_prototype(prototype).select{|p| !p.empty?}.to_enum.with_index.map do |decl, i|
+    begin
+      name = nil
+      type = nil
+
+      case decl
+        when /\*$/, /\*\srestrict$/
+          name = "_arg_#{i}"
+          type = decl
+        when 'void'
+          type = 'void'
+        when '...'
+          name = '...'
+        when /^[^\s]+$/
+          name = "_arg_#{i}"
+          type = decl
+        when FUNCTION_POINTER_DECL
+          name = $2
+          type = $1 + '(*)' + $3
+        when /^(.+?)(\w+)$/
+          name = $2
+          type = $1.strip
+        when /^(.+?)(\w+)(\[(\d*|restrict)\])$/
+          name = $2
+          type = $1 + $3
+        else
+          raise "Unknown decl #{decl.inspect}"
+      end
+
+      {name: name, type: type}
+    rescue
+      STDERR.puts "in \"#{prototype}\""
+      raise
+    end
+  end
+
+  {prototype: prototype, name: fn_type_name[:name], type: fn_type_name[:type], args: args}
+end
 
 $functions = {}
 
@@ -9,9 +94,8 @@ def define(headers, prototypes)
   for proto in prototypes
     fn = parse_prototype(proto)
     if not $functions[fn[:name]]
-      h = JSON.parse(JSON.generate(fn))
-      h['includes'] = headers.map{|h| '#include <' + h + '>'}
-      $functions[fn[:name]] = h
+      fn[:includes] = headers.map{|h| '#include <' + h + '>'}
+      $functions[fn[:name]] = fn
     end
   end
 end
@@ -20,10 +104,9 @@ def lsb_define(headers, prototypes)
   for proto in prototypes
     fn = parse_prototype(proto)
     if not $functions[fn[:name]]
-      h = JSON.parse(JSON.generate(fn))
-      h['includes'] = headers.map{|h| '#include <' + h + '>'}
-      h[:lsb] = true
-      $functions[fn[:name]] = h
+      fn[:includes] = headers.map{|h| '#include <' + h + '>'}
+      fn[:lsb] = true
+      $functions[fn[:name]] = fn
     end
   end
 end
@@ -456,7 +539,7 @@ define(["sys/mman.h"], [
 # OPEN(2)
 define(["fcntl.h"], [
   "int open(const char* path, int flags, ...)",
-  "int openat(int fd, const char* path, int flags, ...)"
+  #~ "int openat(int fd, const char* path, int flags, ...)"
 ])
 
 # PIPE(2)
@@ -799,10 +882,10 @@ define(["rpc/rpc.h"], [
 
 # SETJMP(3)
 define(["setjmp.h"], [
-  "void siglongjmp(sigjmp_buf env, int val)",
-  "int setjmp(jmp_buf env)",
+  #~ "void siglongjmp(sigjmp_buf env, int val)",
+  #~ "int setjmp(jmp_buf env)",
   "void longjmp(jmp_buf env, int val)",
-  "int _setjmp(jmp_buf env)",
+  #~ "int _setjmp(jmp_buf env)",
   "void _longjmp(jmp_buf env, int val)"
 ])
 
@@ -1360,7 +1443,7 @@ define(["grp.h"], [
   "int getgrnam_r(const char* name, struct group* grp, char* buffer, size_t bufsize, struct group** result)",
   "struct group* getgrgid(gid_t gid)",
   "int getgrgid_r(gid_t gid, struct group* grp, char* buffer, size_t bufsize, struct group** result)",
-  "int setgrent(void)",
+  "void setgrent(void)",
   "void endgrent(void)"
 ])
 
@@ -1732,7 +1815,7 @@ define(["stdio.h"], [
 
 # FREELOCALE(3)
 define(["locale.h"], [
-  "int freelocale(locale_t locale)"
+  "void freelocale(locale_t locale)"
 ])
 
 # FREXP(3)
@@ -2091,7 +2174,7 @@ define(["wctype.h"], [
   "int iswalnum_l(wint_t wc, locale_t loc)",
   "int iswalpha_l(wint_t wc, locale_t loc)",
   "int iswcntrl_l(wint_t wc, locale_t loc)",
-  "int iswctype_l(wint_t wc, locale_t loc)",
+  #~ "int iswctype_l(wint_t wc, locale_t loc)",
   "int iswdigit_l(wint_t wc, locale_t loc)",
   "int iswgraph_l(wint_t wc, locale_t loc)",
   "int iswlower_l(wint_t wc, locale_t loc)",
@@ -2211,8 +2294,8 @@ define(["math.h"], [
 
 # MAKECONTEXT(3)
 define(["ucontext.h"], [
-  "void makecontext(ucontext_t* ucp, void (*func)(void), int argc, ...)",
-  "int swapcontext(ucontext_t* oucp, const ucontext_t* ucp)"
+  #~ "void makecontext(ucontext_t* ucp, void (*func)(void), int argc, ...)",
+  #~ "int swapcontext(ucontext_t* oucp, const ucontext_t* ucp)"
 ])
 
 # MBLEN(3)
@@ -2778,7 +2861,7 @@ define(["pthread.h"], [
 
 # QUICK_EXIT(3)
 define(["stdlib.h"], [
-  "_Noreturn void quick_exit(int status)"
+  #~ "_Noreturn void quick_exit(int status)"
 ])
 
 # RAISE(3)
@@ -2876,7 +2959,7 @@ define(["semaphore.h", "time.h"], [
 
 # SEM_OPEN(3)
 define(["semaphore.h"], [
-  "sem_t* sem_open(const char* name, int oflag, ...)",
+  #~ "sem_t* sem_open(const char* name, int oflag, ...)",
   "int sem_close(sem_t* sem)",
   "int sem_unlink(const char* name)"
 ])
@@ -3026,8 +3109,8 @@ define(["string.h"], [
 
 # STRFMON(3)
 define(["monetary.h"], [
-  "ssize_t strfmon(char* restrict s, size_t maxsize, const char* restrict format, ...)",
-  "ssize_t strfmon_l(char* restrict s, size_t maxsize, locale_t loc, const char* restrict format, ...)"
+  #~ "ssize_t strfmon(char* restrict s, size_t maxsize, const char* restrict format, ...)",
+  #~ "ssize_t strfmon_l(char* restrict s, size_t maxsize, locale_t loc, const char* restrict format, ...)"
 ])
 
 # STRFTIME(3)
@@ -3247,7 +3330,7 @@ define(["unistd.h"], [
 
 # ULIMIT(3)
 define(["ulimit.h"], [
-  "long ulimit(int cmd, ...)"
+  #~ "long ulimit(int cmd, ...)"
 ])
 
 # UNAME(3)
@@ -3496,7 +3579,7 @@ lsb_define([
   "ssize_t __recv_chk(int fd, void* buf, size_t len, size_t buflen, int flag)",
   "ssize_t __recvfrom_chk(int fd, void* buf, size_t len, size_t buflen, int flag, struct sockaddr* from, socklen_t* fromlen)",
   "int __register_atfork(void (*prepare)(void), void (*parent)(void), void (*child)(void), void* __dso_handle)",
-  "int __sigsetjmp(jmp_buf env, int savemask)",
+  #~ "int __sigsetjmp(jmp_buf env, int savemask)",
   "int __snprintf_chk(char* str, size_t maxlen, int flag, size_t strlen, const char* format)",
   "int __sprintf_chk(char* str, int flag, size_t strlen, const char* format)",
   "void __stack_chk_fail(void)",

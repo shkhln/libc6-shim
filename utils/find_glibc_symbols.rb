@@ -11,12 +11,30 @@ end
 for lib in libs
   for line in `readelf -s #{lib}`.lines
     if !(line =~ /(UND|LOCAL)/) && line =~ /\s(\w+)@@?(GLIBC_[0-9\.]+)/i
-      symbols[$1] =  [] if not symbols[$1]
-      symbols[$1] << $2 unless symbols[$1].include?($2)
+
+      name    = $1
+      version = $2
+      type    =
+        case line.split(/\s+/)[4]
+          when 'FUNC'   then :fun
+          when 'IFUNC'  then :fun
+          when 'OS+0'   then :fun
+          when 'OBJECT' then :obj
+          else
+            raise
+        end
+
+      if not symbols[name]
+        symbols[name] = {versions: [], type: type}
+      end
+
+      if not symbols[name][:versions].include?(version)
+        symbols[name][:versions] << version
+      end
     end
   end
 end
 
 for sym in symbols.keys.sort
-  print sym, ': ', symbols[sym].sort.join(', '), "\n"
+  print symbols[sym][:type], ' ', sym, ': ', symbols[sym][:versions].sort.join(', '), "\n"
 end
