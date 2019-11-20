@@ -864,11 +864,11 @@ define(["stdlib.h"], [
 ])
 
 # ICONV(3)
-define(["iconv.h"], [
-  "iconv_t iconv_open(const char* dstname, const char* srcname)",
-  "int iconv_close(iconv_t cd)",
-  "size_t iconv(iconv_t cd, char** restrict src, size_t* restrict srcleft, char** restrict dst, size_t* restrict dstleft)"
-])
+#~ define(["iconv.h"], [
+  #~ "iconv_t iconv_open(const char* dstname, const char* srcname)",
+  #~ "int iconv_close(iconv_t cd)",
+  #~ "size_t iconv(iconv_t cd, char** restrict src, size_t* restrict srcleft, char** restrict dst, size_t* restrict dstleft)"
+#~ ])
 
 # RPC_SVC_CALLS(3)
 define(["rpc/rpc.h"], [
