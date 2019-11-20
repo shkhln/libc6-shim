@@ -60,9 +60,9 @@ struct linux_stat {
   int64_t               st_size;
   int64_t               st_blksize;
   int64_t               st_blocks;
-  linux_timespec st_atim;
-  linux_timespec st_mtim;
-  linux_timespec st_ctim;
+  linux_timespec        st_atim;
+  linux_timespec        st_mtim;
+  linux_timespec        st_ctim;
   uint8_t               _pad2[24];
 };
 
