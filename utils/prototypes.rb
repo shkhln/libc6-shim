@@ -291,7 +291,7 @@ define(["unistd.h"], [
 ])
 
 # STATFS(2)
-define(["sys/param.h", "sys/mount.h"], [
+define(["sys/param.h", "sys/mount.h", ("sys/statfs.h" if LINUX)].compact, [
   "int statfs(const char* path, struct statfs* buf)",
   "int fstatfs(int fd, struct statfs* buf)"
 ])
@@ -601,7 +601,7 @@ define(["unistd.h", "sys/uio.h"], [
 ])
 
 # QUOTACTL(2)
-define(["sys/types.h", "ufs/ufs/quota.h"], [
+define(["sys/types.h", ("ufs/ufs/quota.h" if not LINUX)].compact, [
   "int quotactl(const char* path, int cmd, int id, void* addr)"
 ])
 
@@ -951,7 +951,7 @@ define(["unistd.h"], [
 ])
 
 # JEMALLOC(3)
-define(["stdlib.h", "malloc_np.h"], [
+define(["stdlib.h", ("malloc_np.h" if not LINUX)].compact, [
   "void* calloc(size_t number, size_t size)",
   "int posix_memalign(void** ptr, size_t alignment, size_t size)",
   "void* aligned_alloc(size_t alignment, size_t size)",
@@ -2539,7 +2539,7 @@ define(["signal.h", "string.h"], [
 ])
 
 # PTHREAD_AFFINITY_NP(3)
-define(["pthread_np.h"], [
+define([LINUX ? "pthread.h" : "pthread_np.h"], [
   "int pthread_getaffinity_np(pthread_t td, size_t cpusetsize, cpuset_t* cpusetp)",
   "int pthread_setaffinity_np(pthread_t td, size_t cpusetsize, const cpuset_t* cpusetp)"
 ])
@@ -2574,7 +2574,7 @@ define(["pthread.h"], [
 ])
 
 # PTHREAD_ATTR_AFFINITY_NP(3)
-define(["pthread_np.h"], [
+define([LINUX ? "pthread.h" : "pthread_np.h"], [
   "int pthread_attr_getaffinity_np(const pthread_attr_t* pattr, size_t cpusetsize, cpuset_t* cpusetp)",
   "int pthread_attr_setaffinity_np(pthread_attr_t* pattr, size_t cpusetsize, const cpuset_t* cpusetp)"
 ])
@@ -2682,7 +2682,7 @@ define(["pthread.h"], [
 ])
 
 # PTHREAD_JOIN(3)
-define(["pthread.h", "pthread_np.h"], [
+define(LINUX ? ["pthread.h"] : ["pthread.h", "pthread_np.h"], [
   "int pthread_join(pthread_t thread, void** value_ptr)",
   "int pthread_timedjoin_np(pthread_t thread, void** value_ptr, const struct timespec* abstime)"
 ])
@@ -2752,7 +2752,7 @@ define(["pthread.h"], [
 ])
 
 # PTHREAD_MUTEXATTR_GETKIND_NP(3)
-define(["pthread_np.h"], [
+define([LINUX ? "pthread.h" : "pthread_np.h"], [
   "int pthread_mutexattr_getkind_np(pthread_mutexattr_t attr)",
   "int pthread_mutexattr_setkind_np(pthread_mutexattr_t* attr, int kind)"
 ])
@@ -3490,10 +3490,10 @@ lsb_define([
   "link.h",
   #~ "utmp.h",
   #~ "envz.h",
-  #~ "sys/epoll.h",
+  ("sys/epoll.h" if LINUX),
   "err.h",
   #~ "error.h",
-  #~ "sys/statfs.h",
+  ("sys/statfs.h" if LINUX),
   "sys/time.h",
   "grp.h",
   "netdb.h",
@@ -3522,7 +3522,7 @@ lsb_define([
   "sys/resource.h",
   "sys/wait.h",
   "rpc/xdr.h"
-], [
+].compact, [
   "int _IO_feof(_IO_FILE* __fp)",
   "int _IO_getc(_IO_FILE* __fp)",
   "int _IO_putc(int __c, _IO_FILE* __fp)",

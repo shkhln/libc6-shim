@@ -31,6 +31,9 @@ $(BUILD_DIR)/lib$(b)/nvshim.debug.so: $(SOURCES) $(BUILD_DIR)/wrappers$(b).c $(B
 
 .endfor
 
+check-prototypes:
+	./utils/prototype-check.rb | /compat/linux/bin/gcc -x c -std=c99 --sysroot=/compat/linux -o /dev/null -
+
 clean:
 .for f in $(LIBS)
 .  if exists($f)

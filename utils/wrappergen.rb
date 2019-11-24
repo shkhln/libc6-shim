@@ -223,7 +223,6 @@ for line in `readelf -s #{ARGV[1]} | grep -v UND`.lines
 end
 
 puts <<E
-#define _WITH_GETLINE
 #include <stdarg.h>
 #include <stdint.h>
 #include "../src/shim.h"
@@ -235,6 +234,8 @@ puts <<E
 #include "../src/libc/sys/stat.h"
 #include "../src/libc/sys/utsname.h"
 E
+
+LINUX = false
 
 require(__dir__ + '/prototypes.rb')
 
