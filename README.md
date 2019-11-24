@@ -1,6 +1,6 @@
 Requirements:
 
-FreeBSD 12; llvm60-6.0; nvidia-driver 415.22 or newer; ruby.
+FreeBSD 12; nvidia-driver 415.22 or newer; ruby.
 
 Usage:
 

@@ -240,34 +240,46 @@ require(__dir__ + '/prototypes.rb')
 
 for sym in symbols.keys
 
-  if SUBSTITUTIONS[sym.to_sym]
+  puts "// #{sym}"
 
-    for version in symbols[sym][:versions]
-      puts "__asm__(\".symver shim_#{SUBSTITUTIONS[sym.to_sym]},#{sym}@#{version}\");"
-      puts
-    end
+  if symbols[sym][:type] == 'fun' && !SUBSTITUTIONS[sym.to_sym]
 
-  else
+    if not implemented_wrappers[sym]
+      implemented_wrappers[sym] = true
 
-    function = $functions[sym]
-    if function
-
-      if not implemented_wrappers[function[:name]]
-        implemented_wrappers[function[:name]] = true
+      function = $functions[sym]
+      if function
         puts generate_wrapper(function, implemented_shims[function[:name]])
-        puts
-      end
-
-    else
-
-      if symbols[sym][:type] == 'fun' && !implemented_wrappers[sym]
-        implemented_wrappers[sym] = true
+      else
         puts 'void shim_' + sym + '() {'
         puts '  UNIMPLEMENTED();'
         puts '}'
         puts
       end
 
+      versions = symbols[sym][:versions]
+      if versions.size > 1
+        for version in versions
+          puts "extern __typeof(shim_#{sym}) shim_#{sym}_#{version.gsub('.', '_')} __attribute__((alias(\"shim_#{sym}\")));"
+        end
+      end
+    end
+  end
+
+  puts
+end
+
+puts
+
+for sym, subst in SUBSTITUTIONS
+  versions = symbols[sym.to_s][:versions]
+  if versions.size == 1
+    puts "extern __typeof(shim_#{subst}) shim_#{sym} __attribute__((alias(\"shim_#{subst}\")));"
+  else
+    for version in versions
+      puts "extern __typeof(shim_#{subst}) shim_#{sym}_#{version.gsub('.', '_')} __attribute__((alias(\"shim_#{subst}\")));"
     end
   end
 end
+
+puts

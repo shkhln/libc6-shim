@@ -24,7 +24,6 @@ int shim_finite_impl(double x) {
 
 #ifdef __i386__
 
-__asm__(".symver shim___divdi3,__divdi3@GLIBC_2.0");
 int64_t shim___divdi3(int64_t a, int64_t b) {
   LOG_ARGS("%lld, %lld", a, b);
   int64_t ret = a / b;
@@ -32,7 +31,6 @@ int64_t shim___divdi3(int64_t a, int64_t b) {
   return ret;
 }
 
-__asm__(".symver shim___udivdi3,__udivdi3@GLIBC_2.0");
 uint64_t shim___udivdi3(uint64_t a, uint64_t b) {
   LOG_ARGS("%llu, %llu", a, b);
   uint64_t ret = a / b;
@@ -40,7 +38,6 @@ uint64_t shim___udivdi3(uint64_t a, uint64_t b) {
   return ret;
 }
 
-__asm__(".symver shim___umoddi3,__umoddi3@GLIBC_2.0");
 uint64_t shim___umoddi3(uint64_t a, uint64_t b) {
   LOG_ARGS("%llu, %llu", a, b);
   uint64_t ret = a % b;

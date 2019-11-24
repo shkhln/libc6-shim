@@ -84,8 +84,6 @@ int shim_pthread_mutexattr_setkind_np_impl(pthread_mutexattr_t* attr, int linux_
   return shim_pthread_mutexattr_settype_impl(attr, linux_kind);
 }
 
-__asm__(".symver shim_pthread_mutexattr_setpshared,pthread_mutexattr_setpshared@GLIBC_2.0");
-__asm__(".symver shim_pthread_mutexattr_setpshared,pthread_mutexattr_setpshared@GLIBC_2.2.5");
 int shim_pthread_mutexattr_setpshared(pthread_mutexattr_t* attr, int pshared) {
   LOG_ARGS("%p, %d",  attr, pshared);
   int err = pthread_mutexattr_setpshared(attr, pshared);
@@ -93,8 +91,6 @@ int shim_pthread_mutexattr_setpshared(pthread_mutexattr_t* attr, int pshared) {
   return err;
 }
 
-__asm__(".symver shim___pthread_key_create,__pthread_key_create@GLIBC_2.0");
-__asm__(".symver shim___pthread_key_create,__pthread_key_create@GLIBC_2.2.5");
 int shim___pthread_key_create(pthread_key_t* key, void (*destructor)(void*)) {
   LOG_ARGS("%p, %p", key, destructor);
   int err = pthread_key_create(key, destructor);

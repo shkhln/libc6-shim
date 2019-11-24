@@ -10,35 +10,28 @@
 
 #include "shim.h"
 
-__asm__(".symver shim_stdin,_IO_stdin_@GLIBC_2.0");
-__asm__(".symver shim_stdin,_IO_2_1_stdin_@GLIBC_2.1");
-__asm__(".symver shim_stdin,_IO_2_1_stdin_@GLIBC_2.2.5");
-
-__asm__(".symver shim_stdout,_IO_stdout_@GLIBC_2.0");
-__asm__(".symver shim_stdout,_IO_2_1_stdout_@GLIBC_2.1");
-__asm__(".symver shim_stdout,_IO_2_1_stdout_@GLIBC_2.2.5");
-
-__asm__(".symver shim_stderr,_IO_stderr_@GLIBC_2.0");
-__asm__(".symver shim_stderr,_IO_2_1_stderr_@GLIBC_2.1");
-__asm__(".symver shim_stderr,_IO_2_1_stderr_@GLIBC_2.2.5");
-
 static FILE std[3] = {};
 
 FILE* shim_stdin  = &std[0];
 FILE* shim_stdout = &std[1];
 FILE* shim_stderr = &std[2];
 
-__asm__(".symver shim_env,environ@GLIBC_2.0");
-__asm__(".symver shim_env,environ@GLIBC_2.2.5");
-__asm__(".symver shim_env,_environ@GLIBC_2.0");
-__asm__(".symver shim_env,_environ@GLIBC_2.2.5");
-__asm__(".symver shim_env,__environ@GLIBC_2.0");
-__asm__(".symver shim_env,__environ@GLIBC_2.2.5");
+extern FILE* shim__IO_stdin_     __attribute__((alias("shim_stdin")));
+extern FILE* shim__IO_2_1_stdin_ __attribute__((alias("shim_stdin")));
+
+extern FILE* shim__IO_stdout_     __attribute__((alias("shim_stdout")));
+extern FILE* shim__IO_2_1_stdout_ __attribute__((alias("shim_stdout")));
+
+extern FILE* shim__IO_stderr_     __attribute__((alias("shim_stderr")));
+extern FILE* shim__IO_2_1_stderr_ __attribute__((alias("shim_stderr")));
 
 #define MAX_SHIM_ENV_ENTRIES 100
 
 static char* _shim_env[MAX_SHIM_ENV_ENTRIES];
-char** shim_env = _shim_env;
+char** shim_environ = _shim_env;
+
+extern char** shim__environ  __attribute__((alias("shim_environ")));
+extern char** shim___environ __attribute__((alias("shim_environ")));
 
 char* shim___progname = "<progname>";
 
@@ -57,7 +50,7 @@ static void shim_init(int argc, char** argv, char** env) {
   for (int i = 0;; i++) {
     if (env[i] == NULL) {
       assert(i < MAX_SHIM_ENV_ENTRIES);
-      memcpy(shim_env, env, sizeof(char*) * (i + 1));
+      memcpy(shim_environ, env, sizeof(char*) * (i + 1));
       break;
     }
   }
@@ -124,11 +117,11 @@ int shim___libc_start_main(
 
   if (init != NULL) {
     LOG("%s: init\n", __func__);
-    init(shim_argc, shim_argv, shim_env);
+    init(shim_argc, shim_argv, shim_environ);
   }
 
   LOG("%s: main\n", __func__);
-  exit(main(shim_argc, shim_argv, shim_env));
+  exit(main(shim_argc, shim_argv, shim_environ));
 }
 
 char* shim_gnu_get_libc_version_impl() {

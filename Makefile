@@ -18,16 +18,16 @@ $(BUILD_DIR)/versions$(b).h:
 
 $(BUILD_DIR)/wrappers$(b).c:
 	mkdir -p $(BUILD_DIR)
-	cc $(CFLAGS) -m$(b) -o $(BUILD_DIR)/shim$(b).tmp $(SOURCES)
+	$(CC) $(CFLAGS) -m$(b) -o $(BUILD_DIR)/shim$(b).tmp $(SOURCES)
 	./utils/wrappergen.rb glibc-2.17-symbols.$(b) $(BUILD_DIR)/shim$(b).tmp > $(.TARGET)
 
 $(BUILD_DIR)/lib$(b)/nvshim.so:       $(SOURCES) $(BUILD_DIR)/wrappers$(b).c $(BUILD_DIR)/versions$(b).h
 	mkdir -p $(BUILD_DIR)/lib$(b)
-	clang60 -O2     -m$(b) $(CFLAGS) -o $(.TARGET) $(SOURCES) -include $(BUILD_DIR)/versions$(b).h $(BUILD_DIR)/wrappers$(b).c -lm -pthread
+	$(CC) -O2     -m$(b) $(CFLAGS) -o $(.TARGET) $(SOURCES) -include $(BUILD_DIR)/versions$(b).h $(BUILD_DIR)/wrappers$(b).c -lm -pthread
 
 $(BUILD_DIR)/lib$(b)/nvshim.debug.so: $(SOURCES) $(BUILD_DIR)/wrappers$(b).c $(BUILD_DIR)/versions$(b).h
 	mkdir -p $(BUILD_DIR)/lib$(b)
-	clang60 -DDEBUG -m$(b) $(CFLAGS) -o $(.TARGET) $(SOURCES) -include $(BUILD_DIR)/versions$(b).h $(BUILD_DIR)/wrappers$(b).c -lm -pthread
+	$(CC) -DDEBUG -m$(b) $(CFLAGS) -o $(.TARGET) $(SOURCES) -include $(BUILD_DIR)/versions$(b).h $(BUILD_DIR)/wrappers$(b).c -lm -pthread
 
 .endfor
 
