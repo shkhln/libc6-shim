@@ -113,7 +113,7 @@ end
 
 # SYSCALL(2)
 define(["sys/syscall.h", "unistd.h"], [
-  "int syscall(int number, ...)"
+  "long syscall(long number, ...)"
 ])
 
 # EXIT(2)
@@ -186,7 +186,7 @@ define(["sys/types.h", "sys/socket.h"], [
 
 # BRK(2)
 define(["unistd.h"], [
-  "int brk(const void* addr)",
+  "int brk(void* addr)",
   "void* sbrk(intptr_t incr)"
 ])
 
@@ -352,7 +352,7 @@ define(["sys/time.h"], [
 # GETLOGIN(2)
 define(["unistd.h", "sys/param.h"], [
   "char* getlogin(void)",
-  "int getlogin_r(char* name, int len)",
+  "int getlogin_r(char* name, size_t len)",
   "int setlogin(const char* name)"
 ])
 
@@ -464,7 +464,7 @@ define(["sys/mman.h"], [
 
 # MINCORE(2)
 define(["sys/mman.h"], [
-  "int mincore(const void* addr, size_t len, char* vec)"
+  #~ "int mincore(void* addr, size_t len, unsigned char* vec)"
 ])
 
 # MKDIR(2)
@@ -498,12 +498,12 @@ define(["sys/mman.h"], [
 
 # MOUNT(2)
 define(["sys/param.h", "sys/mount.h"], [
-  "int mount(const char* type, const char* dir, int flags, void* data)"
+  #~ "int mount(const char* type, const char* dir, int flags, void* data)"
 ])
 
 # MPROTECT(2)
 define(["sys/mman.h"], [
-  "int mprotect(const void* addr, size_t len, int prot)"
+  "int mprotect(void* addr, size_t len, int prot)"
 ])
 
 # MSGCTL(2)
@@ -518,7 +518,7 @@ define(["sys/msg.h"], [
 
 # MSGRCV(2)
 define(["sys/types.h", "sys/ipc.h", "sys/msg.h"], [
-  "int msgrcv(int msqid, void* msgp, size_t msgsz, long msgtyp, int msgflg)"
+  "ssize_t msgrcv(int msqid, void* msgp, size_t msgsz, long msgtyp, int msgflg)"
 ])
 
 # MSGSND(2)
@@ -621,7 +621,7 @@ define(["sys/types.h", "sys/socket.h"], [
   "ssize_t recv(int s, void* buf, size_t len, int flags)",
   "ssize_t recvfrom(int s, void* buf, size_t len, int flags, struct sockaddr* restrict from, socklen_t* restrict fromlen)",
   "ssize_t recvmsg(int s, struct msghdr* msg, int flags)",
-  "ssize_t recvmmsg(int s, struct mmsghdr* restrict msgvec, size_t vlen, int flags, const struct timespec* restrict timeout)"
+  "int recvmmsg(int s, struct mmsghdr* msgvec, unsigned int vlen, int flags, const struct timespec* timeout)"
 ])
 
 # RENAME(2)
@@ -689,7 +689,7 @@ define(["sys/types.h", "sys/socket.h"], [
   "ssize_t send(int s, const void* msg, size_t len, int flags)",
   "ssize_t sendto(int s, const void* msg, size_t len, int flags, const struct sockaddr* to, socklen_t tolen)",
   "ssize_t sendmsg(int s, const struct msghdr* msg, int flags)",
-  "ssize_t sendmmsg(int s, struct mmsghdr* restrict msgvec, size_t vlen, int flags)"
+  "int sendmmsg(int s, struct mmsghdr* restrict msgvec, unsigned int vlen, int flags)"
 ])
 
 # SENDFILE(2)
@@ -707,13 +707,13 @@ define(["unistd.h"], [
 
 # SETGROUPS(2)
 define(["sys/param.h", "unistd.h"], [
-  "int setgroups(int ngroups, const gid_t* gidset)"
+  "int setgroups(size_t ngroups, const gid_t* gidset)"
 ])
 
 # SETPGID(2)
 define(["unistd.h"], [
   "int setpgid(pid_t pid, pid_t pgrp)",
-  "int setpgrp(pid_t pid, pid_t pgrp)"
+  #~ "int setpgrp(pid_t pid, pid_t pgrp)"
 ])
 
 # SETREGID(2)
@@ -786,7 +786,7 @@ define(["signal.h"], [
 
 # SIGRETURN(2)
 define(["signal.h"], [
-  "int sigreturn(const ucontext_t* scp)"
+  #~ "int sigreturn(const ucontext_t* scp)"
 ])
 
 # SIGSUSPEND(2)
@@ -1385,7 +1385,7 @@ define(["stdlib.h"], [
 
 # DIRNAME(3)
 define(["libgen.h"], [
-  "char* dirname(const char* path)"
+  "char* dirname(char* path)"
 ])
 
 # DIV(3)
@@ -1473,7 +1473,7 @@ define(["netdb.h"], [
   "int getnetgrent(char** host, char** user, char** domain)",
   "int getnetgrent_r(char** host, char** user, char** domain, char* buf, size_t bufsize)",
   "int innetgr(const char* netgroup, const char* host, const char* user, const char* domain)",
-  "void setnetgrent(const char* netgroup)",
+  #~ "int setnetgrent(const char* netgroup)",
   "void endnetgrent(void)"
 ])
 
@@ -1609,7 +1609,7 @@ define(["math.h"], [
 # FCLOSE(3)
 define(["stdio.h"], [
   "int fclose(FILE* stream)",
-  "void fcloseall(void)"
+  #~ "int fcloseall(void)"
 ])
 
 # FDIM(3)
@@ -1624,7 +1624,7 @@ define(["stdio.h"], [
   "FILE* fopen(const char* restrict path, const char* restrict mode)",
   "FILE* fdopen(int fildes, const char* mode)",
   "FILE* freopen(const char* path, const char* mode, FILE* stream)",
-  "FILE* fmemopen(void* restrict* buf, size_t size, const char* restrict mode)"
+  "FILE* fmemopen(void* buf, size_t size, const char* restrict mode)"
 ])
 
 # FECLEAREXCEPT(3)
@@ -1848,7 +1848,7 @@ define(["sys/types.h", "sys/ipc.h"], [
 
 # FTS(3)
 define(["fts.h"], [
-  "FTS* fts_open(char* const* path_argv, int options, int (*compar)(const FTSENT* const*, const FTSENT* const*))",
+  #~ "FTS* fts_open(char* const* path_argv, int options, int (*compar)(const FTSENT**, const FTSENT**))",
   "FTSENT* fts_read(FTS* ftsp)",
   "FTSENT* fts_children(FTS* ftsp, int options)",
   "int fts_set(FTS* ftsp, FTSENT* f, int options)",
@@ -1890,7 +1890,7 @@ define(["math.h"], [
   "long double lgammal_r(long double x, int* signgamp)",
   "double gamma(double x)",
   "float gammaf(float x)",
-  "long double tgamma(double x)",
+  "double tgamma(double x)",
   "float tgammaf(float x)",
   "long double tgammal(long double x)"
 ])
@@ -1915,8 +1915,8 @@ define(["stdio.h"], [
 
 # GETDOMAINNAME(3)
 define(["unistd.h"], [
-  "int getdomainname(char* name, int namelen)",
-  "int setdomainname(const char* name, int namelen)"
+  "int getdomainname(char* name, size_t namelen)",
+  "int setdomainname(const char* name, size_t namelen)"
 ])
 
 # GETENV(3)
@@ -1935,13 +1935,13 @@ define(["unistd.h"], [
 # GETHOSTID(3)
 define(["unistd.h"], [
   "long gethostid(void)",
-  "void sethostid(long hostid)"
+  #~ "int sethostid(long hostid)"
 ])
 
 # GETHOSTNAME(3)
 define(["unistd.h"], [
   "int gethostname(char* name, size_t namelen)",
-  "int sethostname(const char* name, int namelen)"
+  "int sethostname(const char* name, size_t namelen)"
 ])
 
 # GETLOADAVG(3)
@@ -1972,7 +1972,7 @@ define(["pwd.h", "unistd.h"], [
 
 # GETRPCPORT(3)
 define([], [
-  "int getrpcport(char* host, int prognum, int versnum, int proto)"
+  "int getrpcport(const char* host, unsigned long prognum, unsigned long versnum, unsigned int proto)"
 ])
 
 # GETSUBOPT(3)
@@ -2006,7 +2006,7 @@ define(["search.h"], [
 # QSORT(3)
 define(["stdlib.h"], [
   "void qsort(void* base, size_t nmemb, size_t size, int (*compar)(const void*, const void*))",
-  "void qsort_r(void* base, size_t nmemb, size_t size, void* thunk, int (*compar)(void*, const void*, const void*))"
+  #~ "void qsort_r(void* base, size_t nmemb, size_t size, void* thunk, int (*compar)(void*, const void*, const void*))"
 ])
 
 # IEEE_TEST(3)
@@ -2051,8 +2051,8 @@ define(["unistd.h"], [
 # RANDOM(3)
 define(["stdlib.h"], [
   "long random(void)",
-  "void srandom(unsigned long seed)",
-  "char* initstate(unsigned long seed, char* state, long n)",
+  "void srandom(unsigned int seed)",
+  "char* initstate(unsigned int seed, char* state, size_t n)",
   "char* setstate(char* state)"
 ])
 
@@ -2064,11 +2064,11 @@ define(["search.h"], [
 
 # RCMD(3)
 define(["unistd.h"], [
-  "int rcmd(char** ahost, int inport, const char* locuser, const char* remuser, const char* cmd, int* fd2p)",
+  "int rcmd(char** ahost, unsigned short int inport, const char* locuser, const char* remuser, const char* cmd, int* fd2p)",
   "int rresvport(int* port)",
-  "int iruserok(u_long raddr, int superuser, const char* ruser, const char* luser)",
+  "int iruserok(uint32_t raddr, int superuser, const char* ruser, const char* luser)",
   "int ruserok(const char* rhost, int superuser, const char* ruser, const char* luser)",
-  "int rcmd_af(char** ahost, int inport, const char* locuser, const char* remuser, const char* cmd, int* fd2p, int af)",
+  "int rcmd_af(char** ahost, unsigned short int inport, const char* locuser, const char* remuser, const char* cmd, int* fd2p, int af)",
   "int rresvport_af(int* port, int af)"
 ])
 
@@ -2204,13 +2204,13 @@ define(["math.h"], [
   "double j1(double x)",
   "float j1f(float x)",
   "double jn(int n, double x)",
-  #~ "float jnf(int n, float x)",
+  "float jnf(int n, float x)",
   "double y0(double x)",
   "float y0f(float x)",
   "double y1(double x)",
   "float y1f(float x)",
   "double yn(int n, double x)",
-  #~ "float ynf(int n, float x)"
+  "float ynf(int n, float x)"
 ])
 
 # LABS(3)
@@ -2468,7 +2468,7 @@ define(["stdio.h"], [
 define(["stdio.h", "string.h"], [
   "void perror(const char* string)",
   "char* strerror(int errnum)",
-  "int strerror_r(int errnum, char* strerrbuf, size_t buflen)"
+  "char* strerror_r(int errnum, char* strerrbuf, size_t buflen)"
 ])
 
 # POSIX_SPAWN(3)
@@ -2856,7 +2856,7 @@ define(["pthread.h"], [
 
 # PTHREAD_YIELD(3)
 define(["pthread.h"], [
-  "void pthread_yield(void)"
+  #~ "int pthread_yield(void)"
 ])
 
 # QUICK_EXIT(3)
@@ -2993,8 +2993,8 @@ define(["semaphore.h"], [
 # SETBUF(3)
 define(["stdio.h"], [
   "void setbuf(FILE* restrict stream, char* restrict buf)",
-  "void setbuffer(FILE* stream, char* buf, int size)",
-  "int setlinebuf(FILE* stream)",
+  "void setbuffer(FILE* stream, char* buf, size_t size)",
+  "void setlinebuf(FILE* stream)",
   "int setvbuf(FILE* restrict stream, char* restrict buf, int mode, size_t size)"
 ])
 
@@ -3178,7 +3178,7 @@ define(["stdlib.h", "limits.h", "inttypes.h", "sys/types.h"], [
   "long strtol(const char* restrict nptr, char** restrict endptr, int base)",
   "long long strtoll(const char* restrict nptr, char** restrict endptr, int base)",
   "intmax_t strtoimax(const char* restrict nptr, char** restrict endptr, int base)",
-  "quad_t strtoq(const char* nptr, char** endptr, int base)"
+  "long long int strtoq(const char* nptr, char** endptr, int base)"
 ])
 
 # STRTOK(3)
@@ -3192,7 +3192,7 @@ define(["stdlib.h", "limits.h", "inttypes.h", "sys/types.h"], [
   "unsigned long strtoul(const char* restrict nptr, char** restrict endptr, int base)",
   "unsigned long long strtoull(const char* restrict nptr, char** restrict endptr, int base)",
   "uintmax_t strtoumax(const char* restrict nptr, char** restrict endptr, int base)",
-  "u_quad_t strtouq(const char* nptr, char** endptr, int base)"
+  "unsigned long long strtouq(const char* nptr, char** endptr, int base)"
 ])
 
 # STRXFRM(3)
@@ -3213,7 +3213,7 @@ define(["unistd.h"], [
 
 # SYSCTL(3)
 define(["sys/types.h", "sys/sysctl.h"], [
-  "int sysctl(const int* name, u_int namelen, void* oldp, size_t* oldlenp, const void* newp, size_t newlen)"
+  "int sysctl(int* name, int namelen, void* oldp, size_t* oldlenp, void* newp, size_t newlen)"
 ])
 
 # SYSTEM(3)
@@ -3375,8 +3375,8 @@ define(["wchar.h"], [
   "wchar_t* wmemcpy(wchar_t* restrict s1, const wchar_t* restrict s2, size_t n)",
   "wchar_t* wmemmove(wchar_t* s1, const wchar_t* s2, size_t n)",
   "wchar_t* wmemset(wchar_t* s, wchar_t c, size_t n)",
-  "wchar_t* wcpcpy(wchar_t* s1, wchar_t* s2)",
-  "wchar_t* wcpncpy(wchar_t* s1, wchar_t* s2, size_t n)",
+  "wchar_t* wcpcpy(wchar_t* s1, const wchar_t* s2)",
+  "wchar_t* wcpncpy(wchar_t* s1, const wchar_t* s2, size_t n)",
   "int wcscasecmp(const wchar_t* s1, const wchar_t* s2)",
   "wchar_t* wcscat(wchar_t* restrict s1, const wchar_t* restrict s2)",
   "wchar_t* wcschr(const wchar_t* s, wchar_t c)",
@@ -3532,8 +3532,8 @@ lsb_define([
   "size_t __confstr_chk(int name, char* buf, size_t len, size_t buflen)",
   "const unsigned short** __ctype_b_loc(void)",
   "size_t __ctype_get_mb_cur_max(void)",
-  "int32_t** __ctype_tolower_loc(void)",
-  "int32_t** __ctype_toupper_loc(void)",
+  "const int32_t** __ctype_tolower_loc(void)",
+  "const int32_t** __ctype_toupper_loc(void)",
   "int __cxa_atexit(void (*func)(void*), void* arg, void* dso_handle)",
   "void __cxa_finalize(void* d)",
   "int* __errno_location(void)",
@@ -3683,7 +3683,7 @@ lsb_define([
   "int epoll_create(int size)",
   "int epoll_ctl(int epfd, int op, int fd, struct epoll_event* event)",
   "int epoll_wait(int epfd, struct epoll_event* events, int maxevents, int timeout)",
-  "int erand48_r(unsigned short[3] xsubi, struct drand48_data* buffer, double* result)",
+  "int erand48_r(unsigned short xsubi[3], struct drand48_data* buffer, double* result)",
   "void err(int eval, const char* fmt, ...)",
   "void error(int status, int errnum, const char* format, ...)",
   "void errx(int eval, const char* fmt, ...)",
@@ -3734,20 +3734,20 @@ lsb_define([
   "int ioctl(int fildes , int request, ...)",
   "int ioctl(int sockfd, int request, void* argp)",
   "int ioctl(int fd, unsigned long request, int* argp)",
-  "int jrand48_r(unsigned short[3] xsubi, struct drand48_data* buffer, long int* result)",
+  "int jrand48_r(unsigned short xsubi[3], struct drand48_data* buffer, long int* result)",
   "int kill(pid_t pid, int sig)",
-  "int lcong48_r(unsigned short[7] param, struct drand48_data* buffer)",
+  "int lcong48_r(unsigned short param[7], struct drand48_data* buffer)",
   "int link(const char* path1, const char* path2)",
   "int lrand48_r(struct drand48_data* buffer, long int* result)",
   "void* memmem(const void* haystack, size_t haystacklen, const void* needle, size_t needlelen)",
   "void* memrchr(const void* s, int c, size_t n)",
   "int mkstemp64(char* template)",
   "int mrand48_r(struct drand48_data* buffer, long int* result)",
-  "void* mremap(void* old_address, size_t old_size, size_t new_size, int flags)",
+  "void* mremap(void* old_address, size_t old_size, size_t new_size, int flags, ...)",
   "char* ngettext(const char* msgid1, const char* msgid2, unsigned long int n)",
-  "int nrand48_r(unsigned short[3] xsubi, struct drand48_data* buffer, long int* result)",
+  "int nrand48_r(unsigned short xsubi[3], struct drand48_data* buffer, long int* result)",
   "int openat64(int fd, const char* path, int oflag, ...)",
-  "u_short* pmap_getport(struct sockaddr_in* address, const u_long program, const u_long* version, u_int protocol)",
+  #~ "u_short* pmap_getport(struct sockaddr_in* address, const u_long program, const u_long* version, u_int protocol)",
   "bool_t pmap_set(const u_long program, const u_long version, int protocol, u_short port)",
   "bool_t pmap_unset(u_long prognum, u_long versnum)",
   "int posix_fadvise64(int fd, off64_t offset, off64_t len, int advice)",
@@ -3757,11 +3757,11 @@ lsb_define([
   "ssize_t pwrite64(int fd, const void* buf, size_t count, off64_t offset)",
   "int random_r(struct random_data* buffer, int32_t* result)",
   "int readdir64_r(DIR* dirp, struct dirent64* entry, struct dirent64** result)",
-  "int scandir64(const char* dir, const struct dirent64** namelist, int (*sel)(const struct dirent64*), int (*compar)(const struct dirent64**, const struct dirent64**))",
+  "int scandir64(const char* dir, struct dirent64*** namelist, int (*selector)(const struct dirent64*), int (*cmp)(const struct dirent64**, const struct dirent64**))",
   "int sched_getaffinity(pid_t pid, unsigned int cpusetsize, cpu_set_t* mask)",
   "int sched_setaffinity(pid_t pid, unsigned int cpusetsize, cpu_set_t* mask)",
   "int sched_setscheduler(pid_t pid, int policy, const struct sched_param* param)",
-  "int seed48_r(unsigned short[3] seed16v, struct drand48_data* buffer)",
+  "int seed48_r(unsigned short seed16v[3], struct drand48_data* buffer)",
   #~ "ssize_t sendfile(int out_fd, int in_fd, off_t* offset, size_t count)",
   #~ "ssize_t sendfile64(int out_fd, int in_fd, off64_t* offset, size_t count)",
   "void setbuffer(FILE* stream, char* buf, size_t size)",
@@ -3820,8 +3820,8 @@ lsb_define(["math.h", "complex.h", "fenv.h"], [
   "float complex clog10f(float complex z)",
   "long double complex clog10l(long double complex z)",
   "double drem(double x, double y)",
-  "double dremf(double x, double y)",
-  "double dreml(double x, double y)",
+  "float dremf(float x, float y)",
+  "long double dreml(long double x, long double y)",
   "double exp10(double x)",
   "float exp10f(float x)",
   "long double exp10l(long double x)",
@@ -3838,8 +3838,8 @@ lsb_define(["math.h", "complex.h", "fenv.h"], [
   "long double j0l(long double x)",
   "float j1f(float x)",
   "long double j1l(long double x)",
-  #~ "float jnf(float x)",
-  "long double jnl(long double x)",
+  "float jnf(int n, float x)",
+  "long double jnl(int n, long double x)",
   "double lgamma_r(double x, int* signp)",
   "float lgammaf_r(float x, int* signp)",
   "double lgammal_r(double x, int* signp)",
@@ -3847,8 +3847,8 @@ lsb_define(["math.h", "complex.h", "fenv.h"], [
   "double pow10(double x)",
   "float pow10f(float x)",
   "long double pow10l(long double x)",
-  "float scalbf(float x, double exp)",
-  "long double scalbl(long double x, double exp)",
+  "float scalbf(float x, float exp)",
+  "long double scalbl(long double x, long double exp)",
   "double significand(double x)",
   "float significandf(float x)",
   "long double significandl(long double x)",
@@ -3859,8 +3859,8 @@ lsb_define(["math.h", "complex.h", "fenv.h"], [
   "long double y0l(long double x)",
   "float y1f(float x)",
   "long double y1l(long double x)",
-  #~ "float ynf(float x)",
-  "long double ynl(long double x)"
+  "float ynf(int n, float x)",
+  "long double ynl(int n, long double x)"
 ])
 
 # 14.11. Interface Definitions for libpthread
@@ -3877,5 +3877,5 @@ lsb_define(["pthread.h"], [
 lsb_define(["dlfcn.h"], [
   "int dladdr(const void* addr, Dl_info* dlip)",
   "void* dlopen(const char* filename, int flag)",
-  "void* dlvsym(void* handle, char* name, char* version)"
+  "void* dlvsym(void* handle, const char* name, const char* version)"
 ])

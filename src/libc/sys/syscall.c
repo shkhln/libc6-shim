@@ -23,7 +23,7 @@
 
 #define LINUX_CLOCK_MONOTONIC 1
 
-long shim_syscall_impl(int number, va_list args) {
+long shim_syscall_impl(long number, va_list args) {
 
   if (number == LINUX_GETPID) {
 
@@ -64,5 +64,5 @@ long shim_syscall_impl(int number, va_list args) {
     }
   }
 
-  UNIMPLEMENTED_ARGS("%d, ...", number);
+  UNIMPLEMENTED_ARGS("%ld, ...", number);
 }
