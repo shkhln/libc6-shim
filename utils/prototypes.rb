@@ -1711,7 +1711,7 @@ define(["stdio.h", "sys/types.h"], [
 # FGETS(3)
 define(["stdio.h"], [
   "char* fgets(char* restrict str, int size, FILE* restrict stream)",
-  "char* gets(char* str)"
+  #~ "char* gets(char* str)"
 ])
 
 # GETWC(3)
@@ -3517,7 +3517,7 @@ lsb_define([
   "sys/utsname.h",
   "limits.h",
   "rpc/svc.h",
-  "sys/sysinfo.h",
+  #~ "sys/sysinfo.h",
   "stdarg.h",
   "sys/resource.h",
   "sys/wait.h",
@@ -3790,7 +3790,7 @@ lsb_define([
   "bool_t svc_sendreply(SVCXPRT* xprt, xdrproc_t outproc, caddr_t out)",
   "SVCXPRT* svctcp_create(int sock, u_int send_buf_size, u_int recv_buf_size)",
   "long sysconf(int name)",
-  "int sysinfo(struct sysinfo* info)",
+  #~ "int sysinfo(struct sysinfo* info)",
   "int system(const char* string)",
   "char* textdomain(const char* domainname)",
   "int unlink(const char* path)",
