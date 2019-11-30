@@ -3,8 +3,8 @@
 #include "../../shim.h"
 
 int shim_get_nprocs(void) {
-  LOG("%s()\n", __func__);
+  LOG_ENTRY();
   int nprocs = sysconf(_SC_NPROCESSORS_CONF);
-  LOG_RES("%d", nprocs);
+  LOG_EXIT("%d", nprocs);
   return nprocs;
 }

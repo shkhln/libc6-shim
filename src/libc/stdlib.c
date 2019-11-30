@@ -3,10 +3,10 @@
 #include "../shim.h"
 
 void* shim_memalign(size_t alignment, size_t size) {
-  LOG_ARGS("%zu, %zu", alignment, size);
+  LOG_ENTRY("%zu, %zu", alignment, size);
   void* p = NULL;
   posix_memalign(&p, alignment, size);
-  LOG_RES("%p",  p);
+  LOG_EXIT("%p",  p);
   return p;
 }
 

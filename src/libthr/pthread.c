@@ -22,8 +22,9 @@ int shim_pthread_getname_np(pthread_t tid, char* name, size_t len) {
 }
 
 int shim_pthread_setname_np(pthread_t tid, const char* name) {
-  LOG_ARGS("%p, %s",  tid, name);
+  LOG_ENTRY("%p, %s",  tid, name);
   pthread_set_name_np(tid, name);
+  LOG_EXIT("%d", 0);
   return 0;
 }
 
@@ -85,15 +86,15 @@ int shim_pthread_mutexattr_setkind_np_impl(pthread_mutexattr_t* attr, int linux_
 }
 
 int shim_pthread_mutexattr_setpshared(pthread_mutexattr_t* attr, int pshared) {
-  LOG_ARGS("%p, %d",  attr, pshared);
+  LOG_ENTRY("%p, %d",  attr, pshared);
   int err = pthread_mutexattr_setpshared(attr, pshared);
-  LOG_RES("%d", err);
+  LOG_EXIT("%d", err);
   return err;
 }
 
 int shim___pthread_key_create(pthread_key_t* key, void (*destructor)(void*)) {
-  LOG_ARGS("%p, %p", key, destructor);
+  LOG_ENTRY("%p, %p", key, destructor);
   int err = pthread_key_create(key, destructor);
-  LOG_RES("%d", err);
+  LOG_EXIT("%d", err);
   return err;
 }

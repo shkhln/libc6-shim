@@ -53,15 +53,15 @@ void* shim_mmap_impl(void *addr, size_t len, int prot, int linux_flags, int fd, 
 }
 
 void* shim_mmap(void* addr, size_t len, int prot, int linux_flags, int fd, linux_off_t offset) {
-  LOG_ARGS("%p, %zu, %d, %d, %d, %jd", addr, len, prot, linux_flags, fd, (off_t)offset);
+  LOG_ENTRY("%p, %zu, %d, %d, %d, %jd", addr, len, prot, linux_flags, fd, (off_t)offset);
   void* p = shim_mmap_impl(addr, len, prot, linux_flags, fd, offset);
-  LOG_RES("%p", p);
+  LOG_EXIT("%p", p);
   return p;
 }
 
 void* shim_mmap64(void* addr, size_t len, int prot, int linux_flags, int fd, linux_off64_t offset) {
-  LOG_ARGS("%p, %zu, %d, %d, %d, %jd", addr, len, prot, linux_flags, fd, offset);
+  LOG_ENTRY("%p, %zu, %d, %d, %d, %jd", addr, len, prot, linux_flags, fd, offset);
   void* p = shim_mmap_impl(addr, len, prot, linux_flags, fd, offset);
-  LOG_RES("%p", p);
+  LOG_EXIT("%p", p);
   return p;
 }

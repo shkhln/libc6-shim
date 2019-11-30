@@ -85,18 +85,22 @@ def log_args(args)
     log_args      << arg[:name] if f.include?('%')
   end
 
-  fmt_string = '"%s(' + log_fmt_parts.map{|p| p =~ /%[^a-z]*s/ ? "\\\"#{p}\\\"" : p}.join(', ') + ')\\n"'
+  fmt_string = log_fmt_parts.map{|p| p =~ /%[^a-z]*s/ ? '\"' + p + '\"' : p}.join(', ')
 
   if log_args.empty?
-    "LOG(#{fmt_string}, __func__);"
+    "LOG_ENTRY();"
   else
-    "LOG(#{fmt_string}, __func__, #{log_args.join(', ')});"
+    "LOG_ENTRY(\"#{fmt_string}\", #{log_args.join(', ')});"
   end
 end
 
-def log_result(decl)
-  f = format_specifier(decl)
-  'LOG("%s -> ' + (f =~ /%[^a-z]*s/ ? "\\\"#{f}\\\"" : f) + '\\n", __func__' + (f.include?('%') ? ', _ret_' : '') + ');'
+def log_result(function)
+  if function[:type] == 'void'
+    "LOG_EXIT();"
+  else
+    f = format_specifier(function)
+    "LOG_EXIT(\"#{f =~ /%[^a-z]*s/ ? '\"' + f + '\"' : f}\"#{f.include?('%') ? ', _ret_' : ''});"
+  end
 end
 
 def is_variadic(function)
@@ -197,8 +201,9 @@ def generate_wrapper(function, shim_impl_exists)
     puts '  va_end(_args_);'
   end
 
+  puts '  ' + log_result(function)
+
   if function[:type] != 'void'
-    puts '  ' + log_result(function)
     puts '  return _ret_;'
   end
 

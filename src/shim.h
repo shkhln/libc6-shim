@@ -10,15 +10,19 @@
 
 #ifdef DEBUG
 
-#define LOG(...)      fprintf(stderr, __VA_ARGS__)
-#define LOG_ARGS(...) fprintf(stderr, "%s("    __HEAD(__VA_ARGS__) ")\n", __func__, __TAIL(__VA_ARGS__))
-#define LOG_RES(...)  fprintf(stderr, "%s -> " __HEAD(__VA_ARGS__)  "\n", __func__, __TAIL(__VA_ARGS__))
+#include <pthread_np.h>
+#include <unistd.h>
+
+#define LOG(...) fprintf(stderr, "[%d:%d] " __HEAD(__VA_ARGS__) "\n", getpid(), pthread_getthreadid_np(), __TAIL(__VA_ARGS__))
+
+#define LOG_ENTRY(fmt, ...) __builtin_choose_expr(__builtin_strcmp("" fmt, "") == 0, LOG("%s()",       __func__), LOG("%s("    fmt ")", __func__, ## __VA_ARGS__))
+#define LOG_EXIT( fmt, ...) __builtin_choose_expr(__builtin_strcmp("" fmt, "") == 0, LOG("%s -> void", __func__), LOG("%s -> " fmt,     __func__, ## __VA_ARGS__))
 
 #else
 
 #define LOG(...)
-#define LOG_ARGS(...)
-#define LOG_RES(...)
+#define LOG_ENTRY(fmt, ...)
+#define LOG_EXIT( fmt, ...)
 
 #endif
 

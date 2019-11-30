@@ -36,7 +36,7 @@ void* shim_dlopen_impl(const char* path, int linux_mode) {
 
 #ifdef DEBUG
   if (p == NULL) {
-    fprintf(stderr, "%s: %s\n", __func__, dlerror());
+    LOG("%s: %s\n", __func__, dlerror());
   }
 #endif
 
@@ -53,7 +53,7 @@ void* shim_dlsym_impl(void* handle, const char* symbol) {
 
   void* shim_fn = dlsym(NULL, buf);
   if (shim_fn) {
-    LOG("%s: substituting %s with %s\n", __func__, symbol, buf);
+    LOG("%s: substituting %s with %s", __func__, symbol, buf);
     return shim_fn;
   }
 
@@ -73,15 +73,15 @@ void* shim_dlsym_impl(void* handle, const char* symbol) {
 }
 
 void* shim_dlvsym(void* handle, const char* name, const char* version) {
-  LOG_ARGS("%p, \"%s\", \"%s\"", handle, name, version);
+  LOG_ENTRY("%p, \"%s\", \"%s\"", handle, name, version);
   void* p = shim_dlsym_impl(handle, name);
-  LOG_RES("%p", p);
+  LOG_EXIT("%p", p);
   return p;
 }
 
 int shim_dladdr1(void* address, Dl_info* info, void** extra_info, int flags) {
-  LOG_ARGS("%p, %p, %p, %d", address, info, extra_info, flags);
+  LOG_ENTRY("%p, %p, %p, %d", address, info, extra_info, flags);
   int err = dladdr(address, info);
-  LOG_RES("%d", err);
+  LOG_EXIT("%d", err);
   return err;
 }

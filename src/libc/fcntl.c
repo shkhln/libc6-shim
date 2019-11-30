@@ -24,19 +24,19 @@
 int shim_fcntl_impl(int fd, int cmd, va_list args) {
 
   if (cmd == LINUX_F_GETFD) {
-    LOG("%s: cmd = F_GETFD\n", __func__);
+    LOG("%s: cmd = F_GETFD", __func__);
     return fcntl(fd, F_GETFD);
   }
 
   if (cmd == LINUX_F_SETFD) {
     int arg = va_arg(args, int);
-    LOG("%s: cmd = F_SETFD, arg = 0x%x\n", __func__, arg);
+    LOG("%s: cmd = F_SETFD, arg = 0x%x", __func__, arg);
     assert(arg == 1);
     return fcntl(fd, F_SETFD, FD_CLOEXEC);
   }
 
   if (cmd == LINUX_F_GETFL) {
-    LOG("%s: cmd = F_GETFL\n", __func__);
+    LOG("%s: cmd = F_GETFL", __func__);
     int flags       = fcntl(fd, F_GETFL);
     int linux_flags =
       (flags & O_RDWR     ? LINUX_O_RDWR     : 0) |
@@ -47,7 +47,7 @@ int shim_fcntl_impl(int fd, int cmd, va_list args) {
 
   if (cmd == LINUX_F_SETFL) {
     int linux_flags = va_arg(args, int);
-    LOG("%s: cmd = F_SETFL, arg = 0x%x\n", __func__, linux_flags);
+    LOG("%s: cmd = F_SETFL, arg = 0x%x", __func__, linux_flags);
 
     assert((linux_flags & (LINUX_O_RDWR | LINUX_O_NONBLOCK)) == linux_flags);
 

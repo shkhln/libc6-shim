@@ -27,20 +27,20 @@ long shim_syscall_impl(long number, va_list args) {
 
   if (number == LINUX_GETPID) {
 
-    LOG("%s: getpid()\n", __func__);
+    LOG("%s: getpid()", __func__);
 
     pid_t pid = getpid();
-    LOG("%s: getpid -> %d\n", __func__, pid);
+    LOG("%s: getpid -> %d", __func__, pid);
 
     return pid;
   }
 
   if (number == LINUX_GETTID) {
 
-    LOG("%s: gettid()\n", __func__);
+    LOG("%s: gettid()", __func__);
 
     int tid = pthread_getthreadid_np();
-    LOG("%s: gettid -> %d\n", __func__, tid);
+    LOG("%s: gettid -> %d", __func__, tid);
 
     return tid;
   }
@@ -50,12 +50,12 @@ long shim_syscall_impl(long number, va_list args) {
     clockid_t        clock_id = va_arg(args, clockid_t);
     struct timespec* tp       = va_arg(args, struct timespec*);
 
-    LOG("%s: clock_gettime(%d, %p)\n", __func__, clock_id, tp);
+    LOG("%s: clock_gettime(%d, %p)", __func__, clock_id, tp);
 
     if (clock_id == LINUX_CLOCK_MONOTONIC) {
 
       int time = clock_gettime(CLOCK_MONOTONIC, tp);
-      LOG("%s: clock_gettime -> %d\n", __func__, time);
+      LOG("%s: clock_gettime -> %d", __func__, time);
 
       return time;
 

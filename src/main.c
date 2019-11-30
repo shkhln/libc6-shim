@@ -84,7 +84,7 @@ static void shim_libgl_init(int argc, char** argv, char** env) {
       for (const Elf_Dyn* dyn = map->l_ld; dyn->d_tag != DT_NULL; dyn++) {
         if (dyn->d_tag == DT_FINI) {
 
-          LOG("%s: calling init function for %s\n", __func__, map->l_name);
+          LOG("%s: calling init function for %s", __func__, map->l_name);
 
           void (*init)(int, char**, char**) = (void*)(map->l_addr + dyn->d_un.d_ptr);
           init(argc, argv, env);
@@ -116,11 +116,11 @@ int shim___libc_start_main(
   }
 
   if (init != NULL) {
-    LOG("%s: init\n", __func__);
+    LOG("%s: init", __func__);
     init(shim_argc, shim_argv, shim_environ);
   }
 
-  LOG("%s: main\n", __func__);
+  LOG("%s: main", __func__);
   exit(main(shim_argc, shim_argv, shim_environ));
 }
 

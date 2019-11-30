@@ -25,23 +25,23 @@ int shim_finite_impl(double x) {
 #ifdef __i386__
 
 int64_t shim___divdi3(int64_t a, int64_t b) {
-  LOG_ARGS("%lld, %lld", a, b);
+  LOG_ENTRY("%lld, %lld", a, b);
   int64_t ret = a / b;
-  LOG_RES("%lld", ret);
+  LOG_EXIT("%lld", ret);
   return ret;
 }
 
 uint64_t shim___udivdi3(uint64_t a, uint64_t b) {
-  LOG_ARGS("%llu, %llu", a, b);
+  LOG_ENTRY("%llu, %llu", a, b);
   uint64_t ret = a / b;
-  LOG_RES("%llu", ret);
+  LOG_EXIT("%llu", ret);
   return ret;
 }
 
 uint64_t shim___umoddi3(uint64_t a, uint64_t b) {
-  LOG_ARGS("%llu, %llu", a, b);
+  LOG_ENTRY("%llu, %llu", a, b);
   uint64_t ret = a % b;
-  LOG_RES("%llu", ret);
+  LOG_EXIT("%llu", ret);
   return ret;
 }
 

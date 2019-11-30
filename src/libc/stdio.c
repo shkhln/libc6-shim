@@ -44,11 +44,11 @@ int shim_remove_impl(const char* path) {
 }
 
 int shim___isoc99_fscanf(FILE* restrict stream, const char* restrict format, ...) {
-  LOG("%s(%p, \"%.100s\", ...)\n", __func__, stream, format);
+  LOG_ENTRY("%p, \"%.100s\", ...", stream, format);
   va_list args;
   va_start(args, format);
   int nitems = vfscanf(stream, format, args);
   va_end(args);
-  LOG("%s -> %d\n", __func__, nitems);
+  LOG_EXIT("%d", nitems);
   return nitems;
 }

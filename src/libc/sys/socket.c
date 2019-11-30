@@ -181,7 +181,7 @@ int shim_connect_impl(int s, const struct linux_sockaddr* linux_name, socklen_t 
       {
         struct sockaddr_un addr;
         linux_to_native_sockaddr((struct sockaddr*)&addr, linux_name, namelen);
-        LOG("%s: path = %s\n", __func__, addr.sun_path);
+        LOG("%s: path = %s", __func__, addr.sun_path);
         return connect(s, (struct sockaddr*)&addr, sizeof(addr));
       }
 

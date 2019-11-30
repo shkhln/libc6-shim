@@ -132,9 +132,9 @@ struct linux_dirent64* shim_readdir64_impl(struct shim_directory* shim_dir) {
 }
 
 struct linux_dirent64* shim_readdir64(struct shim_directory* shim_dir) {
-  LOG_ARGS("%p", shim_dir);
+  LOG_ENTRY("%p", shim_dir);
   struct linux_dirent64* entry = shim_readdir64_impl(shim_dir);
-  LOG_RES("%p", entry);
+  LOG_EXIT("%p", entry);
   return entry;
 }
 
