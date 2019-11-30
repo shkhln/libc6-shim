@@ -148,7 +148,7 @@ def generate_wrapper(function, shim_impl_exists)
       when FUNCTION_POINTER_TYPE
         "#{$1}(#{$2}#{arg[:name]})#{$3}"
       else
-        "#{arg[:type] ? arg[:type].gsub(/struct\s+/, 'linux_') : ''} #{arg[:name]}"
+        "#{arg[:type] ? arg[:type].gsub(/struct\s+/, 'linux_').gsub(/off_t/, 'linux_off_t').gsub(/off64_t/, 'linux_off64_t') : ''} #{arg[:name]}"
     end
   end
 
