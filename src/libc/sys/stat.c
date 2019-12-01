@@ -73,6 +73,18 @@ int shim___fxstat64_impl(int ver, int fd, linux_stat64* stat_buf) {
   return err;
 }
 
+int shim___lxstat64_impl(int ver, const char* path, linux_stat64* stat_buf) {
+
+  struct stat sb;
+
+  int err = lstat(path, &sb);
+  if (err == 0) {
+    copy_stat_buf64(stat_buf, &sb);
+  }
+
+  return err;
+}
+
 int shim___xmknod_impl(int ver, const char* path, mode_t mode, dev_t* dev) {
   UNIMPLEMENTED();
 }
@@ -89,6 +101,18 @@ int shim___xstat_impl(int ver, const char* path, linux_stat* stat_buf) {
   return err;
 }
 
+int shim___xstat64_impl(int ver, const char* path, linux_stat64* stat_buf) {
+
+  struct stat sb;
+
+  int err = stat(path, &sb);
+  if (err == 0) {
+    copy_stat_buf64(stat_buf, &sb);
+  }
+
+  return err;
+}
+
 int shim_chmod_impl(const char* path, mode_t mode) {
   assert(!str_starts_with(path, "/dev/"));
   return chmod(path, mode);
@@ -96,6 +120,8 @@ int shim_chmod_impl(const char* path, mode_t mode) {
 
 SHIM_WRAP(__fxstat);
 SHIM_WRAP(__fxstat64);
+SHIM_WRAP(__lxstat64);
 SHIM_WRAP(__xmknod);
 SHIM_WRAP(__xstat);
+SHIM_WRAP(__xstat64);
 SHIM_WRAP(chmod);
