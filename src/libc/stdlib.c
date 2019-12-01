@@ -2,38 +2,36 @@
 #include <string.h>
 #include "../shim.h"
 
-void* shim_memalign(size_t alignment, size_t size) {
-  LOG_ENTRY("%zu, %zu", alignment, size);
+#define STRTONUM_INTERNAL_I(ret_type, name) \
+  ret_type shim_ ## __ ## name ## _internal_impl(char* nptr, char** endptr, int base, int group) {\
+    return name(nptr, endptr, base);\
+  }
+
+#define STRTONUM_INTERNAL_F(ret_type, name) \
+  ret_type shim_ ## __ ## name ## _internal_impl(char* nptr, char** endptr, int group) {\
+    return name(nptr, endptr);\
+  }
+
+STRTONUM_INTERNAL_I(long,               strtol);
+STRTONUM_INTERNAL_I(long long,          strtoll);
+STRTONUM_INTERNAL_I(unsigned long,      strtoul);
+STRTONUM_INTERNAL_I(unsigned long long, strtoull);
+STRTONUM_INTERNAL_F(float,              strtof);
+STRTONUM_INTERNAL_F(double,             strtod);
+STRTONUM_INTERNAL_F(long double,        strtold);
+
+SHIM_WRAP(__strtol_internal);
+SHIM_WRAP(__strtoll_internal);
+SHIM_WRAP(__strtoul_internal);
+SHIM_WRAP(__strtoull_internal);
+SHIM_WRAP(__strtof_internal);
+SHIM_WRAP(__strtod_internal);
+SHIM_WRAP(__strtold_internal);
+
+void* shim_memalign_impl(size_t alignment, size_t size) {
   void* p = NULL;
   posix_memalign(&p, alignment, size);
-  LOG_EXIT("%p",  p);
   return p;
 }
 
-long shim___strtol_internal_impl(char* nptr, char** endptr, int base, int group) {
-  return strtol(nptr, endptr, base);
-}
-
-long shim___strtoll_internal_impl(char* nptr, char** endptr, int base, int group) {
-  return strtoll(nptr, endptr, base);
-}
-
-unsigned long shim___strtoul_internal_impl(char* nptr, char** endptr, int base, int group) {
-  return strtoul(nptr, endptr, base);
-}
-
-unsigned long shim___strtoull_internal_impl(char* nptr, char** endptr, int base, int group) {
-  return strtoull(nptr, endptr, base);
-}
-
-float shim___strtof_internal_impl(char* nptr, char** endptr, int group) {
-  return strtof(nptr, endptr);
-}
-
-double shim___strtod_internal_impl(char* nptr, char** endptr, int group) {
-  return strtod(nptr, endptr);
-}
-
-long double shim___strtold_internal_impl(char* nptr, char** endptr, int group) {
-  return strtold(nptr, endptr);
-}
+SHIM_WRAP(memalign);

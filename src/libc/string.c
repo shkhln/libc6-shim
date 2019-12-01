@@ -10,3 +10,6 @@ char* shim_strerror_r_impl(int errnum, char* strerrbuf, size_t buflen) {
   strerror_r(errnum, strerrbuf, buflen);
   return strerrbuf;
 }
+
+SHIM_WRAP(__rawmemchr);
+SHIM_WRAP(strerror_r);

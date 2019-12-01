@@ -24,25 +24,35 @@ int shim_finite_impl(double x) {
 
 #ifdef __i386__
 
-int64_t shim___divdi3(int64_t a, int64_t b) {
-  LOG_ENTRY("%lld, %lld", a, b);
+int64_t shim___divdi3_impl(int64_t a, int64_t b) {
+  //~ LOG_ENTRY("%lld, %lld", a, b);
   int64_t ret = a / b;
-  LOG_EXIT("%lld", ret);
+  //~ LOG_EXIT("%lld", ret);
   return ret;
 }
 
-uint64_t shim___udivdi3(uint64_t a, uint64_t b) {
-  LOG_ENTRY("%llu, %llu", a, b);
+uint64_t shim___udivdi3_impl(uint64_t a, uint64_t b) {
+  //~ LOG_ENTRY("%llu, %llu", a, b);
   uint64_t ret = a / b;
-  LOG_EXIT("%llu", ret);
+  //~ LOG_EXIT("%llu", ret);
   return ret;
 }
 
-uint64_t shim___umoddi3(uint64_t a, uint64_t b) {
-  LOG_ENTRY("%llu, %llu", a, b);
+uint64_t shim___umoddi3_impl(uint64_t a, uint64_t b) {
+  //~ LOG_ENTRY("%llu, %llu", a, b);
   uint64_t ret = a % b;
-  LOG_EXIT("%llu", ret);
+  //~ LOG_EXIT("%llu", ret);
   return ret;
 }
+
+SHIM_WRAP(__divdi3);
+SHIM_WRAP(__udivdi3);
+SHIM_WRAP(__umoddi3);
 
 #endif
+
+SHIM_WRAP(__isinf);
+SHIM_WRAP(__isinff);
+SHIM_WRAP(__isnan);
+SHIM_WRAP(__isnanf);
+SHIM_WRAP(finite);

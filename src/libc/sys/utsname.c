@@ -23,3 +23,5 @@ int shim_uname_impl(struct linux_utsname* linux_name) {
 
   return err;
 }
+
+SHIM_WRAP(uname);

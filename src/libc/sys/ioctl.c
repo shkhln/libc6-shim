@@ -30,3 +30,5 @@ int shim_ioctl_impl(int fd, unsigned long request, va_list args) {
 
   return ioctl(fd, request, va_arg(args, void*));
 }
+
+SHIM_WRAP(ioctl);

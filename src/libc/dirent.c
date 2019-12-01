@@ -131,13 +131,6 @@ struct linux_dirent64* shim_readdir64_impl(struct shim_directory* shim_dir) {
   return entry != NULL ? insert_entry64(shim_dir, entry) : NULL;
 }
 
-struct linux_dirent64* shim_readdir64(struct shim_directory* shim_dir) {
-  LOG_ENTRY("%p", shim_dir);
-  struct linux_dirent64* entry = shim_readdir64_impl(shim_dir);
-  LOG_EXIT("%p", entry);
-  return entry;
-}
-
 int shim_closedir_impl(struct shim_directory* shim_dir) {
   int err = closedir(shim_dir->dir);
   destroy_shim_dir(shim_dir);
@@ -176,3 +169,18 @@ int shim_scandir_impl(
 ) {
   UNIMPLEMENTED();
 }
+
+typedef struct shim_directory linux_DIR;
+
+SHIM_WRAP(alphasort);
+SHIM_WRAP(closedir);
+SHIM_WRAP(dirfd);
+SHIM_WRAP(fdopendir);
+SHIM_WRAP(opendir);
+SHIM_WRAP(readdir);
+SHIM_WRAP(readdir64);
+SHIM_WRAP(readdir_r);
+SHIM_WRAP(rewinddir);
+SHIM_WRAP(scandir);
+SHIM_WRAP(seekdir);
+SHIM_WRAP(telldir);

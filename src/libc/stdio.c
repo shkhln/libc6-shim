@@ -9,6 +9,10 @@
 #include <sys/sysctl.h>
 #include "../shim.h"
 
+int shim___isoc99_fscanf_impl(FILE* restrict stream, const char* restrict format, va_list args) {
+  return vfscanf(stream, format, args);
+}
+
 FILE* shim_fopen_impl(const char* path, const char* mode) {
 
   if (str_starts_with(path, "/proc/")) {
@@ -38,17 +42,16 @@ FILE* shim_fopen_impl(const char* path, const char* mode) {
   return fopen(path, mode);
 }
 
+FILE* shim_fopen64_impl(const char* path, const char* mode) {
+  return shim_fopen_impl(path, mode);
+}
+
 int shim_remove_impl(const char* path) {
   assert(!str_starts_with(path, "/dev/"));
   return remove(path);
 }
 
-int shim___isoc99_fscanf(FILE* restrict stream, const char* restrict format, ...) {
-  LOG_ENTRY("%p, \"%.100s\", ...", stream, format);
-  va_list args;
-  va_start(args, format);
-  int nitems = vfscanf(stream, format, args);
-  va_end(args);
-  LOG_EXIT("%d", nitems);
-  return nitems;
-}
+SHIM_WRAP(__isoc99_fscanf);
+SHIM_WRAP(fopen);
+SHIM_WRAP(fopen64);
+SHIM_WRAP(remove);

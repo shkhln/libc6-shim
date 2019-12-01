@@ -313,3 +313,9 @@ ssize_t shim_recvmsg_impl(int s, struct linux_msghdr* linux_msg, int linux_flags
 
   return err;
 }
+
+SHIM_WRAP(bind);
+SHIM_WRAP(connect);
+SHIM_WRAP(recvmsg);
+SHIM_WRAP(sendmsg);
+SHIM_WRAP(socket);

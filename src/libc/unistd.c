@@ -67,17 +67,17 @@ ssize_t shim_readlink_impl(const char* path, char* buf, size_t bufsize) {
   return readlink(path, buf, bufsize);
 }
 
-int shim_execl_impl(const char* path, const char* arg, va_list args) {
-  UNIMPLEMENTED();
-}
+//~ int shim_execl_impl(const char* path, const char* arg, va_list args) {
+  //~ UNIMPLEMENTED();
+//~ }
 
-int shim_execle_impl(const char* path, const char* arg, va_list args) {
-  UNIMPLEMENTED();
-}
+//~ int shim_execle_impl(const char* path, const char* arg, va_list args) {
+  //~ UNIMPLEMENTED();
+//~ }
 
-int shim_execlp_impl(const char* file, const char* arg, va_list args) {
-  UNIMPLEMENTED();
-}
+//~ int shim_execlp_impl(const char* file, const char* arg, va_list args) {
+  //~ UNIMPLEMENTED();
+//~ }
 
 #define GLIBC_SC_PAGESIZE         30
 #define GLIBC_SC_NPROCESSORS_ONLN 84
@@ -99,9 +99,7 @@ int shim_ftruncate64_impl(int fd, linux_off64_t length) {
   return ftruncate(fd, length);
 }
 
-int shim_ftruncate64(int fd, linux_off64_t length) {
-  LOG_ENTRY("%d, %jd", fd, length);
-  int err = shim_ftruncate64_impl(fd, length);
-  LOG_EXIT("%d", err);
-  return err;
-}
+SHIM_WRAP(chown);
+SHIM_WRAP(ftruncate64);
+SHIM_WRAP(readlink);
+SHIM_WRAP(sysconf);

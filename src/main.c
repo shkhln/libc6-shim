@@ -16,24 +16,46 @@ FILE* shim_stdin  = &std[0];
 FILE* shim_stdout = &std[1];
 FILE* shim_stderr = &std[2];
 
-extern FILE* shim__IO_stdin_     __attribute__((alias("shim_stdin")));
-extern FILE* shim__IO_2_1_stdin_ __attribute__((alias("shim_stdin")));
+SHIM_EXPORT(stdin);
+SHIM_EXPORT(stdout);
+SHIM_EXPORT(stderr);
 
-extern FILE* shim__IO_stdout_     __attribute__((alias("shim_stdout")));
+#ifdef __i386__
+
+extern FILE* shim__IO_stdin_  __attribute__((alias("shim_stdin")));
+extern FILE* shim__IO_stdout_ __attribute__((alias("shim_stdout")));
+extern FILE* shim__IO_stderr_ __attribute__((alias("shim_stderr")));
+
+SHIM_EXPORT(_IO_stdin_);
+SHIM_EXPORT(_IO_stdout_);
+SHIM_EXPORT(_IO_stderr_);
+
+#endif
+
+extern FILE* shim__IO_2_1_stdin_  __attribute__((alias("shim_stdin")));
 extern FILE* shim__IO_2_1_stdout_ __attribute__((alias("shim_stdout")));
-
-extern FILE* shim__IO_stderr_     __attribute__((alias("shim_stderr")));
 extern FILE* shim__IO_2_1_stderr_ __attribute__((alias("shim_stderr")));
+
+SHIM_EXPORT(_IO_2_1_stdin_);
+SHIM_EXPORT(_IO_2_1_stdout_);
+SHIM_EXPORT(_IO_2_1_stderr_);
 
 #define MAX_SHIM_ENV_ENTRIES 100
 
 static char* _shim_env[MAX_SHIM_ENV_ENTRIES];
 char** shim_environ = _shim_env;
 
-extern char** shim__environ  __attribute__((alias("shim_environ")));
+SHIM_EXPORT(environ);
+
 extern char** shim___environ __attribute__((alias("shim_environ")));
+extern char** shim__environ  __attribute__((alias("shim_environ")));
+
+SHIM_EXPORT(__environ);
+SHIM_EXPORT(_environ);
 
 char* shim___progname = "<progname>";
+
+SHIM_EXPORT(__progname);
 
 static int    shim_argc = 0;
 static char** shim_argv = NULL;
@@ -98,7 +120,15 @@ static void shim_libgl_init(int argc, char** argv, char** env) {
   }
 }
 
-int shim___libc_start_main(
+void shim___cxa_finalize_impl(void* d) {
+  // do nothing
+}
+
+int shim___cxa_atexit_impl(void (*cb)(void*), void* arg, void* dso_handle) {
+  return 0;
+}
+
+int shim___libc_start_main_impl(
   int (*main)(int, char**, char**),
   int argc,
   char** ubp_av,
@@ -124,18 +154,6 @@ int shim___libc_start_main(
   exit(main(shim_argc, shim_argv, shim_environ));
 }
 
-char* shim_gnu_get_libc_version_impl() {
-  return "2.17";
-}
-
-void shim___cxa_finalize_impl(void* d) {
-  // do nothing
-}
-
-int shim___cxa_atexit_impl(void (*cb)(void*), void* arg, void* dso_handle) {
-  return 0;
-}
-
 void shim___stack_chk_fail_impl() {
   assert(0);
 }
@@ -143,3 +161,14 @@ void shim___stack_chk_fail_impl() {
 int shim___register_atfork_impl(void (*prepare)(void), void (*parent)(void), void (*child)(void), void* dso_handle) {
   return pthread_atfork(prepare, parent, child);
 }
+
+char* shim_gnu_get_libc_version_impl() {
+  return "2.17";
+}
+
+SHIM_WRAP(__cxa_atexit);
+SHIM_WRAP(__cxa_finalize);
+SHIM_WRAP(__libc_start_main);
+SHIM_WRAP(__stack_chk_fail);
+SHIM_WRAP(__register_atfork);
+SHIM_WRAP(gnu_get_libc_version);

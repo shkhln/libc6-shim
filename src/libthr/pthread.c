@@ -17,19 +17,34 @@ int shim_pthread_setaffinity_np_impl(pthread_t thread, size_t cpusetsize, /*cons
   UNIMPLEMENTED();
 }
 
-int shim_pthread_getname_np(pthread_t tid, char* name, size_t len) {
+int shim_pthread_getname_np_impl(pthread_t tid, char* name, size_t len) {
   UNIMPLEMENTED();
 }
 
-int shim_pthread_setname_np(pthread_t tid, const char* name) {
-  LOG_ENTRY("%p, %s",  tid, name);
+int shim_pthread_setname_np_impl(pthread_t tid, const char* name) {
   pthread_set_name_np(tid, name);
-  LOG_EXIT("%d", 0);
   return 0;
 }
 
 int shim_pthread_kill_impl(pthread_t thread, int sig) {
   UNIMPLEMENTED();
+}
+
+SHIM_WRAP(pthread_getaffinity_np);
+SHIM_WRAP(pthread_setaffinity_np);
+SHIM_WRAP(pthread_getname_np);
+SHIM_WRAP(pthread_setname_np);
+//SHIM_WRAP(pthread_key_create);
+SHIM_WRAP(pthread_kill);
+
+int shim_pthread_mutexattr_getkind_np_impl(/*const pthread_mutexattr_t* attr, int* kind*/ pthread_mutexattr_t attr) {
+  UNIMPLEMENTED();
+}
+
+int shim_pthread_mutexattr_settype_impl(pthread_mutexattr_t* attr, int linux_kind);
+
+int shim_pthread_mutexattr_setkind_np_impl(pthread_mutexattr_t* attr, int linux_kind) {
+  return shim_pthread_mutexattr_settype_impl(attr, linux_kind);
 }
 
 int shim_pthread_mutexattr_getprioceiling_impl(const pthread_mutexattr_t* restrict attr, int* restrict prioceiling) {
@@ -40,6 +55,10 @@ int shim_pthread_mutexattr_setprioceiling_impl(pthread_mutexattr_t* attr, int pr
   UNIMPLEMENTED();
 }
 
+int shim_pthread_mutexattr_setpshared_impl(pthread_mutexattr_t* attr, int pshared) {
+  return pthread_mutexattr_setpshared(attr, pshared);
+}
+
 int shim_pthread_mutexattr_getrobust_impl(const pthread_mutexattr_t* attr, int* robustness) {
   UNIMPLEMENTED();
 }
@@ -48,11 +67,7 @@ int shim_pthread_mutexattr_setrobust_impl(const pthread_mutexattr_t* attr, int r
   UNIMPLEMENTED();
 }
 
-int shim_pthread_mutexattr_gettype(const pthread_mutexattr_t* attr, int* kind) {
-  UNIMPLEMENTED();
-}
-
-int shim_pthread_mutexattr_getkind_np(const pthread_mutexattr_t*attr, int* kind) {
+int shim_pthread_mutexattr_gettype_impl(const pthread_mutexattr_t* attr, int* kind) {
   UNIMPLEMENTED();
 }
 
@@ -81,20 +96,12 @@ int shim_pthread_mutexattr_settype_impl(pthread_mutexattr_t* attr, int linux_kin
   return pthread_mutexattr_settype(attr, kind);
 }
 
-int shim_pthread_mutexattr_setkind_np_impl(pthread_mutexattr_t* attr, int linux_kind) {
-  return shim_pthread_mutexattr_settype_impl(attr, linux_kind);
-}
-
-int shim_pthread_mutexattr_setpshared(pthread_mutexattr_t* attr, int pshared) {
-  LOG_ENTRY("%p, %d",  attr, pshared);
-  int err = pthread_mutexattr_setpshared(attr, pshared);
-  LOG_EXIT("%d", err);
-  return err;
-}
-
-int shim___pthread_key_create(pthread_key_t* key, void (*destructor)(void*)) {
-  LOG_ENTRY("%p, %p", key, destructor);
-  int err = pthread_key_create(key, destructor);
-  LOG_EXIT("%d", err);
-  return err;
-}
+SHIM_WRAP(pthread_mutexattr_getkind_np);
+SHIM_WRAP(pthread_mutexattr_setkind_np);
+SHIM_WRAP(pthread_mutexattr_getprioceiling);
+SHIM_WRAP(pthread_mutexattr_setprioceiling);
+SHIM_WRAP(pthread_mutexattr_setpshared);
+SHIM_WRAP(pthread_mutexattr_getrobust);
+SHIM_WRAP(pthread_mutexattr_setrobust);
+SHIM_WRAP(pthread_mutexattr_gettype);
+SHIM_WRAP(pthread_mutexattr_settype);

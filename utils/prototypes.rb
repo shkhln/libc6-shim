@@ -870,10 +870,10 @@ define(["rpc/rpc.h"], [
 
 # SETJMP(3)
 define(["setjmp.h"], [
-  #~ "void siglongjmp(sigjmp_buf env, int val)",
-  #~ "int setjmp(jmp_buf env)",
+  "void siglongjmp(sigjmp_buf env, int val)",
+  "int setjmp(jmp_buf env)",
   "void longjmp(jmp_buf env, int val)",
-  #~ "int _setjmp(jmp_buf env)",
+  "int _setjmp(jmp_buf env)",
   "void _longjmp(jmp_buf env, int val)"
 ])
 
@@ -3408,7 +3408,7 @@ lsb_define([
   "ssize_t __recv_chk(int fd, void* buf, size_t len, size_t buflen, int flag)",
   "ssize_t __recvfrom_chk(int fd, void* buf, size_t len, size_t buflen, int flag, struct sockaddr* from, socklen_t* fromlen)",
   "int __register_atfork(void (*prepare)(void), void (*parent)(void), void (*child)(void), void* __dso_handle)",
-  #~ "int __sigsetjmp(jmp_buf env, int savemask)",
+  "int __sigsetjmp(jmp_buf env, int savemask)",
   "int __snprintf_chk(char* str, size_t maxlen, int flag, size_t strlen, const char* format)",
   "int __sprintf_chk(char* str, int flag, size_t strlen, const char* format)",
   "void __stack_chk_fail(void)",
@@ -3626,4 +3626,26 @@ lsb_define(["pthread.h"], [
 # 14.17. Interface Definitions for libdl
 lsb_define(["dlfcn.h"], [
   "void* dlvsym(void* handle, const char* name, const char* version)"
+])
+
+lsb_define([], [
+  "int64_t __divdi3(int64_t a, int64_t b)",
+  "int __isoc99_fscanf(FILE* stream, const char* format, ...)",
+  "int __libc_start_main(int (*main)(int, char**, char**), int argc, char** ubp_av, void (*init)(int, char**, char**), void (*fini)(void), void (*rtld_fini)(void), void* stack_end)",
+  "uint64_t __udivdi3(uint64_t a, uint64_t b)",
+  "uint64_t __umoddi3(uint64_t a, uint64_t b)",
+  "int dladdr1(void* addr, Dl_info* info, void** extra_info, int flags)",
+  "FILE* fopen64(const char* filename, const char* type)",
+  "int ftruncate64(int fd, off64_t length)",
+  "int get_nprocs(void)",
+  "struct mallinfo mallinfo(void)",
+  "void* memalign(size_t alignment, size_t size)",
+  "void* mmap64(void *addr, size_t len, int prot, int linux_flags, int fd, off64_t offset)",
+  "int open64(const char* path, int oflag, ...)",
+  "int pthread_getname_np(pthread_t thread, char *name, size_t len)",
+  "int pthread_mutexattr_setpshared(pthread_mutexattr_t* attr, int pshared)",
+  "int pthread_setname_np(pthread_t thread, const char *name)",
+  "struct dirent64* readdir64(DIR* dirp)",
+  "int sigaction(int signum, const struct sigaction* act, struct sigaction* oldact)",
+  "sig_t signal(int sig, sig_t func)"
 ])

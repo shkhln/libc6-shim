@@ -66,3 +66,5 @@ long shim_syscall_impl(long number, va_list args) {
 
   UNIMPLEMENTED_ARGS("%ld, ...", number);
 }
+
+SHIM_WRAP(syscall);

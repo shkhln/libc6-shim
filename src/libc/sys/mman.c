@@ -21,7 +21,7 @@
  LINUX_MAP_NORESERVE             \
 )
 
-void* shim_mmap_impl(void *addr, size_t len, int prot, int linux_flags, int fd, off_t offset) {
+void* shim_mmap64_impl(void *addr, size_t len, int prot, int linux_flags, int fd, linux_off64_t offset) {
 
   assert((linux_flags & KNOWN_LINUX_MMAP_FLAGS) == linux_flags);
 
@@ -52,16 +52,9 @@ void* shim_mmap_impl(void *addr, size_t len, int prot, int linux_flags, int fd, 
   return p;
 }
 
-void* shim_mmap(void* addr, size_t len, int prot, int linux_flags, int fd, linux_off_t offset) {
-  LOG_ENTRY("%p, %zu, %d, %d, %d, %jd", addr, len, prot, linux_flags, fd, (off_t)offset);
-  void* p = shim_mmap_impl(addr, len, prot, linux_flags, fd, offset);
-  LOG_EXIT("%p", p);
-  return p;
+void* shim_mmap_impl(void *addr, size_t len, int prot, int linux_flags, int fd, linux_off_t offset) {
+  return shim_mmap64_impl(addr, len, prot, linux_flags, fd, offset);
 }
 
-void* shim_mmap64(void* addr, size_t len, int prot, int linux_flags, int fd, linux_off64_t offset) {
-  LOG_ENTRY("%p, %zu, %d, %d, %d, %jd", addr, len, prot, linux_flags, fd, offset);
-  void* p = shim_mmap_impl(addr, len, prot, linux_flags, fd, offset);
-  LOG_EXIT("%p", p);
-  return p;
-}
+SHIM_WRAP(mmap);
+SHIM_WRAP(mmap64);

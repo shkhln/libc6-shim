@@ -9,12 +9,13 @@ for line in IO.read(ARGV[0]).lines
 end
 
 for sym in symbols.keys
-  versions = symbols[sym][:versions]
-  if versions.size == 1
-    puts "__asm__(\".symver shim_#{sym},#{sym}@#{versions.first}\");"
-  else
-    for version in versions
-      puts "__asm__(\".symver shim_#{sym}_#{version.gsub('.', '_')},#{sym}@#{version}\");"
-    end
-  end
+  puts "#define SHIM_EXPORT_#{sym} \\"
+  puts (symbols[sym][:versions].map do |version|
+    sym_alias = "#{sym}_#{version.gsub('.', '_')}"
+    [
+      %Q! extern __typeof(shim_#{sym}) shim_#{sym_alias} __attribute__((alias("shim_#{sym}"))); !,
+      %Q! __asm__(".symver shim_#{sym_alias},#{sym}@#{version}"); !
+    ]
+  end).flatten.join("\\\n")
+  puts
 end

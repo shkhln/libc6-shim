@@ -53,3 +53,6 @@ int shim_statfs64_impl(const char* path, linux_statfs64* linux_buf) {
 
   return err;
 }
+
+SHIM_WRAP(statfs);
+SHIM_WRAP(statfs64);

@@ -2,9 +2,8 @@
 #include <unistd.h>
 #include "../../shim.h"
 
-int shim_get_nprocs(void) {
-  LOG_ENTRY();
-  int nprocs = sysconf(_SC_NPROCESSORS_CONF);
-  LOG_EXIT("%d", nprocs);
-  return nprocs;
+int shim_get_nprocs_impl() {
+  return sysconf(_SC_NPROCESSORS_CONF);
 }
+
+SHIM_WRAP(get_nprocs);
