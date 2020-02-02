@@ -27,21 +27,27 @@ $(BUILD_DIR)/wrappers$(b).c: utils/prototypes.rb
 	mkdir -p $(BUILD_DIR)
 	./utils/wrappers_c.rb glibc-2.17-symbols.$(b) > $(.TARGET)
 
-$(BUILD_DIR)/lib$(b)/nvshim.so:       $(SOURCES) $(BUILD_DIR)/wrappers$(b).c $(BUILD_DIR)/wrappers$(b).h $(BUILD_DIR)/versions$(b).h
+$(BUILD_DIR)/lib$(b)/nvshim.so:       $(SOURCES) $(BUILD_DIR)/wrappers$(b).c $(BUILD_DIR)/wrappers$(b).h $(BUILD_DIR)/versions$(b).h $(BUILD_DIR)/lib$(b)/dummy-librt.so
 	mkdir -p $(BUILD_DIR)/lib$(b)
 	$(CC) -O2     -m$(b) $(CFLAGS) -o $(.TARGET) $(SOURCES) \
 	  -include $(BUILD_DIR)/versions$(b).h \
 	  -include $(BUILD_DIR)/wrappers$(b).h \
 	  $(BUILD_DIR)/wrappers$(b).c \
+	  $(BUILD_DIR)/lib$(b)/dummy-librt.so \
 	  -lm -pthread
 
-$(BUILD_DIR)/lib$(b)/nvshim.debug.so: $(BUILD_DIR)/lib$(b)/nvshim.so
+$(BUILD_DIR)/lib$(b)/nvshim.debug.so: $(BUILD_DIR)/lib$(b)/nvshim.so $(BUILD_DIR)/lib$(b)/dummy-librt.so
 	mkdir -p $(BUILD_DIR)/lib$(b)
 	$(CC) -DDEBUG -m$(b) $(CFLAGS) -o $(.TARGET) $(SOURCES) \
 	  -include $(BUILD_DIR)/versions$(b).h \
 	  -include $(BUILD_DIR)/wrappers$(b).h \
 	  $(BUILD_DIR)/wrappers$(b).c \
+	  $(BUILD_DIR)/lib$(b)/dummy-librt.so \
 	  -lm -pthread
+
+$(BUILD_DIR)/lib$(b)/dummy-librt.so:
+	mkdir -p $(BUILD_DIR)/lib$(b)
+	$(CC) -m$(b) -shared -fPIC -Wl,-soname,bsd-librt.so.1 -o $(.TARGET)
 
 .endfor
 
@@ -55,7 +61,7 @@ clean:
 .  endif
 .endfor
 .for b in 32 64
-.  for f in $(BUILD_DIR)/wrappers$(b).c $(BUILD_DIR)/wrappers$(b).h $(BUILD_DIR)/versions$(b).h
+.  for f in $(BUILD_DIR)/wrappers$(b).c $(BUILD_DIR)/wrappers$(b).h $(BUILD_DIR)/versions$(b).h $(BUILD_DIR)/lib$(b)/dummy-librt.so
 .    if exists($f)
 	rm $f
 .    endif

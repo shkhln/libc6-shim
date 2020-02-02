@@ -14,7 +14,7 @@ end
 
 shim_lib = ENV['SHIM_DEBUG'] ? 'nvshim.debug.so' : 'nvshim.so'
 
-libmap = [
+libmap_common = [
    "libgl_nvidia #{libgl_nvidia}",
   ("libGL.so     #{libgl_nvidia}" if not ENV['SHIM_GLVND']),
   ("libGL.so.1   #{libgl_nvidia}" if not ENV['SHIM_GLVND']),
@@ -26,11 +26,17 @@ libmap = [
   "libdl.so.2      #{shim_lib}",
   "libm.so.6       #{shim_lib}",
   "libpthread.so.0 #{shim_lib}",
-  "librt.so.x      #{shim_lib}"
-].compact.join("\n")
+  "librt.so.1      #{shim_lib}"
+].compact
 
-ENV['LD_LIBMAP']          = libmap
-ENV['LD_32_LIBMAP']       = libmap
+libmap64 = libmap_common.dup
+libmap64 << 'bsd-librt.so.1 /usr/lib/librt.so.1'
+
+libmap32 = libmap_common.dup
+libmap32 << 'bsd-librt.so.1 /usr/lib32/librt.so.1'
+
+ENV['LD_LIBMAP']          = libmap64.join("\n")
+ENV['LD_32_LIBMAP']       = libmap32.join("\n")
 ENV['LD_LIBRARY_PATH']    = [__dir__ + '/build/lib64', __dir__ + '/nvidia/lib64/tls', __dir__ + '/nvidia/lib64', ENV['LD_LIBRARY_PATH']   ].compact.join(':')
 ENV['LD_32_LIBRARY_PATH'] = [__dir__ + '/build/lib32', __dir__ + '/nvidia/lib32/tls', __dir__ + '/nvidia/lib32', ENV['LD_32_LIBRARY_PATH']].compact.join(':')
 
