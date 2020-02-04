@@ -2,7 +2,14 @@
 
 #include <time.h>
 
+#define LINUX_CLOCK_MONOTONIC     1
+#define LINUX_CLOCK_MONOTONIC_RAW 4
+
+typedef clockid_t linux_clockid_t;
+
 typedef struct timespec linux_timespec;
 typedef struct timeval  linux_timeval;
 typedef struct timezone linux_timezone;
 typedef struct tm       linux_tm;
+
+int shim_clock_gettime_impl(linux_clockid_t clock_id, linux_timespec* tp);

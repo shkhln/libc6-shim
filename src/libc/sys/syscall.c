@@ -7,6 +7,7 @@
 #include <sys/types.h>
 //#include <sys/syscall.h>
 
+#include "../time.h"
 #include "../../shim.h"
 
 #ifdef __i386__
@@ -20,8 +21,6 @@
 #define LINUX_GETTID        186
 #define LINUX_CLOCK_GETTIME 228
 #endif
-
-#define LINUX_CLOCK_MONOTONIC 1
 
 long shim_syscall_impl(long number, va_list args) {
 
@@ -47,21 +46,15 @@ long shim_syscall_impl(long number, va_list args) {
 
   if (number == LINUX_CLOCK_GETTIME) {
 
-    clockid_t        clock_id = va_arg(args, clockid_t);
-    struct timespec* tp       = va_arg(args, struct timespec*);
+    linux_clockid_t clock_id = va_arg(args, linux_clockid_t);
+    linux_timespec* tp       = va_arg(args, linux_timespec*);
 
     LOG("%s: clock_gettime(%d, %p)", __func__, clock_id, tp);
 
-    if (clock_id == LINUX_CLOCK_MONOTONIC) {
+    int err = shim_clock_gettime_impl(clock_id, tp);
+    LOG("%s: clock_gettime -> %d", __func__, err);
 
-      int time = clock_gettime(CLOCK_MONOTONIC, tp);
-      LOG("%s: clock_gettime -> %d", __func__, time);
-
-      return time;
-
-    } else {
-      assert(0);
-    }
+    return err;
   }
 
   UNIMPLEMENTED_ARGS("%ld, ...", number);
