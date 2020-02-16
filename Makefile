@@ -10,7 +10,7 @@ LIBS      = $(BUILD_DIR)/lib64/nvshim.so \
             $(BUILD_DIR)/lib32/nvshim.debug.so
 
 CFLAGS    = -std=c99 -Wall -Wextra -Wno-unused-parameter -Wno-incompatible-pointer-types-discards-qualifiers \
- -shared -fPIC -Wl,--version-script=src/shim.map -I/usr/local/include
+ -shared -fPIC -Wl,-soname,librt.so.1 -Wl,--version-script=src/shim.map -I/usr/local/include
 
 all: $(LIBS)
 
