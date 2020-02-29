@@ -100,7 +100,6 @@ SHIM_WRAP(pthread_mutexattr_settype);
 #define NATIVE_MUTEX_T(shim_mutex) &(shim_mutex->_native_mutex)
 
 int shim_pthread_mutex_init_impl(linux_pthread_mutex_t* mutex, const pthread_mutexattr_t* attr) {
-  assert(mutex->linux_kind == 0);
   return pthread_mutex_init(NATIVE_MUTEX_T(mutex), attr);
 }
 
