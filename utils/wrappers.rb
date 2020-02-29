@@ -78,6 +78,8 @@ def to_shim_type(type)
       'linux_off64_t'
     when 'DIR*'
       'linux_DIR*'
+    when 'pthread_mutex_t*'
+      'linux_pthread_mutex_t*'
     else
       type.gsub(/struct\s+/, 'linux_')
   end

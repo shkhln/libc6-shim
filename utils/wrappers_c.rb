@@ -57,6 +57,7 @@ puts <<E
 #include "../src/libc/sys/socket.h"
 #include "../src/libc/sys/stat.h"
 #include "../src/libc/sys/utsname.h"
+#include "../src/libthr/pthread.h"
 
 E
 
