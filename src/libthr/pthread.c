@@ -97,7 +97,7 @@ SHIM_WRAP(pthread_mutexattr_setrobust);
 SHIM_WRAP(pthread_mutexattr_gettype);
 SHIM_WRAP(pthread_mutexattr_settype);
 
-#define NATIVE_MUTEX_T(shim_mutex) &(shim_mutex->_native_mutex)
+#define NATIVE_MUTEX_T(shim_mutex) &(shim_mutex->_wrapped_mutex)
 
 int shim_pthread_mutex_init_impl(linux_pthread_mutex_t* mutex, const pthread_mutexattr_t* attr) {
   return pthread_mutex_init(NATIVE_MUTEX_T(mutex), attr);
@@ -105,11 +105,20 @@ int shim_pthread_mutex_init_impl(linux_pthread_mutex_t* mutex, const pthread_mut
 
 static void init_mutex_if_necessary(linux_pthread_mutex_t* mutex) {
 
-  if (mutex->_native_mutex == 0 && mutex->linux_kind > 0) {
-    pthread_mutexattr_t attr;
-    pthread_mutexattr_init(&attr);
-    pthread_mutexattr_settype(&attr, linux_to_native_mutex_kind(mutex->linux_kind));
-    pthread_mutex_init(NATIVE_MUTEX_T(mutex), &attr);
+  if (mutex->_wrapped_mutex == 0 && mutex->linux_kind > 0) {
+
+    int err = pthread_mutex_lock(&(mutex->_init_mutex));
+    if (err == 0) {
+
+      if (mutex->_wrapped_mutex == 0) {
+        pthread_mutexattr_t attr;
+        pthread_mutexattr_init(&attr);
+        pthread_mutexattr_settype(&attr, linux_to_native_mutex_kind(mutex->linux_kind));
+        pthread_mutex_init(NATIVE_MUTEX_T(mutex), &attr);
+      }
+
+      pthread_mutex_unlock(&(mutex->_init_mutex));
+    }
   }
 }
 
@@ -122,27 +131,27 @@ SHIM_WRAP(pthread_mutex_init);
 SHIM_WRAP(pthread_mutex_lock);
 
 int shim_pthread_cond_timedwait_impl(pthread_cond_t* cond, linux_pthread_mutex_t* mutex, const linux_timespec* abstime) {
-  assert(mutex->_native_mutex != 0);
+  assert(mutex->_wrapped_mutex != 0);
   return pthread_cond_timedwait(cond, NATIVE_MUTEX_T(mutex), abstime);
 }
 
 int shim_pthread_cond_wait_impl(pthread_cond_t* cond, linux_pthread_mutex_t* mutex) {
-  assert(mutex->_native_mutex != 0);
+  assert(mutex->_wrapped_mutex != 0);
   return pthread_cond_wait(cond, NATIVE_MUTEX_T(mutex));
 }
 
 int shim_pthread_mutex_consistent_impl(linux_pthread_mutex_t* mutex) {
-  assert(mutex->_native_mutex != 0);
+  assert(mutex->_wrapped_mutex != 0);
   return pthread_mutex_consistent(NATIVE_MUTEX_T(mutex));
 }
 
 int shim_pthread_mutex_timedlock_impl(linux_pthread_mutex_t* mutex, const linux_timespec* abs_timeout) {
-  assert(mutex->_native_mutex != 0);
+  assert(mutex->_wrapped_mutex != 0);
   return pthread_mutex_timedlock(NATIVE_MUTEX_T(mutex), abs_timeout);
 }
 
 int shim_pthread_mutex_trylock_impl(linux_pthread_mutex_t* mutex) {
-  assert(mutex->_native_mutex != 0);
+  assert(mutex->_wrapped_mutex != 0);
   return pthread_mutex_trylock(NATIVE_MUTEX_T(mutex));
 }
 
@@ -153,12 +162,12 @@ SHIM_WRAP(pthread_mutex_timedlock);
 SHIM_WRAP(pthread_mutex_trylock);
 
 int shim_pthread_mutex_destroy_impl(linux_pthread_mutex_t* mutex) {
-  assert(mutex->_native_mutex != 0);
+  assert(mutex->_wrapped_mutex != 0);
   return pthread_mutex_destroy(NATIVE_MUTEX_T(mutex));
 }
 
 int shim_pthread_mutex_unlock_impl(linux_pthread_mutex_t* mutex) {
-  assert(mutex->_native_mutex != 0);
+  assert(mutex->_wrapped_mutex != 0);
   return pthread_mutex_unlock(NATIVE_MUTEX_T(mutex));
 }
 

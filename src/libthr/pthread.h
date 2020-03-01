@@ -1,9 +1,10 @@
 #include <pthread.h>
 
 struct shim_pthread_mutex {
-  pthread_mutex_t _native_mutex;
+  pthread_mutex_t _wrapped_mutex;
   uint32_t        _pad[2];
   uint32_t        linux_kind;
+  pthread_mutex_t _init_mutex;
 };
 
 #ifdef __i386__
