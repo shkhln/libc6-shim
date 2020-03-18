@@ -39,6 +39,8 @@
 
 bool str_starts_with(const char* str, const char* substr);
 
+int native_to_linux_errno(int error);
+
 typedef int64_t linux_off64_t;
 
 #ifdef __i386__

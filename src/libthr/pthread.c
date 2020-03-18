@@ -132,7 +132,7 @@ SHIM_WRAP(pthread_mutex_lock);
 
 int shim_pthread_cond_timedwait_impl(pthread_cond_t* cond, linux_pthread_mutex_t* mutex, const linux_timespec* abstime) {
   assert(mutex->_wrapped_mutex != 0);
-  return pthread_cond_timedwait(cond, NATIVE_MUTEX_T(mutex), abstime);
+  return native_to_linux_errno(pthread_cond_timedwait(cond, NATIVE_MUTEX_T(mutex), abstime));
 }
 
 int shim_pthread_cond_wait_impl(pthread_cond_t* cond, linux_pthread_mutex_t* mutex) {
@@ -147,7 +147,7 @@ int shim_pthread_mutex_consistent_impl(linux_pthread_mutex_t* mutex) {
 
 int shim_pthread_mutex_timedlock_impl(linux_pthread_mutex_t* mutex, const linux_timespec* abs_timeout) {
   assert(mutex->_wrapped_mutex != 0);
-  return pthread_mutex_timedlock(NATIVE_MUTEX_T(mutex), abs_timeout);
+  return native_to_linux_errno(pthread_mutex_timedlock(NATIVE_MUTEX_T(mutex), abs_timeout));
 }
 
 int shim_pthread_mutex_trylock_impl(linux_pthread_mutex_t* mutex) {
@@ -173,3 +173,20 @@ int shim_pthread_mutex_unlock_impl(linux_pthread_mutex_t* mutex) {
 
 SHIM_WRAP(pthread_mutex_destroy);
 SHIM_WRAP(pthread_mutex_unlock);
+
+int shim_pthread_rwlock_timedrdlock_impl(pthread_rwlock_t* rwlock, const linux_timespec* abs_timeout) {
+  return native_to_linux_errno(pthread_rwlock_timedrdlock(rwlock, abs_timeout));
+}
+
+int shim_pthread_rwlock_timedwrlock_impl(pthread_rwlock_t* rwlock, const linux_timespec* abs_timeout) {
+  return native_to_linux_errno(pthread_rwlock_timedwrlock(rwlock, abs_timeout));
+}
+
+SHIM_WRAP(pthread_rwlock_timedrdlock);
+SHIM_WRAP(pthread_rwlock_timedwrlock);
+
+int shim_pthread_timedjoin_np_impl(pthread_t thread, void** value_ptr, const linux_timespec* abstime) {
+  return native_to_linux_errno(pthread_timedjoin_np(thread, value_ptr, abstime));
+}
+
+SHIM_WRAP(pthread_timedjoin_np);
