@@ -3568,7 +3568,7 @@ lsb_define([
   "int stime(const time_t* t)",
   "bool_t svc_register(SVCXPRT* xprt, rpcprog_t prognum, rpcvers_t versnum, __dispatch_fn_t dispatch, rpcprot_t protocol)",
   "SVCXPRT* svctcp_create(int sock, u_int send_buf_size, u_int recv_buf_size)",
-  #~ "int sysinfo(struct sysinfo* info)",
+  "int sysinfo(struct sysinfo* info)",
   "char* textdomain(const char* domainname)",
   "int utmpname(const char* dbname)",
   "long long int wcstoq(const wchar_t* restrict nptr, wchar_t** restrict endptr, int base)",

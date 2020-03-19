@@ -7,3 +7,9 @@ int shim_get_nprocs_impl() {
 }
 
 SHIM_WRAP(get_nprocs);
+
+int shim_sysinfo_impl(void* info) {
+  return -1;
+}
+
+SHIM_WRAP(sysinfo);
