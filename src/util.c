@@ -18,3 +18,12 @@ int native_to_linux_errno(int error) {
       return error;
   }
 }
+
+int linux_to_native_errno(int error) {
+  switch (error) {
+    case LINUX_EAGAIN:    return EAGAIN;
+    case LINUX_ETIMEDOUT: return ETIMEDOUT;
+    default:
+      return error;
+  }
+}
