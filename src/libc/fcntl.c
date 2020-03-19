@@ -6,10 +6,11 @@
 #include <string.h>
 #include "../shim.h"
 
-#define LINUX_F_GETFD 1
-#define LINUX_F_SETFD 2
-#define LINUX_F_GETFL 3
-#define LINUX_F_SETFL 4
+#define LINUX_F_GETFD  1
+#define LINUX_F_SETFD  2
+#define LINUX_F_GETFL  3
+#define LINUX_F_SETFL  4
+#define LINUX_F_SETOWN 6
 
 #define LINUX_O_RDONLY   0x00000
 #define LINUX_O_WRONLY   0x00001
@@ -56,6 +57,14 @@ int shim_fcntl_impl(int fd, int cmd, va_list args) {
       (linux_flags & LINUX_O_NONBLOCK ? O_NONBLOCK : 0);
 
     return fcntl(fd, F_SETFL, flags);
+  }
+
+  if (cmd == LINUX_F_SETOWN) {
+#ifdef DEBUG
+    int pid = va_arg(args, int);
+    LOG("%s: cmd = F_SETOWN, arg = 0x%x", __func__, pid);
+#endif
+    return -1;
   }
 
   UNIMPLEMENTED_ARGS("%d, %d, ...", fd, cmd);
