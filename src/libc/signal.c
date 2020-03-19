@@ -10,7 +10,11 @@ int shim___libc_current_sigrtmin_impl() {
 SHIM_WRAP(__libc_current_sigrtmin);
 
 int shim_kill_impl(pid_t pid, int sig) {
-  UNIMPLEMENTED();
+  if (sig == 0) {
+    return kill(pid, sig);
+  } else {
+    UNIMPLEMENTED_ARGS("%d, %d", pid, sig);
+  }
 }
 
 int shim_killpg_impl(pid_t pgrp, int sig) {

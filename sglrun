@@ -22,6 +22,11 @@ libmap_common = [
   "libGLX_nvidia.so.0            libGLX_nvidia.so.#{driver_version}",
   "libnvidia-ptxjitcompiler.so.1 libnvidia-ptxjitcompiler.so.#{driver_version}",
   '',
+  "libcuda.so.1                  libcuda.so.#{driver_version}",
+  "libnvcuvid.so.1               libnvcuvid.so.#{driver_version}",
+  "libnvidia-encode.so.1         libnvidia-encode.so.#{driver_version}",
+  "libnvidia-opencl.so.1         libnvidia-opencl.so.#{driver_version}",
+  '',
   "libc.so.6       #{shim_lib}",
   "libdl.so.2      #{shim_lib}",
   "libm.so.6       #{shim_lib}",
@@ -40,6 +45,7 @@ ENV['LD_32_LIBMAP']       = libmap32.join("\n")
 ENV['LD_LIBRARY_PATH']    = [__dir__ + '/build/lib64', __dir__ + '/nvidia/lib64/tls', __dir__ + '/nvidia/lib64', ENV['LD_LIBRARY_PATH']   ].compact.join(':')
 ENV['LD_32_LIBRARY_PATH'] = [__dir__ + '/build/lib32', __dir__ + '/nvidia/lib32/tls', __dir__ + '/nvidia/lib32', ENV['LD_32_LIBRARY_PATH']].compact.join(':')
 
-ENV['VK_ICD_FILENAMES']   = __dir__ + '/nv_vk_icd.json'
+ENV['OCL_ICD_VENDORS']    = __dir__ + '/icds/ocl'
+ENV['VK_ICD_FILENAMES']   = __dir__ + '/icds/vk/nv.json'
 
 exec *ARGV

@@ -17,7 +17,7 @@ FILE* shim_fopen_impl(const char* path, const char* mode) {
 
   if (str_starts_with(path, "/proc/")) {
 
-    if (strcmp("/proc/driver/nvidia/params", path) == 0) {
+    if (strcmp(path, "/proc/driver/nvidia/params") == 0) {
 
       assert(strcmp(mode, "r") == 0);
 
@@ -28,6 +28,10 @@ FILE* shim_fopen_impl(const char* path, const char* mode) {
       rewind(mem);
 
       return mem;
+    }
+
+    if (strcmp(path, "/proc/self/maps") == 0) {
+      return fopen("/dev/null", mode); // necessary for CUDA init
     }
 
     errno = EACCES;

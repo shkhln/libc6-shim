@@ -1,6 +1,8 @@
 #include <assert.h>
+#include <errno.h>
 #include <pthread.h>
 #include <pthread_np.h>
+#include <signal.h>
 #include "../shim.h"
 #include "../libc/time.h"
 #include "pthread.h"
@@ -11,8 +13,9 @@ enum linux_pthread_mutextype {
   LINUX_PTHREAD_MUTEX_ERRORCHECK = 2
 };
 
+//TODO: impl
 int shim_pthread_getaffinity_np_impl(pthread_t thread, size_t cpusetsize, /*cpu_set_t* cpuset*/ void* cpuset) {
-  UNIMPLEMENTED();
+  return native_to_linux_errno(EPERM);
 }
 
 int shim_pthread_setaffinity_np_impl(pthread_t thread, size_t cpusetsize, /*const cpu_set_t* cpuset*/ void* cpuset) {
@@ -29,7 +32,11 @@ int shim_pthread_setname_np_impl(pthread_t tid, const char* name) {
 }
 
 int shim_pthread_kill_impl(pthread_t thread, int sig) {
-  UNIMPLEMENTED();
+  if (sig == 0) {
+    return pthread_kill(thread, sig);
+  } else {
+    UNIMPLEMENTED_ARGS("%p, %d", thread, sig);
+  }
 }
 
 SHIM_WRAP(pthread_getaffinity_np);

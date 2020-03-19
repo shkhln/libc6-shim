@@ -12,15 +12,17 @@
 
 #define LINUX_SCM_RIGHTS 1
 
-#define LINUX_SOCK_STREAM   0x00001
-#define LINUX_SOCK_DGRAM    0x00002
-#define LINUX_SOCK_NONBLOCK 0x00800
-#define LINUX_SOCK_CLOEXEC  0x80000
+#define LINUX_SOCK_STREAM    0x00001
+#define LINUX_SOCK_DGRAM     0x00002
+#define LINUX_SOCK_SEQPACKET 0x00005
+#define LINUX_SOCK_NONBLOCK  0x00800
+#define LINUX_SOCK_CLOEXEC   0x80000
 
 #define KNOWN_LINUX_SOCKET_TYPES ( \
-  LINUX_SOCK_STREAM   |            \
-  LINUX_SOCK_DGRAM    |            \
-  LINUX_SOCK_NONBLOCK |            \
+  LINUX_SOCK_STREAM    |           \
+  LINUX_SOCK_DGRAM     |           \
+  LINUX_SOCK_SEQPACKET |           \
+  LINUX_SOCK_NONBLOCK  |           \
   LINUX_SOCK_CLOEXEC               \
 )
 

@@ -25,18 +25,6 @@ driver_version = $1
 
 installer = "#{fetch_dir}/NVIDIA-Linux-x86_64-#{driver_version}.run"
 
-def run(cmd)
-  #~ sync = STDOUT.sync
-  #~ STDOUT.sync = true
-  IO.popen(cmd) do |pipe|
-    pipe.sync = true
-    while s = pipe.gets
-      puts s
-    end
-  end
-  #~ STDOUT.sync = sync
-end
-
 if not File.exists?(installer)
 
   dist_dir = File.dirname(installer)
@@ -48,7 +36,7 @@ if not File.exists?(installer)
   puts "Downloading NVIDIA-Linux-x86_64-#{driver_version}.run..."
   pwd = Dir.pwd
   Dir.chdir(dist_dir)
-  run("fetch https://download.nvidia.com/XFree86/Linux-x86_64/#{driver_version}/NVIDIA-Linux-x86_64-#{driver_version}.run")
+  system("fetch https://download.nvidia.com/XFree86/Linux-x86_64/#{driver_version}/NVIDIA-Linux-x86_64-#{driver_version}.run")
   Dir.chdir(pwd)
 end
 
@@ -76,7 +64,8 @@ end
 
 libs += [
   'libGLX_nvidia.so.'    + driver_version, # glvnd
-  'libnvidia-glcore.so.' + driver_version
+  'libnvidia-glcore.so.' + driver_version,
+  'libcuda.so.'          + driver_version
 ]
 
 if driver_version.split('.').first.to_i >= 396
@@ -97,10 +86,15 @@ if driver_version.split('.').first.to_i >= 410
   libs64 << 'libnvidia-fatbinaryloader.so.' + driver_version
   libs64 << 'libnvidia-ptxjitcompiler.so.'  + driver_version
   libs64 << 'libnvidia-rtcore.so.'          + driver_version
+  libs64 << 'libcuda.so.'                   + driver_version
+  libs64 << 'libnvcuvid.so.'                + driver_version
+  libs64 << 'libnvidia-compiler.so.'        + driver_version
+  libs64 << 'libnvidia-encode.so.'          + driver_version
+  libs64 << 'libnvidia-opencl.so.'          + driver_version
 end
 
-run("tail -n +#{skip} #{installer} | xz -d | tar -C #{lib64_dir} -xf -                      #{libs64.join(' ')}")
-run("tail -n +#{skip} #{installer} | xz -d | tar -C #{lib32_dir} -xf - --strip-components 2 #{libs32.join(' ')}")
+system("tail -n +#{skip} #{installer} | xz -d | tar -C #{lib64_dir} -xf -                      #{libs64.join(' ')}")
+system("tail -n +#{skip} #{installer} | xz -d | tar -C #{lib32_dir} -xf - --strip-components 2 #{libs32.join(' ')}")
 
 puts 'Applying patches...'
 

@@ -42,6 +42,8 @@ void* shim_mmap64_impl(void *addr, size_t len, int prot, int linux_flags, int fd
 
   if (linux_flags & LINUX_MAP_ANON) {
     flags |= MAP_ANON;
+    assert(fd == -1 || fd == 0);
+    fd = -1;
   }
 
   void* p = mmap(addr, len, prot, flags, fd, offset);
