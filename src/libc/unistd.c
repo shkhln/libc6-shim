@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <errno.h>
+#include <fcntl.h>
 #include <limits.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -9,6 +10,7 @@
 #include <sys/param.h>
 #include <sys/sysctl.h>
 #include "../shim.h"
+#include "fcntl.h"
 
 int shim_chown_impl(const char* path, uid_t owner, gid_t group) {
   assert(!str_starts_with(path, "/dev/"));
@@ -103,3 +105,17 @@ SHIM_WRAP(chown);
 SHIM_WRAP(ftruncate64);
 SHIM_WRAP(readlink);
 SHIM_WRAP(sysconf);
+
+int shim_pipe2_impl(int fildes[2], int linux_flags) {
+
+  assert((linux_flags & (LINUX_O_CLOEXEC | LINUX_O_NONBLOCK)) == linux_flags);
+
+  int flags = 0;
+
+  if (linux_flags & LINUX_O_NONBLOCK) flags |= O_NONBLOCK;
+  if (linux_flags & LINUX_O_CLOEXEC)  flags |= O_CLOEXEC;
+
+  return pipe2(fildes, flags);
+}
+
+SHIM_WRAP(pipe2);
