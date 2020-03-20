@@ -3,6 +3,8 @@
 #include <stdint.h>
 #include "../shim.h"
 
+// TODO: __ctype32_b, __ctype32_tolower, __ctype32_toupper?
+
 static uint16_t shim_ctype_b_table[384] = {
   0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
   0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
@@ -38,11 +40,12 @@ const unsigned short** shim___ctype_b_loc_impl() {
   return &shim___ctype_b;
 }
 
-static int32_t  shim_ctype_tolower_table[384];
-static int32_t* shim_ctype_tolower_table_p = &shim_ctype_tolower_table[128];
+size_t shim___ctype_get_mb_cur_max_impl() {
+  UNIMPLEMENTED();
+}
 
+static int32_t  shim_ctype_tolower_table[384];
 static int32_t  shim_ctype_toupper_table[384];
-static int32_t* shim_ctype_toupper_table_p = &shim_ctype_toupper_table[128];
 
 __attribute__((constructor))
 static void ctype_init() {
@@ -53,16 +56,18 @@ static void ctype_init() {
   }
 }
 
-size_t shim___ctype_get_mb_cur_max_impl() {
-  UNIMPLEMENTED();
-}
+int32_t* shim___ctype_tolower = &shim_ctype_tolower_table[128];
+int32_t* shim___ctype_toupper = &shim_ctype_toupper_table[128];
+
+SHIM_EXPORT(__ctype_tolower);
+SHIM_EXPORT(__ctype_toupper);
 
 int32_t** shim___ctype_tolower_loc_impl() {
-  return &shim_ctype_tolower_table_p;
+  return &shim___ctype_tolower;
 }
 
 int32_t** shim___ctype_toupper_loc_impl() {
-  return &shim_ctype_toupper_table_p;
+  return &shim___ctype_toupper;
 }
 
 SHIM_WRAP(__ctype_b_loc);

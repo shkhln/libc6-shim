@@ -2,8 +2,6 @@
 # encoding: UTF-8
 
 SUBSTITUTIONS = {
-  __ctype_toupper: 'toupper',
-  __ctype_tolower: 'tolower',
   __getdelim:      'getdelim',
   __isoc99_sscanf: 'sscanf',
   __strdup:        'strdup',
