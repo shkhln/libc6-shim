@@ -84,6 +84,9 @@ static void shim_init(int argc, char** argv, char** env) {
 __attribute__((constructor(102)))
 static void shim_libgl_init(int argc, char** argv, char** env) {
 
+  if (getenv("SHIM_SKIP_LIBGL_INIT") != NULL)
+    return;
+
   void* libgl = dlopen("libgl_nvidia", RTLD_LAZY);
   assert(libgl != NULL);
 
