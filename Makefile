@@ -17,15 +17,15 @@ all: $(LIBS)
 .for b in 32 64
 
 $(BUILD_DIR)/versions$(b).h:
-	./utils/symver.rb glibc-2.17-symbols.$(b) > $(.TARGET)
+	./utils/symver.rb glibc-2.17-symbols.$(b) > $(.TARGET).tmp && mv $(.TARGET).tmp $(.TARGET)
 
 $(BUILD_DIR)/wrappers$(b).h: utils/prototypes.rb $(SOURCES)
 	mkdir -p $(BUILD_DIR)
-	./utils/wrappers_h.rb -m$(b) $(SOURCES) > $(.TARGET)
+	./utils/wrappers_h.rb -m$(b) $(SOURCES) > $(.TARGET).tmp && mv $(.TARGET).tmp $(.TARGET)
 
 $(BUILD_DIR)/wrappers$(b).c: utils/prototypes.rb
 	mkdir -p $(BUILD_DIR)
-	./utils/wrappers_c.rb glibc-2.17-symbols.$(b) > $(.TARGET)
+	./utils/wrappers_c.rb glibc-2.17-symbols.$(b) > $(.TARGET).tmp && mv $(.TARGET).tmp $(.TARGET)
 
 $(BUILD_DIR)/lib$(b)/nvshim.so:       $(SOURCES) $(BUILD_DIR)/wrappers$(b).c $(BUILD_DIR)/wrappers$(b).h $(BUILD_DIR)/versions$(b).h $(BUILD_DIR)/lib$(b)/dummy-librt.so
 	mkdir -p $(BUILD_DIR)/lib$(b)
@@ -64,6 +64,9 @@ clean:
 .  for f in $(BUILD_DIR)/wrappers$(b).c $(BUILD_DIR)/wrappers$(b).h $(BUILD_DIR)/versions$(b).h $(BUILD_DIR)/lib$(b)/dummy-librt.so
 .    if exists($f)
 	rm $f
+.    endif
+.    if exists($f.tmp)
+	rm $f.tmp
 .    endif
 .  endfor
 .endfor
