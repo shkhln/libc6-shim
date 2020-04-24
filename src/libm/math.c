@@ -53,6 +53,15 @@ SHIM_WRAP(__umoddi3);
 
 SHIM_WRAP(__isinf);
 SHIM_WRAP(__isinff);
+
+#ifdef SHIM_SCAN
+#undef __isnan
+#undef __isnanf
 SHIM_WRAP(__isnan);
 SHIM_WRAP(__isnanf);
+#else
+SHIM_WRAPPER___isnan
+SHIM_WRAPPER___isnanf
+#endif
+
 SHIM_WRAP(finite);
