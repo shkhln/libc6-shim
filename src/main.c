@@ -6,15 +6,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 #include <sys/elf.h>
 
 #include "shim.h"
 
-static FILE std[3] = {};
-
-FILE* shim_stdin  = &std[0];
-FILE* shim_stdout = &std[1];
-FILE* shim_stderr = &std[2];
+FILE* shim_stdin  = NULL;
+FILE* shim_stdout = NULL;
+FILE* shim_stderr = NULL;
 
 SHIM_EXPORT(stdin);
 SHIM_EXPORT(stdout);
@@ -65,9 +64,9 @@ static void shim_init(int argc, char** argv, char** env) {
 
   fprintf(stderr, "shim init\n");
 
-  memcpy(shim_stdin,  stdin,  sizeof(FILE));
-  memcpy(shim_stdout, stdout, sizeof(FILE));
-  memcpy(shim_stderr, stderr, sizeof(FILE));
+  shim_stdin  = fdopen(STDIN_FILENO,  "r");
+  shim_stdout = fdopen(STDOUT_FILENO, "w");
+  shim_stderr = fdopen(STDERR_FILENO, "w");
 
   for (int i = 0;; i++) {
     if (env[i] == NULL) {
@@ -79,6 +78,13 @@ static void shim_init(int argc, char** argv, char** env) {
 
   shim_argc = argc;
   shim_argv = argv;
+}
+
+__attribute__((destructor))
+static void shim_deinit() {
+  fclose(shim_stdin);
+  fclose(shim_stdout);
+  fclose(shim_stderr);
 }
 
 __attribute__((constructor(102)))
