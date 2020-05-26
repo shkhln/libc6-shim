@@ -2,6 +2,10 @@
 #include <string.h>
 #include "shim.h"
 
+#ifdef DEBUG
+__thread int what_was_that_error;
+#endif
+
 bool str_starts_with(const char* str, const char* substr) {
   return strncmp(str, substr, strlen(substr)) == 0;
 }

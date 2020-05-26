@@ -10,10 +10,17 @@
 
 #ifdef DEBUG
 
+#include <errno.h>
 #include <pthread_np.h>
 #include <unistd.h>
 
-#define LOG(...) fprintf(stderr, "[%d:%d] " __HEAD(__VA_ARGS__) "\n", getpid(), pthread_getthreadid_np(), __TAIL(__VA_ARGS__))
+extern __thread int what_was_that_error;
+
+#define LOG(...) (\
+ what_was_that_error = errno,\
+ fprintf(stderr, "[%d:%d] " __HEAD(__VA_ARGS__) "\n", getpid(), pthread_getthreadid_np(), __TAIL(__VA_ARGS__)),\
+ errno = what_was_that_error\
+)
 
 #define LOG_ENTRY(fmt, ...) __builtin_choose_expr(__builtin_strcmp("" fmt, "") == 0, LOG("%s()",       __func__), LOG("%s("    fmt ")", __func__, ## __VA_ARGS__))
 #define LOG_EXIT( fmt, ...) __builtin_choose_expr(__builtin_strcmp("" fmt, "") == 0, LOG("%s -> void", __func__), LOG("%s -> " fmt,     __func__, ## __VA_ARGS__))
