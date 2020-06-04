@@ -3400,7 +3400,7 @@ lsb_define([
   "void* __memset_chk(void* dest, int c, size_t len, size_t destlen)",
   "ssize_t __pread64_chk(int fd, void* buf, size_t nbytes, off64_t offset, size_t buflen)",
   "ssize_t __pread_chk(int fd, void* buf, size_t nbytes, off_t offset, size_t buflen)",
-  "int __printf_chk(int flag, const char* format)",
+  "int __printf_chk(int flag, const char* format, ...)",
   "void* __rawmemchr(const void* s, int c)",
   "ssize_t __read_chk(int fd, void* buf, size_t nbytes, size_t buflen)",
   "ssize_t __readlink_chk(const char* path, char* buf, size_t len, size_t buflen)",

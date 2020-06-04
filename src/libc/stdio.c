@@ -59,3 +59,9 @@ SHIM_WRAP(__isoc99_fscanf);
 SHIM_WRAP(fopen);
 SHIM_WRAP(fopen64);
 SHIM_WRAP(remove);
+
+int shim___printf_chk_impl(int flag, const char* format, va_list args) {
+  return vprintf(format, args);
+}
+
+SHIM_WRAP(__printf_chk);
