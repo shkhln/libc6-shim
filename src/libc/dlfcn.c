@@ -84,3 +84,9 @@ SHIM_WRAP(dladdr1);
 SHIM_WRAP(dlopen);
 SHIM_WRAP(dlsym);
 SHIM_WRAP(dlvsym);
+
+int shim_dlinfo_impl(void* restrict handle, int request, void* restrict p) {
+  UNIMPLEMENTED();
+}
+
+SHIM_WRAP(dlinfo);
