@@ -93,6 +93,8 @@ static void shim_libgl_init(int argc, char** argv, char** env) {
   if (getenv("SHIM_SKIP_LIBGL_INIT") != NULL)
     return;
 
+  LOG_ENTRY("%d, %p, %p", argc, argv, env);
+
   void* libgl = dlopen("libgl_nvidia", RTLD_LAZY);
   assert(libgl != NULL);
 
@@ -127,6 +129,8 @@ static void shim_libgl_init(int argc, char** argv, char** env) {
 
     map = map->l_next;
   }
+
+  LOG_EXIT();
 }
 
 void shim___cxa_finalize_impl(void* d) {
