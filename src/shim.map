@@ -1,4 +1,4 @@
-SHIM  { global: shim_*; local: *; };
+SHIM  { global: shim_*; __progname; environ; local: *; };
 GLIBC_2.0   {} SHIM;
 GLIBC_2.1   {} SHIM;
 GLIBC_2.1.1 {} SHIM;

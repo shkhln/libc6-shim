@@ -56,6 +56,10 @@ char* shim___progname = "<progname>";
 
 SHIM_EXPORT(__progname);
 
+// necessary for the rtld's direct execution mode
+extern char* environ    __attribute__((alias("shim_environ")));
+extern char* __progname __attribute__((alias("shim___progname")));
+
 static int    shim_argc = 0;
 static char** shim_argv = NULL;
 
