@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <errno.h>
 #include <stdio.h>
 #include <signal.h>
 #include "../shim.h"
@@ -45,7 +46,8 @@ SHIM_WRAP(signal);
 SHIM_WRAP(strsignal);
 
 int shim_sigaction_impl(int sig, const struct sigaction* act, const struct sigaction* oact) {
-  UNIMPLEMENTED();
+  errno = EINVAL;
+  return -1;
 }
 
 int shim_sigaddset_impl(sigset_t* set, int signo) {
