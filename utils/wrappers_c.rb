@@ -28,10 +28,11 @@ STRUCT_COMPATIBILITY = {
   sockaddr:    false,
   stat:        false,
   statfs:      false,
-  tm:          true,
+  termios:     false,
   timespec:    true,
   timeval:     true,
   timezone:    true,
+  tm:          true,
   utsname:     false,
   stat64:      false,
   statfs64:    false
