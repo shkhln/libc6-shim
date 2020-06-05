@@ -3294,6 +3294,11 @@ define(["wordexp.h"], [
   "void wordfree(wordexp_t* we)"
 ])
 
+# DL_ITERATE_PHDR(3)
+define(["link.h"], [
+  "int dl_iterate_phdr(int (*callback)(struct dl_phdr_info*, size_t, void*), void* data)"
+])
+
 # 14.5. Interface Definitions for libc
 lsb_define([
   "unistd.h",
@@ -3492,7 +3497,6 @@ lsb_define([
   "char* dcgettext(const char* domainname, const char* msgid, int category)",
   "char* dcngettext(const char* domainname, const char* msgid1, const char* msgid2, unsigned long int n, int category)",
   "char* dgettext(const char* domainname, const char* msgid)",
-  "int dl_iterate_phdr(int (*callback)(struct dl_phdr_info*, size_t, void*), void* data)",
   "char* dngettext(const char* domainname, const char* msgid1, const char* msgid2, unsigned long int n)",
   "int drand48_r(struct drand48_data* buffer, double* result)",
   "void endutent(void)",

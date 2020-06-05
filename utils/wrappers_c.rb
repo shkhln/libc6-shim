@@ -13,30 +13,31 @@ SUBSTITUTIONS = {
 }
 
 STRUCT_COMPATIBILITY = {
-  cmsghdr:     false, # compatible on i386
-  dirent:      false,
-  in_addr:     true,
-  iovec:       true,
-  hostent:     true,
-  msghdr:      false, # compatible on i386
-  option:      true,
-  pollfd:      true,
-  rlimit:      false, # compatible on x86_64
-  rusage:      true,
-  sembuf:      true,
-  sched_param: true,
-  shmid_ds:    false,
-  sockaddr:    false,
-  stat:        false,
-  statfs:      false,
-  termios:     false,
-  timespec:    true,
-  timeval:     true,
-  timezone:    true,
-  tm:          true,
-  utsname:     false,
-  stat64:      false,
-  statfs64:    false
+  cmsghdr:      false, # compatible on i386
+  dirent:       false,
+  dl_phdr_info: true,
+  in_addr:      true,
+  iovec:        true,
+  hostent:      true,
+  msghdr:       false, # compatible on i386
+  option:       true,
+  pollfd:       true,
+  rlimit:       false, # compatible on x86_64
+  rusage:       true,
+  sembuf:       true,
+  sched_param:  true,
+  shmid_ds:     false,
+  sockaddr:     false,
+  stat:         false,
+  statfs:       false,
+  termios:      false,
+  timespec:     true,
+  timeval:      true,
+  timezone:     true,
+  tm:           true,
+  utsname:      false,
+  stat64:       false,
+  statfs64:     false
 }
 
 symbols = {}

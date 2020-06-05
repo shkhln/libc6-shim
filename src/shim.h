@@ -90,3 +90,7 @@ typedef struct linux_rlimit linux_rlimit;
 struct linux_sysinfo;
 
 typedef struct linux_sysinfo linux_sysinfo;
+
+#include <link.h>
+
+typedef struct dl_phdr_info linux_dl_phdr_info;
