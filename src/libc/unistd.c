@@ -83,6 +83,7 @@ ssize_t shim_readlink_impl(const char* path, char* buf, size_t bufsize) {
 
 #define GLIBC_SC_PAGESIZE         30
 #define GLIBC_SC_NPROCESSORS_ONLN 84
+#define GLIBC_SC_PHYS_PAGES       85
 
 long shim_sysconf_impl(int name) {
 
@@ -92,6 +93,10 @@ long shim_sysconf_impl(int name) {
 
   if (name == GLIBC_SC_PAGESIZE) {
     return sysconf(_SC_PAGESIZE);
+  }
+
+  if (name == GLIBC_SC_PHYS_PAGES) {
+    return sysconf(_SC_PHYS_PAGES);
   }
 
   UNIMPLEMENTED_ARGS("%d", name);
