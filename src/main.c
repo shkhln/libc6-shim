@@ -183,3 +183,18 @@ SHIM_WRAP(__libc_start_main);
 SHIM_WRAP(__stack_chk_fail);
 SHIM_WRAP(__register_atfork);
 SHIM_WRAP(gnu_get_libc_version);
+
+extern void* __tls_get_addr(void*);
+
+__attribute__((__regparm__(1)))
+void* shim___tls_get_addr(void* ti) {
+  LOG_ENTRY("%p", ti);
+  void* p = __tls_get_addr(ti);
+  LOG_EXIT("%p", p);
+  return p;
+}
+
+extern __typeof(shim___tls_get_addr) shim____tls_get_addr __attribute__((alias("shim___tls_get_addr")));
+
+__asm__(".symver shim___tls_get_addr,__tls_get_addr@GLIBC_2.3");
+__asm__(".symver shim____tls_get_addr,___tls_get_addr@GLIBC_2.3");
