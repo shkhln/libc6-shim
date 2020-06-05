@@ -27,11 +27,13 @@ libmap_common = [
   "libnvidia-encode.so.1         libnvidia-encode.so.#{driver_version}",
   "libnvidia-opencl.so.1         libnvidia-opencl.so.#{driver_version}",
   '',
-  "libc.so.6       #{shim_lib}",
-  "libdl.so.2      #{shim_lib}",
-  "libm.so.6       #{shim_lib}",
-  "libpthread.so.0 #{shim_lib}",
-  "librt.so.1      #{shim_lib}"
+  "ld-linux.so.2        #{shim_lib}",
+  "ld-linux-x86-64.so.2 #{shim_lib}",
+  "libc.so.6            #{shim_lib}",
+  "libdl.so.2           #{shim_lib}",
+  "libm.so.6            #{shim_lib}",
+  "libpthread.so.0      #{shim_lib}",
+  "librt.so.1           #{shim_lib}"
 ].compact
 
 libmap64 = libmap_common.dup
