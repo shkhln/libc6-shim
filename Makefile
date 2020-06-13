@@ -12,6 +12,13 @@ LIBS      = $(BUILD_DIR)/lib64/nvshim.so \
 CFLAGS    = -std=c99 -Wall -Wextra -Wno-unused-parameter -Wno-incompatible-pointer-types-discards-qualifiers \
  -shared -fPIC -Wl,-soname,librt.so.1 -Wl,--version-script=src/shim.map -I/usr/local/include
 
+GCC_VER ?= 9
+
+.if exists(/usr/local/lib/gcc${GCC_VER})
+LIBS += $(BUILD_DIR)/lib64/fakecxxrt.so
+LIBS += $(BUILD_DIR)/lib32/fakecxxrt.so
+.endif
+
 all: $(LIBS)
 
 .for b in 32 64
@@ -48,6 +55,16 @@ $(BUILD_DIR)/lib$(b)/nvshim.debug.so: $(BUILD_DIR)/lib$(b)/nvshim.so $(BUILD_DIR
 $(BUILD_DIR)/lib$(b)/dummy-librt.so:
 	mkdir -p $(BUILD_DIR)/lib$(b)
 	$(CC) -m$(b) -shared -fPIC -Wl,-soname,bsd-librt.so.1 -o $(.TARGET)
+
+$(BUILD_DIR)/lib$(b)/fakecxxrt.so:
+	mkdir -p $(BUILD_DIR)/lib$(b)
+	gcc${GCC_VER} -m$(b) -shared -fPIC \
+	  -Wl,--version-script=src/fakecxxrt.map \
+	  -Wl,-soname,libcxxrt.so.1 \
+	  -Wl,-rpath=/usr/local/lib${b:S/64//}/gcc${GCC_VER} \
+	  -L/usr/local/lib${b:S/64//}/gcc${GCC_VER} \
+	  -lstdc++ \
+	  -o $(.TARGET)
 
 .endfor
 

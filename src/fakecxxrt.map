@@ -1,0 +1,6 @@
+# this is just a dummy libcxxrt.so.1
+# to assist with libcxxrt.so.1 -> libstdc++.so (libsupc++) substitution
+
+CXXRT_1.0   {};
+CXXABI_1.3  {};
+GLIBCXX_3.4 {};
