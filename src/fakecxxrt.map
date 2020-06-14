@@ -1,6 +1,15 @@
 # this is just a dummy libcxxrt.so.1
 # to assist with libcxxrt.so.1 -> libstdc++.so (libsupc++) substitution
 
-CXXRT_1.0   {};
-CXXABI_1.3  {};
-GLIBCXX_3.4 {};
+CXXRT_1.0    {};
+
+CXXABI_1.3   {};
+CXXABI_1.3.1 {};
+CXXABI_1.3.5 {};
+CXXABI_1.3.6 {};
+CXXABI_1.3.9 {};
+
+GLIBCXX_3.4    {};
+GLIBCXX_3.4.9  {};
+GLIBCXX_3.4.20 {};
+GLIBCXX_3.4.22 {};
