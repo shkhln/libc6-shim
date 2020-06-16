@@ -42,7 +42,7 @@ libmap64 << 'bsd-librt.so.1 /usr/lib/librt.so.1'
 libmap32 = libmap_common.dup
 libmap32 << 'bsd-librt.so.1 /usr/lib32/librt.so.1'
 
-if not ENV['SHIM_SKIP_FAKECXXRT']
+if ENV['SHIM_FAKECXXRT']
   libmap64 << "libcxxrt.so.1 fakecxxrt.so" if File.exist?(__dir__ + '/build/lib64/fakecxxrt.so')
   libmap32 << "libcxxrt.so.1 fakecxxrt.so" if File.exist?(__dir__ + '/build/lib32/fakecxxrt.so')
 end
