@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <errno.h>
 #include <pthread_np.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -14,12 +15,14 @@
 #define LINUX_GETPID         20
 #define LINUX_GETTID        224
 #define LINUX_CLOCK_GETTIME 265
+#define LINUX_MEMFD_CREATE  356
 #endif
 
 #ifdef __x86_64__
 #define LINUX_GETPID         39
 #define LINUX_GETTID        186
 #define LINUX_CLOCK_GETTIME 228
+#define LINUX_MEMFD_CREATE  319
 #endif
 
 long shim_syscall_impl(long number, va_list args) {
@@ -55,6 +58,11 @@ long shim_syscall_impl(long number, va_list args) {
     LOG("%s: clock_gettime -> %d", __func__, err);
 
     return err;
+  }
+
+  if (number == LINUX_MEMFD_CREATE) {
+    errno = ENOSYS;
+    return -1;
   }
 
   UNIMPLEMENTED_ARGS("%ld, ...", number);

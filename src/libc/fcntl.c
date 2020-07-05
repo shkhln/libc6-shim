@@ -1,6 +1,5 @@
 #include <assert.h>
 #include <errno.h>
-#include <fcntl.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
@@ -66,12 +65,19 @@ int shim_open_impl(const char* path, int linux_flags, va_list args) {
 
   int flags = 0;
 
-  if (linux_flags & LINUX_O_WRONLY)   flags |= O_WRONLY;
-  if (linux_flags & LINUX_O_RDWR)     flags |= O_RDWR;
-  if (linux_flags & LINUX_O_CREAT)    flags |= O_CREAT;
-  if (linux_flags & LINUX_O_TRUNC)    flags |= O_TRUNC;
-  if (linux_flags & LINUX_O_NONBLOCK) flags |= O_NONBLOCK;
-  if (linux_flags & LINUX_O_CLOEXEC)  flags |= O_CLOEXEC;
+  if (linux_flags & LINUX_O_WRONLY)    flags |= O_WRONLY;
+  if (linux_flags & LINUX_O_RDWR)      flags |= O_RDWR;
+  if (linux_flags & LINUX_O_CREAT)     flags |= O_CREAT;
+  if (linux_flags & LINUX_O_EXCL)      flags |= O_EXCL;
+  if (linux_flags & LINUX_O_TRUNC)     flags |= O_TRUNC;
+  if (linux_flags & LINUX_O_NONBLOCK)  flags |= O_NONBLOCK;
+  if (linux_flags & LINUX_O_DIRECTORY) flags |= O_DIRECTORY;
+  if (linux_flags & LINUX_O_CLOEXEC)   flags |= O_CLOEXEC;
+
+  if (linux_flags & LINUX_O_TMPFILE) {
+    //~ fprintf(stderr, "%s: O_TMPFILE\n", __func__);
+    return -1; // ?
+  }
 
   mode_t mode = 0;
 

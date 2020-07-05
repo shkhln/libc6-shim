@@ -3639,6 +3639,7 @@ lsb_define([], [
   "uint64_t __udivdi3(uint64_t a, uint64_t b)",
   "uint64_t __umoddi3(uint64_t a, uint64_t b)",
   "int dladdr1(void* addr, Dl_info* info, void** extra_info, int flags)",
+  "int eventfd(unsigned int initval, int flags)",
   "FILE* fopen64(const char* filename, const char* type)",
   "int ftruncate64(int fd, off64_t length)",
   "int get_nprocs(void)",

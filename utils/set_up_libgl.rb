@@ -14,7 +14,8 @@ SHA256 = {
   'NVIDIA-Linux-x86_64-440.31.run': 'cd592f385c9bfb798f973225dfd086654973984762b669c7d765b074c0d8850f',
   'NVIDIA-Linux-x86_64-440.59.run': '61cb1a6c1017087d431c8cec4fc0450030d469cb825a4cac7d1a5142b8c14f98',
   'NVIDIA-Linux-x86_64-440.64.run': 'e13c9f1ba13262bb7a9c4bb8180f7beb09be2b17145f611a81e8cf92600b7575',
-  'NVIDIA-Linux-x86_64-440.82.run': 'edd415acf2f75a659e0f3b4f27c1fab770cf21614e84a18152d94f0d004a758e'
+  'NVIDIA-Linux-x86_64-440.82.run': 'edd415acf2f75a659e0f3b4f27c1fab770cf21614e84a18152d94f0d004a758e',
+  'NVIDIA-Linux-x86_64-450.51.run': 'c25155bc5ad0121f1665047d5719cb17c60c9453b9a8fad9dea9cb334eaaea9e'
 }
 
 fetch_dir = __dir__ + '/../nvidia'
@@ -84,9 +85,12 @@ libs32 = libs.map{|lib| '32/' + lib}
 
 if driver_version.split('.').first.to_i >= 410
   libs64 << 'libnvidia-cbl.so.'             + driver_version
-  libs64 << 'libnvidia-fatbinaryloader.so.' + driver_version
   libs64 << 'libnvidia-ptxjitcompiler.so.'  + driver_version
   libs64 << 'libnvidia-rtcore.so.'          + driver_version
+
+  if driver_version.split('.').first.to_i < 450
+    libs64 << 'libnvidia-fatbinaryloader.so.' + driver_version
+  end
 end
 
 libs64 << 'libcuda.so.'            + driver_version
