@@ -30,8 +30,14 @@ FILE* shim_fopen_impl(const char* path, const char* mode) {
       return mem;
     }
 
+    // CUDA init
     if (strcmp(path, "/proc/self/maps") == 0) {
-      return fopen("/dev/null", mode); // necessary for CUDA init
+      return fopen("/dev/null", mode);
+    }
+
+    // Steam
+    if (strcmp(path, "/proc/cpuinfo") == 0) {
+      return fopen("/compat/linux/proc/cpuinfo", mode);
     }
 
     errno = EACCES;
