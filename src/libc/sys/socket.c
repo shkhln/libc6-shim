@@ -319,3 +319,10 @@ SHIM_WRAP(connect);
 SHIM_WRAP(recvmsg);
 SHIM_WRAP(sendmsg);
 SHIM_WRAP(socket);
+
+ssize_t shim___recv_chk_impl(int fd, void* buf, size_t len, size_t buflen, int flags) {
+  assert(len <= buflen);
+  return recv(fd, buf, len, flags);
+}
+
+SHIM_WRAP(__recv_chk);
