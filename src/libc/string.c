@@ -25,3 +25,10 @@ SHIM_WRAP(__rawmemchr);
 SHIM_WRAP(perror);
 SHIM_WRAP(strerror);
 SHIM_WRAP(strerror_r);
+
+char* shim___strcpy_chk_impl(char* dest, const char* src, size_t destlen) {
+  assert(strlen(src) < destlen);
+  return strcpy(dest, src);
+}
+
+SHIM_WRAP(__strcpy_chk);
