@@ -3636,6 +3636,8 @@ lsb_define([], [
   "int64_t __divdi3(int64_t a, int64_t b)",
   "int __isoc99_fscanf(FILE* stream, const char* format, ...)",
   "int __libc_start_main(int (*main)(int, char**, char**), int argc, char** ubp_av, void (*init)(int, char**, char**), void (*fini)(void), void (*rtld_fini)(void), void* stack_end)",
+  "locale_t __newlocale(int category_mask, const char* locale, locale_t base)",
+  "locale_t __uselocale(locale_t locale)",
   "uint64_t __udivdi3(uint64_t a, uint64_t b)",
   "uint64_t __umoddi3(uint64_t a, uint64_t b)",
   "int __vasprintf_chk(char** result_ptr, int flags, const char* format, va_list args)",
