@@ -3641,6 +3641,7 @@ lsb_define([], [
   "uint64_t __udivdi3(uint64_t a, uint64_t b)",
   "uint64_t __umoddi3(uint64_t a, uint64_t b)",
   "int __vasprintf_chk(char** result_ptr, int flags, const char* format, va_list args)",
+  "wctype_t __wctype_l(const char* property, locale_t locale)",
   "int dladdr1(void* addr, Dl_info* info, void** extra_info, int flags)",
   "void* dlmopen(Lmid_t lmid, const char* path, int mode)",
   "int eventfd(unsigned int initval, int flags)",
