@@ -34,7 +34,12 @@ int shim_ioctl_impl(int fd, unsigned long request, va_list args) {
     return ioctl(fd, FIONBIO, va_arg(args, int*));
   }
 
-  return ioctl(fd, request, va_arg(args, void*));
+  int m = request & 0xffff;
+  if ((m >= 0x4600 && m <= 0x46ff) /* nvidia */ || m == 0x6d00 /* nvidia-modeset */) {
+    return ioctl(fd, request, va_arg(args, void*));
+  }
+
+  UNIMPLEMENTED_ARGS("%d, 0x%lx, _", fd, request);
 }
 
 SHIM_WRAP(ioctl);
