@@ -1,3 +1,4 @@
+#include <limits.h>
 #include <stdlib.h>
 #include <string.h>
 #include "../shim.h"
@@ -35,3 +36,10 @@ void* shim_memalign_impl(size_t alignment, size_t size) {
 }
 
 SHIM_WRAP(memalign);
+
+char* shim___realpath_chk_impl(const char* path, char* resolved_path, size_t resolved_len) {
+  assert(resolved_len >= PATH_MAX);
+  return realpath(path, resolved_path);
+}
+
+SHIM_WRAP(__realpath_chk);
