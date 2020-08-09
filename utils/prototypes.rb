@@ -3640,6 +3640,7 @@ lsb_define([], [
   "uint64_t __umoddi3(uint64_t a, uint64_t b)",
   "int __vasprintf_chk(char** result_ptr, int flags, const char* format, va_list args)",
   "int dladdr1(void* addr, Dl_info* info, void** extra_info, int flags)",
+  "void* dlmopen(Lmid_t lmid, const char* path, int mode)",
   "int eventfd(unsigned int initval, int flags)",
   "FILE* fopen64(const char* filename, const char* type)",
   "int ftruncate64(int fd, off64_t length)",

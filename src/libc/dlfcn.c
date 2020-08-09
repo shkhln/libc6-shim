@@ -47,6 +47,12 @@ void* shim_dlopen_impl(const char* path, int linux_mode) {
   return p;
 }
 
+typedef long int Lmid_t;
+
+void* shim_dlmopen_impl(Lmid_t lmid, const char* path, int mode) {
+  return shim_dlopen_impl(path, mode);
+}
+
 #define GLIBC_RTLD_NEXT    ((void*)-1)
 #define GLIBC_RTLD_DEFAULT ((void*) 0)
 
@@ -82,6 +88,7 @@ void* shim_dlvsym_impl(void* handle, const char* symbol, const char* version) {
 
 SHIM_WRAP(dladdr1);
 SHIM_WRAP(dlopen);
+SHIM_WRAP(dlmopen);
 SHIM_WRAP(dlsym);
 SHIM_WRAP(dlvsym);
 
