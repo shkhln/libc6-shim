@@ -64,4 +64,31 @@ int shim___printf_chk_impl(int flag, const char* format, va_list args) {
   return vprintf(format, args);
 }
 
+int shim___snprintf_chk_impl(char* str, size_t maxlen, int flag, size_t strlen, const char* format, va_list args) {
+  assert(flag == 1 && strlen >= maxlen);
+  return vsnprintf(str, maxlen, format, args);
+}
+
+int shim___vsnprintf_chk_impl(char* str, size_t maxlen, int flag, size_t strlen, const char* format, va_list args) {
+  assert(flag == 1 && strlen >= maxlen);
+  return vsnprintf(str, maxlen, format, args);
+}
+
+int shim___fprintf_chk_impl(FILE* stream, int flag, const char* format, va_list args) {
+  return vfprintf(stream, format, args);
+}
+
+int shim___sprintf_chk_impl(char* str, int flag, size_t strlen, const char* format, va_list args) {
+  return vsprintf(str, format, args);
+}
+
+int shim___vasprintf_chk_impl(char** ret, int flags, const char* format, va_list args) {
+  return vasprintf(ret, format, args);
+}
+
 SHIM_WRAP(__printf_chk);
+SHIM_WRAP(__snprintf_chk);
+SHIM_WRAP(__vsnprintf_chk);
+SHIM_WRAP(__fprintf_chk);
+SHIM_WRAP(__sprintf_chk);
+SHIM_WRAP(__vasprintf_chk);
