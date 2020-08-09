@@ -144,6 +144,11 @@ int shim_socket_impl(int domain, int type, int protocol) {
   return socket(domain, linux_to_native_sock_type(type), protocol);
 }
 
+int shim_socketpair_impl(int domain, int type, int protocol, int* sv) {
+  assert(domain == PF_UNIX || domain == PF_INET);
+  return socketpair(domain, linux_to_native_sock_type(type), protocol, sv);
+}
+
 int shim_bind_impl(int s, const struct linux_sockaddr* linux_addr, socklen_t addrlen) {
 
   switch (linux_addr->sa_family) {
@@ -319,6 +324,7 @@ SHIM_WRAP(connect);
 SHIM_WRAP(recvmsg);
 SHIM_WRAP(sendmsg);
 SHIM_WRAP(socket);
+SHIM_WRAP(socketpair);
 
 ssize_t shim___recv_chk_impl(int fd, void* buf, size_t len, size_t buflen, int flags) {
   assert(len <= buflen);

@@ -10,6 +10,8 @@
 
 #define NV_ERR_NOT_SUPPORTED 0x56
 
+#define LINUX_FIONBIO 0x5421
+
 struct NvUvmInitParams
 {
   uint64_t flags __attribute__((aligned(8)));
@@ -26,6 +28,10 @@ int shim_ioctl_impl(int fd, unsigned long request, va_list args) {
 
   if (request == NV_UVM_DEINITIALIZE) {
     return 0;
+  }
+
+  if (request == LINUX_FIONBIO) {
+    return ioctl(fd, FIONBIO, va_arg(args, int*));
   }
 
   return ioctl(fd, request, va_arg(args, void*));
