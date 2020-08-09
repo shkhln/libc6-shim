@@ -5,7 +5,7 @@
 #include "../../shim.h"
 
 int shim_semctl_impl(int semid, int semnum, int cmd, ...) {
-  UNIMPLEMENTED();
+  return -1;
 }
 
 SHIM_WRAP(semctl);
