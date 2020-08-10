@@ -63,16 +63,30 @@ static void destroy_shim_dir(struct shim_directory* shim_dir) {
   free(shim_dir);
 }
 
+static void copy_direntry(linux_dirent* dst, const struct dirent* src) {
+
+  dst->d_ino    = src->d_ino;
+  dst->d_off    = src->d_off;
+  dst->d_reclen = src->d_reclen;
+  dst->d_type   = src->d_type;
+
+  strlcpy(dst->d_name, src->d_name, sizeof(dst->d_name));
+}
+
+static void copy_direntry64(linux_dirent64* dst, const struct dirent* src) {
+
+  dst->d_ino    = src->d_ino;
+  dst->d_off    = src->d_off;
+  dst->d_reclen = src->d_reclen;
+  dst->d_type   = src->d_type;
+
+  strlcpy(dst->d_name, src->d_name, sizeof(dst->d_name));
+}
+
 static struct linux_dirent* insert_entry(struct shim_directory* shim_dir, struct dirent* entry) {
 
-  struct linux_dirent* linux_entry = malloc(sizeof(struct linux_dirent));
-
-  linux_entry->d_ino    = entry->d_ino;
-  linux_entry->d_off    = entry->d_off;
-  linux_entry->d_reclen = entry->d_reclen;
-  linux_entry->d_type   = entry->d_type;
-
-  strlcpy(linux_entry->d_name, entry->d_name, sizeof(linux_entry->d_name));
+  struct linux_dirent* linux_entry = malloc(sizeof(linux_dirent));
+  copy_direntry(linux_entry, entry);
 
   struct shim_dir_entry* shim_entry = malloc(sizeof(struct shim_dir_entry));
   shim_entry->linux_entry   = linux_entry;
@@ -89,14 +103,8 @@ static struct linux_dirent* insert_entry(struct shim_directory* shim_dir, struct
 
 static struct linux_dirent64* insert_entry64(struct shim_directory* shim_dir, struct dirent* entry) {
 
-  struct linux_dirent64* linux_entry64 = malloc(sizeof(struct linux_dirent64));
-
-  linux_entry64->d_ino    = entry->d_ino;
-  linux_entry64->d_off    = entry->d_off;
-  linux_entry64->d_reclen = entry->d_reclen;
-  linux_entry64->d_type   = entry->d_type;
-
-  strlcpy(linux_entry64->d_name, entry->d_name, sizeof(linux_entry64->d_name));
+  struct linux_dirent64* linux_entry64 = malloc(sizeof(linux_dirent64));
+  copy_direntry64(linux_entry64, entry);
 
   struct shim_dir_entry* shim_entry = malloc(sizeof(struct shim_dir_entry));
   shim_entry->linux_entry   = NULL;
@@ -154,7 +162,11 @@ long shim_telldir_impl(struct shim_directory* shim_dir) {
 }
 
 int shim_alphasort_impl(const struct linux_dirent** d1, const struct linux_dirent** d2) {
-  UNIMPLEMENTED();
+  return strcoll((*d1)->d_name, (*d2)->d_name);
+}
+
+int shim_alphasort64_impl(const struct linux_dirent64** d1, const struct linux_dirent64** d2) {
+  return strcoll((*d1)->d_name, (*d2)->d_name);
 }
 
 int shim_readdir_r_impl(struct shim_directory* shim_dir, struct linux_dirent* linux_entry, struct linux_dirent** linux_result) {
@@ -163,16 +175,111 @@ int shim_readdir_r_impl(struct shim_directory* shim_dir, struct linux_dirent* li
 
 int shim_scandir_impl(
   const char* dirname,
-  struct linux_dirent*** namelist,
+  linux_dirent*** linux_namelist,
   int (*select)(const struct linux_dirent*),
   int (*compar)(const struct linux_dirent**, const struct linux_dirent**)
 ) {
-  UNIMPLEMENTED();
+
+  DIR* dir = opendir(dirname);
+  if (dir == NULL) {
+    return -1;
+  }
+
+  struct { linux_dirent** arr; int len; } out;
+
+  out.len = 32;
+  out.arr = malloc(sizeof(linux_dirent*) * out.len);
+
+  int nitems = 0;
+
+  struct dirent* e;
+  while ((e = readdir(dir)) != NULL) {
+
+    linux_dirent* linux_entry = malloc(sizeof(linux_dirent));
+    copy_direntry(linux_entry, e);
+
+    if (select != NULL ? select(linux_entry) : 1) {
+
+      if (nitems >= out.len) {
+        out.len = out.len * 2;
+        out.arr = realloc(out.arr, sizeof(linux_dirent*) * out.len);
+      }
+
+      out.arr[nitems] = linux_entry;
+      nitems++;
+
+    } else {
+      free(linux_entry);
+    }
+  }
+
+  closedir(dir);
+
+  if (nitems > 0 && compar != NULL) {
+    qsort(out.arr, nitems, sizeof(linux_dirent*), (int (*)(const void*, const void*))compar);
+  }
+
+  *linux_namelist = out.arr;
+
+  return nitems;
+}
+
+//TODO: do something about code duplication?
+int shim_scandir64_impl(
+  const char* dirname,
+  linux_dirent64*** linux_namelist,
+  int (*select)(const struct linux_dirent64*),
+  int (*compar)(const struct linux_dirent64**, const struct linux_dirent64**)
+) {
+
+  DIR* dir = opendir(dirname);
+  if (dir == NULL) {
+    return -1;
+  }
+
+  struct { linux_dirent64** arr; int len; } out;
+
+  out.len = 32;
+  out.arr = malloc(sizeof(linux_dirent64*) * out.len);
+
+  int nitems = 0;
+
+  struct dirent* e;
+  while ((e = readdir(dir)) != NULL) {
+
+    linux_dirent64* linux_entry = malloc(sizeof(linux_dirent64));
+    copy_direntry64(linux_entry, e);
+
+    if (select != NULL ? select(linux_entry) : 1) {
+
+      if (nitems >= out.len) {
+        out.len = out.len * 2;
+        out.arr = realloc(out.arr, sizeof(linux_dirent64*) * out.len);
+      }
+
+      out.arr[nitems] = linux_entry;
+      nitems++;
+
+    } else {
+      free(linux_entry);
+    }
+  }
+
+  closedir(dir);
+
+  if (nitems > 0 && compar != NULL) {
+    qsort(out.arr, nitems, sizeof(linux_dirent64*), (int (*)(const void*, const void*))compar);
+  }
+
+  *linux_namelist = out.arr;
+
+  return nitems;
 }
 
 typedef struct shim_directory linux_DIR;
 
 SHIM_WRAP(alphasort);
+SHIM_WRAP(alphasort64);
 SHIM_WRAP(closedir);
 SHIM_WRAP(dirfd);
 SHIM_WRAP(fdopendir);
@@ -182,5 +289,6 @@ SHIM_WRAP(readdir64);
 SHIM_WRAP(readdir_r);
 SHIM_WRAP(rewinddir);
 SHIM_WRAP(scandir);
+SHIM_WRAP(scandir64);
 SHIM_WRAP(seekdir);
 SHIM_WRAP(telldir);
