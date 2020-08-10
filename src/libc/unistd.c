@@ -124,3 +124,9 @@ int shim_pipe2_impl(int fildes[2], int linux_flags) {
 }
 
 SHIM_WRAP(pipe2);
+
+linux_off64_t shim_lseek64_impl(int fd, linux_off64_t offset, int whence) {
+  return lseek(fd, offset, whence);
+}
+
+SHIM_WRAP(lseek64);

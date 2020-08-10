@@ -3648,6 +3648,7 @@ lsb_define([], [
   "FILE* fopen64(const char* filename, const char* type)",
   "int ftruncate64(int fd, off64_t length)",
   "int get_nprocs(void)",
+  "off64_t lseek64(int fd, off64_t offset, int whence)",
   "struct mallinfo mallinfo(void)",
   "void* memalign(size_t alignment, size_t size)",
   "void* mmap64(void *addr, size_t len, int prot, int linux_flags, int fd, off64_t offset)",
