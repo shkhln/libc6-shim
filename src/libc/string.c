@@ -26,9 +26,15 @@ SHIM_WRAP(perror);
 SHIM_WRAP(strerror);
 SHIM_WRAP(strerror_r);
 
+void* shim___memcpy_chk_impl(void* dst, const void* src, size_t len, size_t destlen) {
+  assert(destlen >= len);
+  return memcpy(dst, src, len);
+}
+
 char* shim___strcpy_chk_impl(char* dest, const char* src, size_t destlen) {
   assert(strlen(src) < destlen);
   return strcpy(dest, src);
 }
 
+SHIM_WRAP(__memcpy_chk);
 SHIM_WRAP(__strcpy_chk);
