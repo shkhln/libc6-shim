@@ -70,6 +70,7 @@ int shim_open_impl(const char* path, int linux_flags, va_list args) {
   if (linux_flags & LINUX_O_CREAT)     flags |= O_CREAT;
   if (linux_flags & LINUX_O_EXCL)      flags |= O_EXCL;
   if (linux_flags & LINUX_O_TRUNC)     flags |= O_TRUNC;
+  if (linux_flags & LINUX_O_APPEND)    flags |= O_APPEND;
   if (linux_flags & LINUX_O_NONBLOCK)  flags |= O_NONBLOCK;
   if (linux_flags & LINUX_O_DIRECTORY) flags |= O_DIRECTORY;
   if (linux_flags & LINUX_O_CLOEXEC)   flags |= O_CLOEXEC;

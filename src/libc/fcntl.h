@@ -12,6 +12,7 @@
 #define LINUX_O_CREAT     0x00040
 #define LINUX_O_EXCL      0x00080
 #define LINUX_O_TRUNC     0x00200
+#define LINUX_O_APPEND    0x00400
 #define LINUX_O_NONBLOCK  0x00800
 #define LINUX_O_DIRECTORY 0x10000
 #define LINUX_O_CLOEXEC   0x80000
@@ -24,6 +25,7 @@
  LINUX_O_CREAT     |             \
  LINUX_O_EXCL      |             \
  LINUX_O_TRUNC     |             \
+ LINUX_O_APPEND    |             \
  LINUX_O_NONBLOCK  |             \
  LINUX_O_DIRECTORY |             \
  LINUX_O_CLOEXEC   |             \
