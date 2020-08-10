@@ -92,9 +92,14 @@ int shim___vasprintf_chk_impl(char** ret, int flags, const char* format, va_list
   return vasprintf(ret, format, args);
 }
 
+int shim___vfprintf_chk_impl(FILE* stream, int flag, const char* format, va_list args) {
+  return vfprintf(stream, format, args);
+}
+
 SHIM_WRAP(__printf_chk);
 SHIM_WRAP(__snprintf_chk);
 SHIM_WRAP(__vsnprintf_chk);
 SHIM_WRAP(__fprintf_chk);
 SHIM_WRAP(__sprintf_chk);
 SHIM_WRAP(__vasprintf_chk);
+SHIM_WRAP(__vfprintf_chk);
