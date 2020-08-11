@@ -169,8 +169,30 @@ int shim_alphasort64_impl(const struct linux_dirent64** d1, const struct linux_d
   return strcoll((*d1)->d_name, (*d2)->d_name);
 }
 
-int shim_readdir_r_impl(struct shim_directory* shim_dir, struct linux_dirent* linux_entry, struct linux_dirent** linux_result) {
-  UNIMPLEMENTED();
+int shim_readdir_r_impl(struct shim_directory* shim_dir, struct linux_dirent* linux_entry, struct linux_dirent** result) {
+
+  struct dirent* e = readdir(shim_dir->dir);
+  if (e != NULL) {
+    copy_direntry(linux_entry, e);
+    *result = linux_entry;
+  } else {
+    *result = NULL;
+  }
+
+  return 0;
+}
+
+int shim_readdir64_r_impl(struct shim_directory* shim_dir, struct linux_dirent64* linux_entry, struct linux_dirent64** result) {
+
+  struct dirent* e = readdir(shim_dir->dir);
+  if (e != NULL) {
+    copy_direntry64(linux_entry, e);
+    *result = linux_entry;
+  } else {
+    *result = NULL;
+  }
+
+  return 0;
 }
 
 int shim_scandir_impl(
@@ -287,6 +309,7 @@ SHIM_WRAP(opendir);
 SHIM_WRAP(readdir);
 SHIM_WRAP(readdir64);
 SHIM_WRAP(readdir_r);
+SHIM_WRAP(readdir64_r);
 SHIM_WRAP(rewinddir);
 SHIM_WRAP(scandir);
 SHIM_WRAP(scandir64);
