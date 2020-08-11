@@ -6,6 +6,38 @@
 #include "../shim.h"
 #include "fcntl.h"
 
+#ifdef __i386__
+
+struct linux_flock {
+  uint16_t l_type;
+  uint16_t l_whence;
+  uint32_t l_start;
+  uint32_t l_len;
+  uint32_t l_pid;
+};
+
+#endif
+
+#ifdef __x86_64__
+
+struct linux_flock {
+  uint16_t l_type;
+  uint16_t l_whence;
+  uint64_t l_start;
+  uint64_t l_len;
+  uint32_t l_pid;
+};
+
+#endif
+
+static void copy_linux_flock(struct flock* dst, struct linux_flock* src) {
+  dst->l_type   = src->l_type;
+  dst->l_whence = src->l_whence;
+  dst->l_start  = src->l_start;
+  dst->l_len    = src->l_len;
+  dst->l_pid    = src->l_pid;
+}
+
 int shim_fcntl_impl(int fd, int cmd, va_list args) {
 
   if (cmd == LINUX_F_GETFD) {
@@ -43,12 +75,49 @@ int shim_fcntl_impl(int fd, int cmd, va_list args) {
     return fcntl(fd, F_SETFL, flags);
   }
 
+  if (cmd == LINUX_F_GETLK) {
+#ifdef DEBUG
+    void* lock = va_arg(args, void*);
+    LOG("%s: cmd = F_GETLK, arg = %p", __func__, lock);
+#endif
+    assert(0);
+  }
+
+  if (cmd == LINUX_F_SETLK) {
+
+    struct linux_flock* linux_lock = va_arg(args, struct linux_flock*);
+    LOG("%s: cmd = F_SETLK, arg = %p", __func__, linux_lock);
+
+    struct flock lock;
+    copy_linux_flock(&lock, linux_lock);
+
+    return fcntl(fd, F_SETLK, &lock);
+  }
+
+  if (cmd == LINUX_F_SETLKW) {
+
+    struct linux_flock* linux_lock = va_arg(args, struct linux_flock*);
+    LOG("%s: cmd = F_SETLKW, arg = %p", __func__, linux_lock);
+
+    struct flock lock;
+    copy_linux_flock(&lock, linux_lock);
+
+    return fcntl(fd, F_SETLKW, &lock);
+  }
+
   if (cmd == LINUX_F_SETOWN) {
 #ifdef DEBUG
     int pid = va_arg(args, int);
     LOG("%s: cmd = F_SETOWN, arg = 0x%x", __func__, pid);
 #endif
-    return -1;
+    assert(0);
+  }
+
+  if (cmd == LINUX_F_GETOWN) {
+#ifdef DEBUG
+    LOG("%s: cmd = F_GETOWN", __func__);
+#endif
+    assert(0);
   }
 
   UNIMPLEMENTED_ARGS("%d, %d, ...", fd, cmd);
