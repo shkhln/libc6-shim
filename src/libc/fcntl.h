@@ -11,6 +11,7 @@
 #define LINUX_O_RDWR      0x00002
 #define LINUX_O_CREAT     0x00040
 #define LINUX_O_EXCL      0x00080
+#define LINUX_O_NOCTTY    0x00100
 #define LINUX_O_TRUNC     0x00200
 #define LINUX_O_APPEND    0x00400
 #define LINUX_O_NONBLOCK  0x00800
@@ -24,6 +25,7 @@
  LINUX_O_RDWR      |             \
  LINUX_O_CREAT     |             \
  LINUX_O_EXCL      |             \
+ LINUX_O_NOCTTY    |             \
  LINUX_O_TRUNC     |             \
  LINUX_O_APPEND    |             \
  LINUX_O_NONBLOCK  |             \
