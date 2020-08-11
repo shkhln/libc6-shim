@@ -3653,6 +3653,7 @@ lsb_define([], [
   "void* memalign(size_t alignment, size_t size)",
   "void* mmap64(void *addr, size_t len, int prot, int linux_flags, int fd, off64_t offset)",
   "int open64(const char* path, int oflag, ...)",
+  "int prctl(int option, unsigned long arg2, unsigned long arg3, unsigned long arg4, unsigned long arg5)",
   "int pthread_getname_np(pthread_t thread, char *name, size_t len)",
   "int pthread_mutexattr_setpshared(pthread_mutexattr_t* attr, int pshared)",
   "int pthread_setname_np(pthread_t thread, const char *name)",
