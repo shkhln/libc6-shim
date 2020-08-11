@@ -198,6 +198,3 @@ extern __typeof(shim___tls_get_addr) shim____tls_get_addr __attribute__((alias("
 
 __asm__(".symver shim___tls_get_addr,__tls_get_addr@GLIBC_2.3");
 __asm__(".symver shim____tls_get_addr,___tls_get_addr@GLIBC_2.3");
-
-static long int shim_timezone = 0;
-SHIM_EXPORT(timezone);
