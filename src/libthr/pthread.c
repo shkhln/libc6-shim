@@ -197,3 +197,9 @@ int shim_pthread_timedjoin_np_impl(pthread_t thread, void** value_ptr, const lin
 }
 
 SHIM_WRAP(pthread_timedjoin_np);
+
+int shim_pthread_getattr_np_impl(pthread_t thread, pthread_attr_t* attr) {
+  return pthread_attr_get_np(thread, attr);
+}
+
+SHIM_WRAP(pthread_getattr_np);
