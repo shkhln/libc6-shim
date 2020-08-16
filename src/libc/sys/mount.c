@@ -6,25 +6,65 @@
 #include "../../shim.h"
 #include "mount.h"
 
+static void copy_statfs_buf(linux_statfs* dst, struct statfs* src) {
+  dst->f_type    = src->f_type;
+  dst->f_bsize   = src->f_bsize;
+  dst->f_blocks  = src->f_blocks;
+  dst->f_bfree   = src->f_bfree;
+  dst->f_bavail  = src->f_bavail;
+  dst->f_files   = src->f_files;
+  dst->f_ffree   = src->f_ffree;
+  dst->f_fsid    = 0; // buf->f_fsid;
+  dst->f_namelen = src->f_namemax;
+  dst->f_frsize  = 0;
+  dst->f_flags   = 0; // ?
+}
+
+static void copy_statfs64_buf(linux_statfs64* dst, struct statfs* src) {
+  dst->f_type    = src->f_type;
+  dst->f_bsize   = src->f_bsize;
+  dst->f_blocks  = src->f_blocks;
+  dst->f_bfree   = src->f_bfree;
+  dst->f_bavail  = src->f_bavail;
+  dst->f_files   = src->f_files;
+  dst->f_ffree   = src->f_ffree;
+  dst->f_fsid    = 0; // buf->f_fsid;
+  dst->f_namelen = src->f_namemax;
+  dst->f_frsize  = 0;
+  dst->f_flags   = 0; // ?
+}
+
+int shim_fstatfs_impl(int fd, linux_statfs* linux_buf) {
+
+  struct statfs buf;
+
+  int err = fstatfs(fd, &buf);
+  if (err == 0) {
+    copy_statfs_buf(linux_buf, &buf);
+  }
+
+  return err;
+}
+
+int shim_fstatfs64_impl(int fd, linux_statfs64* linux_buf) {
+
+  struct statfs buf;
+
+  int err = fstatfs(fd, &buf);
+  if (err == 0) {
+    copy_statfs64_buf(linux_buf, &buf);
+  }
+
+  return err;
+}
+
 int shim_statfs_impl(const char* path, linux_statfs* linux_buf) {
 
   struct statfs buf;
 
   int err = statfs(path, &buf);
   if (err == 0) {
-    memset(linux_buf, 0, sizeof(linux_statfs));
-
-    linux_buf->f_type    = buf.f_type;
-    linux_buf->f_bsize   = buf.f_bsize;
-    linux_buf->f_blocks  = buf.f_blocks;
-    linux_buf->f_bfree   = buf.f_bfree;
-    linux_buf->f_bavail  = buf.f_bavail;
-    linux_buf->f_files   = buf.f_files;
-    linux_buf->f_ffree   = buf.f_ffree;
-    linux_buf->f_fsid    = 0; // buf.f_fsid;
-    linux_buf->f_namelen = buf.f_namemax;
-    linux_buf->f_frsize  = 0;
-    linux_buf->f_flags   = 0; // ?
+    copy_statfs_buf(linux_buf, &buf);
   }
 
   return err;
@@ -36,23 +76,13 @@ int shim_statfs64_impl(const char* path, linux_statfs64* linux_buf) {
 
   int err = statfs(path, &buf);
   if (err == 0) {
-    memset(linux_buf, 0, sizeof(linux_statfs64));
-
-    linux_buf->f_type    = buf.f_type;
-    linux_buf->f_bsize   = buf.f_bsize;
-    linux_buf->f_blocks  = buf.f_blocks;
-    linux_buf->f_bfree   = buf.f_bfree;
-    linux_buf->f_bavail  = buf.f_bavail;
-    linux_buf->f_files   = buf.f_files;
-    linux_buf->f_ffree   = buf.f_ffree;
-    linux_buf->f_fsid    = 0; // buf.f_fsid;
-    linux_buf->f_namelen = buf.f_namemax;
-    linux_buf->f_frsize  = 0;
-    linux_buf->f_flags   = 0; // ?
+    copy_statfs64_buf(linux_buf, &buf);
   }
 
   return err;
 }
 
+SHIM_WRAP(fstatfs);
+SHIM_WRAP(fstatfs64);
 SHIM_WRAP(statfs);
 SHIM_WRAP(statfs64);
