@@ -17,6 +17,7 @@ struct NvUvmInitParams
   uint32_t status;
 };
 
+#define LINUX_FIONREAD       0x541b
 #define LINUX_FIONBIO        0x5421
 #define LINUX_SNDCTL_SYSINFO 0x84f85801
 
@@ -40,6 +41,10 @@ int shim_ioctl_impl(int fd, unsigned long request, va_list args) {
     }
 
     return ioctl(fd, request, va_arg(args, void*));
+  }
+
+  if (request == LINUX_FIONREAD) {
+    return ioctl(fd, FIONREAD, va_arg(args, int*));
   }
 
   if (request == LINUX_FIONBIO) {
