@@ -18,6 +18,10 @@ int shim___isnanf_impl(float arg) {
   return isnanf(arg);
 }
 
+int shim___finitef_impl(float x) {
+  return isfinite(x);
+}
+
 int shim_finite_impl(double x) {
   return isfinite(x);
 }
@@ -64,4 +68,5 @@ SHIM_WRAPPER___isnan
 SHIM_WRAPPER___isnanf
 #endif
 
+SHIM_WRAP(__finitef);
 SHIM_WRAP(finite);
