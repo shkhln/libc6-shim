@@ -20,6 +20,7 @@
 #endif
 
 #ifdef __x86_64__
+#define LINUX_MMAP              9
 #define LINUX_GETPID           39
 #define LINUX_GETTID          186
 #define LINUX_FUTEX           202
@@ -28,7 +29,27 @@
 #define LINUX_MEMFD_CREATE    319
 #endif
 
+void* shim_mmap_impl(void*, size_t, int, int, int, linux_off_t);
+
 long shim_syscall_impl(long number, va_list args) {
+
+#ifdef __x86_64__
+  if (number == LINUX_MMAP) {
+    uintptr_t   addr     = va_arg(args, unsigned long);
+    size_t      len      = va_arg(args, unsigned long);
+    int         prot     = va_arg(args, unsigned long);
+    int         flags    = va_arg(args, unsigned long);
+    int         fd       = va_arg(args, unsigned long);
+    linux_off_t pgoffset = va_arg(args, unsigned long);
+
+    LOG("%s: mmap(%p, %zu, %d, %d, %d, %ld)", __func__, (void*)addr, len, prot, flags, fd, pgoffset);
+
+    void* p = shim_mmap_impl((void*)addr, len, prot, flags, fd, pgoffset);
+    LOG("%s: mmap -> %p", __func__, p);
+
+    return (uintptr_t)p;
+  }
+#endif
 
   if (number == LINUX_GETPID) {
 
