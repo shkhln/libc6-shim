@@ -125,7 +125,8 @@ int shim_fcntl_impl(int fd, int cmd, va_list args) {
 
 int shim_open_impl(const char* path, int linux_flags, va_list args) {
 
-  if (str_starts_with(path, "/proc/") || str_starts_with(path, "/sys/")) {
+  char* p = redirect(path);
+  if (p == NULL) {
     errno = EACCES;
     return -1;
   }
@@ -156,11 +157,7 @@ int shim_open_impl(const char* path, int linux_flags, va_list args) {
     mode = va_arg(args, int);
   }
 
-  if (strcmp("/dev/nvidia-uvm", path) == 0) {
-    return open("/dev/null", flags, mode);
-  }
-
-  return open(path, flags, mode);
+  return open(p, flags, mode);
 }
 
 int shim_open64_impl(const char* path, int linux_flags, va_list args) {

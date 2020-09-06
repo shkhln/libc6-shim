@@ -34,3 +34,31 @@ int linux_to_native_errno(int error) {
       return error;
   }
 }
+
+const char* redirect(const char* path) {
+
+  if (strcmp("/dev/nvidia-uvm", path) == 0) {
+    return "/dev/null";
+  }
+
+  if (str_starts_with(path, "/proc/")) {
+
+    // CUDA init
+    if (strcmp(path, "/proc/self/maps") == 0) {
+      return "/dev/null";
+    }
+
+    // Steam, Widevine
+    if (strcmp(path, "/proc/cpuinfo") == 0) {
+      return "/compat/linux/proc/cpuinfo";
+    }
+
+    return NULL;
+  }
+
+  if (str_starts_with(path, "/sys/")) {
+    return NULL;
+  }
+
+  return path;
+}

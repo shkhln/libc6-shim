@@ -49,6 +49,8 @@ bool str_starts_with(const char* str, const char* substr);
 int native_to_linux_errno(int error);
 int linux_to_native_errno(int error);
 
+const char* redirect(const char* path);
+
 typedef int64_t linux_off64_t;
 
 #ifdef __i386__

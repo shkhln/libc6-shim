@@ -15,41 +15,26 @@ int shim___isoc99_fscanf_impl(FILE* restrict stream, const char* restrict format
 
 FILE* shim_fopen_impl(const char* path, const char* mode) {
 
-  if (str_starts_with(path, "/proc/")) {
+  if (strcmp(path, "/proc/driver/nvidia/params") == 0) {
 
-    if (strcmp(path, "/proc/driver/nvidia/params") == 0) {
+    assert(strcmp(mode, "r") == 0);
 
-      assert(strcmp(mode, "r") == 0);
+    char str[] = "ModifyDeviceFiles: 0\n";
 
-      char str[] = "ModifyDeviceFiles: 0\n";
+    FILE* mem = fmemopen(0, sizeof(str), "r+");
+    fwrite(str, sizeof(char), sizeof(str), mem);
+    rewind(mem);
 
-      FILE* mem = fmemopen(0, sizeof(str), "r+");
-      fwrite(str, sizeof(char), sizeof(str), mem);
-      rewind(mem);
+    return mem;
+  }
 
-      return mem;
-    }
-
-    // CUDA init
-    if (strcmp(path, "/proc/self/maps") == 0) {
-      return fopen("/dev/null", mode);
-    }
-
-    // Steam
-    if (strcmp(path, "/proc/cpuinfo") == 0) {
-      return fopen("/compat/linux/proc/cpuinfo", mode);
-    }
-
+  char* p = redirect(path);
+  if (p == NULL) {
     errno = EACCES;
     return NULL;
   }
 
-  if (str_starts_with(path, "/sys/")) {
-    errno = EACCES;
-    return NULL;
-  }
-
-  return fopen(path, mode);
+  return fopen(p, mode);
 }
 
 FILE* shim_fopen64_impl(const char* path, const char* mode) {
