@@ -5,7 +5,7 @@ require 'stringio'
 
 LINUX = false
 
-require(__dir__ + '/prototypes.rb')
+require(__dir__ + '/../src/prototypes.rb')
 require(__dir__ + '/wrappers.rb')
 
 CC = ENV['cc'] || 'cc'

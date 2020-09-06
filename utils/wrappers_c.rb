@@ -65,7 +65,7 @@ E
 
 LINUX = false
 
-require(__dir__ + '/prototypes.rb')
+require(__dir__ + '/../src/prototypes.rb')
 require(__dir__ + '/wrappers.rb')
 
 def check_compat(function)

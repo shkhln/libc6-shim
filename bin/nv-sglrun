@@ -30,10 +30,10 @@ libmap_common = [
 
 ENV['LD_LIBMAP']          = libmap_common.join("\n")
 ENV['LD_32_LIBMAP']       = libmap_common.join("\n")
-ENV['LD_LIBRARY_PATH']    = [__dir__ + '/nvidia/lib64/tls', __dir__ + '/nvidia/lib64', ENV['LD_LIBRARY_PATH']   ].compact.join(':')
-ENV['LD_32_LIBRARY_PATH'] = [__dir__ + '/nvidia/lib32/tls', __dir__ + '/nvidia/lib32', ENV['LD_32_LIBRARY_PATH']].compact.join(':')
+ENV['LD_LIBRARY_PATH']    = [__dir__ + '/../nvidia/lib64/tls', __dir__ + '/../nvidia/lib64', ENV['LD_LIBRARY_PATH']   ].compact.join(':')
+ENV['LD_32_LIBRARY_PATH'] = [__dir__ + '/../nvidia/lib32/tls', __dir__ + '/../nvidia/lib32', ENV['LD_32_LIBRARY_PATH']].compact.join(':')
 
-ENV['OCL_ICD_VENDORS']    = __dir__ + '/icds/ocl'
-ENV['VK_ICD_FILENAMES']   = __dir__ + '/icds/vk/nv.json'
+ENV['OCL_ICD_VENDORS']    = __dir__ + '/../icds/ocl'
+ENV['VK_ICD_FILENAMES']   = __dir__ + '/../icds/vk/nv.json'
 
 exec __dir__ + '/with-glibc-shim', *ARGV

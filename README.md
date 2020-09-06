@@ -7,5 +7,5 @@ Usage:
 ```
 % ./utils/set_up_libgl.rb
 % make
-% ./nv-sglrun glxgears
+% ./bin/nv-sglrun glxgears
 ```

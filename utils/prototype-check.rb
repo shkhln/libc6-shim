@@ -3,7 +3,7 @@
 
 LINUX = true
 
-require(__dir__ + '/prototypes.rb')
+require(__dir__ + '/../src/prototypes.rb')
 
 puts <<E
 #define _GNU_SOURCE
