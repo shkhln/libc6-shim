@@ -1,0 +1,39 @@
+#!/usr/bin/env ruby
+# encoding: UTF-8
+
+ENV['SHIM_ENABLE_LIBGL_INIT_WORKAROUND'] ||= '1'
+
+`sysctl hw.nvidia.version` =~ /^hw.nvidia.version: NVIDIA UNIX x86_64 Kernel Module  ([\d\.+]+)/
+driver_version = $1
+
+raise if not driver_version
+
+libgl_nvidia = if ENV['SHIM_GLVND'] || driver_version.split('.').first.to_i >= 435
+  "libGLX_nvidia.so.#{driver_version}"
+else
+  "libGL.so.#{driver_version}"
+end
+
+libmap_common = [
+   "libgl_nvidia #{libgl_nvidia}",
+  ("libGL.so     #{libgl_nvidia}" if not ENV['SHIM_GLVND']),
+  ("libGL.so.1   #{libgl_nvidia}" if not ENV['SHIM_GLVND']),
+  '',
+  "libGLX_nvidia.so.0            libGLX_nvidia.so.#{driver_version}",
+  "libnvidia-ptxjitcompiler.so.1 libnvidia-ptxjitcompiler.so.#{driver_version}",
+  '',
+  "libcuda.so.1                  libcuda.so.#{driver_version}",
+  "libnvcuvid.so.1               libnvcuvid.so.#{driver_version}",
+  "libnvidia-encode.so.1         libnvidia-encode.so.#{driver_version}",
+  "libnvidia-opencl.so.1         libnvidia-opencl.so.#{driver_version}",
+].compact
+
+ENV['LD_LIBMAP']          = libmap_common.join("\n")
+ENV['LD_32_LIBMAP']       = libmap_common.join("\n")
+ENV['LD_LIBRARY_PATH']    = [__dir__ + '/nvidia/lib64/tls', __dir__ + '/nvidia/lib64', ENV['LD_LIBRARY_PATH']   ].compact.join(':')
+ENV['LD_32_LIBRARY_PATH'] = [__dir__ + '/nvidia/lib32/tls', __dir__ + '/nvidia/lib32', ENV['LD_32_LIBRARY_PATH']].compact.join(':')
+
+ENV['OCL_ICD_VENDORS']    = __dir__ + '/icds/ocl'
+ENV['VK_ICD_FILENAMES']   = __dir__ + '/icds/vk/nv.json'
+
+exec __dir__ + '/with-glibc-shim', *ARGV

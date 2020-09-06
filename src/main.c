@@ -88,7 +88,8 @@ static void shim_init(int argc, char** argv, char** env) {
 __attribute__((constructor(102)))
 static void shim_libgl_init(int argc, char** argv, char** env) {
 
-  if (getenv("SHIM_SKIP_LIBGL_INIT") != NULL)
+  char* should_run_init = getenv("SHIM_ENABLE_LIBGL_INIT_WORKAROUND");
+  if (!(should_run_init && strcmp(should_run_init, "1") == 0))
     return;
 
   LOG_ENTRY("%d, %p, %p", argc, argv, env);
