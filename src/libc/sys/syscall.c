@@ -16,6 +16,7 @@
 #define LINUX_FUTEX           240
 #define LINUX_CLOCK_GETTIME   265
 #define LINUX_GET_ROBUST_LIST 312
+#define LINUX_GETRANDOM       355
 #define LINUX_MEMFD_CREATE    356
 #endif
 
@@ -26,6 +27,7 @@
 #define LINUX_FUTEX           202
 #define LINUX_CLOCK_GETTIME   228
 #define LINUX_GET_ROBUST_LIST 274
+#define LINUX_GETRANDOM       318
 #define LINUX_MEMFD_CREATE    319
 #endif
 
@@ -109,6 +111,11 @@ long shim_syscall_impl(long number, va_list args) {
     LOG("%s: get_robust_list -> %d", __func__, err);
 
     return err;
+  }
+
+  if (number == LINUX_GETRANDOM) {
+    errno = native_to_linux_errno(ENOSYS);
+    return -1;
   }
 
   if (number == LINUX_MEMFD_CREATE) {
