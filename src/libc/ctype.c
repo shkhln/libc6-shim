@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <ctype.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include "../shim.h"
 
 // TODO: __ctype32_b, __ctype32_tolower, __ctype32_toupper?
@@ -41,7 +42,7 @@ const unsigned short** shim___ctype_b_loc_impl() {
 }
 
 size_t shim___ctype_get_mb_cur_max_impl() {
-  UNIMPLEMENTED();
+  return MB_CUR_MAX;
 }
 
 static int32_t  shim_ctype_tolower_table[384];
