@@ -20,13 +20,13 @@ libmap32 = libmap_common.dup
 libmap32 << 'bsd-librt.so.1 /usr/lib32/librt.so.1'
 
 if ENV['SHIM_FAKECXXRT'] == '1'
-  libmap64 << "libcxxrt.so.1 fakecxxrt.so" if File.exist?(__dir__ + '/../build/lib64/fakecxxrt.so')
-  libmap32 << "libcxxrt.so.1 fakecxxrt.so" if File.exist?(__dir__ + '/../build/lib32/fakecxxrt.so')
+  libmap64 << "libcxxrt.so.1 fakecxxrt.so" if File.exist?(__dir__ + '/../lib64/fakecxxrt.so')
+  libmap32 << "libcxxrt.so.1 fakecxxrt.so" if File.exist?(__dir__ + '/../lib32/fakecxxrt.so')
 end
 
 ENV['LD_LIBMAP']          = [libmap64.join("\n"), ENV['LD_LIBMAP']   ].join("\n")
 ENV['LD_32_LIBMAP']       = [libmap32.join("\n"), ENV['LD_32_LIBMAP']].join("\n")
-ENV['LD_LIBRARY_PATH']    = [__dir__ + '/../build/lib64', ENV['LD_LIBRARY_PATH']   ].compact.join(':')
-ENV['LD_32_LIBRARY_PATH'] = [__dir__ + '/../build/lib32', ENV['LD_32_LIBRARY_PATH']].compact.join(':')
+ENV['LD_LIBRARY_PATH']    = [__dir__ + '/../lib64', ENV['LD_LIBRARY_PATH']   ].compact.join(':')
+ENV['LD_32_LIBRARY_PATH'] = [__dir__ + '/../lib32', ENV['LD_32_LIBRARY_PATH']].compact.join(':')
 
 exec *ARGV

@@ -19,9 +19,12 @@ LIBS += $(BUILD_DIR)/lib64/fakecxxrt.so
 LIBS += $(BUILD_DIR)/lib32/fakecxxrt.so
 .endif
 
-all: $(LIBS)
+all: $(LIBS) lib32 lib64
 
 .for b in 32 64
+
+lib$(b):
+	ln -s $(BUILD_DIR)/lib$(b) lib$(b)
 
 $(BUILD_DIR)/versions$(b).h:
 	./utils/symver.rb src/glibc-2.17-symbols.$(b) > $(.TARGET).tmp && mv $(.TARGET).tmp $(.TARGET)
@@ -72,7 +75,7 @@ check-prototypes:
 	./utils/prototype-check.rb | /compat/linux/bin/gcc -x c -std=c99 --sysroot=/compat/linux -o /dev/null -
 
 clean:
-.for f in $(LIBS)
+.for f in $(LIBS) lib32 lib64
 .  if exists($f)
 	rm $f
 .  endif
