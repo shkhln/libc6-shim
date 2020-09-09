@@ -73,6 +73,18 @@ int shim___fxstat64_impl(int ver, int fd, linux_stat64* stat_buf) {
   return err;
 }
 
+int shim___lxstat_impl(int ver, const char* path, linux_stat* stat_buf) {
+
+  struct stat sb;
+
+  int err = lstat(path, &sb);
+  if (err == 0) {
+    copy_stat_buf(stat_buf, &sb);
+  }
+
+  return err;
+}
+
 int shim___lxstat64_impl(int ver, const char* path, linux_stat64* stat_buf) {
 
   struct stat sb;
@@ -120,6 +132,7 @@ int shim_chmod_impl(const char* path, mode_t mode) {
 
 SHIM_WRAP(__fxstat);
 SHIM_WRAP(__fxstat64);
+SHIM_WRAP(__lxstat);
 SHIM_WRAP(__lxstat64);
 SHIM_WRAP(__xmknod);
 SHIM_WRAP(__xstat);
