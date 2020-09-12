@@ -8,6 +8,7 @@
 #define LINUX_MAP_PRIVATE    0x0002
 #define LINUX_MAP_FIXED      0x0010
 #define LINUX_MAP_ANON       0x0020
+#define LINUX_MAP_32BIT      0x0040
 #define LINUX_MAP_EXECUTABLE 0x1000
 #define LINUX_MAP_NORESERVE  0x4000
 
@@ -16,7 +17,7 @@
  LINUX_MAP_PRIVATE    |          \
  LINUX_MAP_FIXED      |          \
  LINUX_MAP_ANON       |          \
- 0x40                 |          \
+ LINUX_MAP_32BIT      |          \
  LINUX_MAP_EXECUTABLE |          \
  LINUX_MAP_NORESERVE             \
 )
@@ -44,6 +45,15 @@ void* shim_mmap64_impl(void *addr, size_t len, int prot, int linux_flags, int fd
     flags |= MAP_ANON;
     assert(fd == -1 || fd == 0);
     fd = -1;
+  }
+
+  if (linux_flags & LINUX_MAP_32BIT) {
+#ifdef __x86_64__
+    assert((linux_flags & LINUX_MAP_FIXED) == 0);
+    flags |= MAP_32BIT;
+#else
+    assert(0);
+#endif
   }
 
   void* p = mmap(addr, len, prot, flags, fd, offset);
