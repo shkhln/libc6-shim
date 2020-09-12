@@ -104,7 +104,7 @@ for sym in symbols.keys
 
   puts "// #{sym}"
 
-  if symbols[sym][:type] == 'fun' && !SUBSTITUTIONS[sym.to_sym]
+  if symbols[sym][:type] == 'fun' && !(SUBSTITUTIONS[sym.to_sym] || sym.to_sym =~ /setjmp/)
 
     puts "#ifndef SHIM_WRAPPER_#{sym}"
     puts

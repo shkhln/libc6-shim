@@ -12,6 +12,9 @@ LIBS      = $(BUILD_DIR)/lib64/nvshim.so \
 CFLAGS    = -std=c99 -Wall -Wextra -Wno-unused-parameter -Wno-incompatible-pointer-types-discards-qualifiers \
  -shared -fPIC -Wl,-soname,librt.so.1 -Wl,--version-script=src/shim.map -I/usr/local/include
 
+LDFLAGS64 = -lm -pthread
+LDFLAGS32 = -lm -pthread -Wl,-z,notext # "relocation R_386_PC32 cannot be used against symbol _setjmp"
+
 GCC_VER ?= 9
 
 .if exists(/usr/local/lib/gcc${GCC_VER})
@@ -44,7 +47,7 @@ $(BUILD_DIR)/lib$(b)/nvshim.so:       $(SOURCES) $(BUILD_DIR)/wrappers$(b).c $(B
 	  -include $(BUILD_DIR)/wrappers$(b).h \
 	  $(BUILD_DIR)/wrappers$(b).c \
 	  $(BUILD_DIR)/lib$(b)/dummy-librt.so \
-	  -lm -pthread
+	  ${LDFLAGS$(b)}
 
 $(BUILD_DIR)/lib$(b)/nvshim.debug.so: $(BUILD_DIR)/lib$(b)/nvshim.so $(BUILD_DIR)/lib$(b)/dummy-librt.so
 	mkdir -p $(BUILD_DIR)/lib$(b)
@@ -53,7 +56,7 @@ $(BUILD_DIR)/lib$(b)/nvshim.debug.so: $(BUILD_DIR)/lib$(b)/nvshim.so $(BUILD_DIR
 	  -include $(BUILD_DIR)/wrappers$(b).h \
 	  $(BUILD_DIR)/wrappers$(b).c \
 	  $(BUILD_DIR)/lib$(b)/dummy-librt.so \
-	  -lm -pthread
+	  ${LDFLAGS$(b)}
 
 $(BUILD_DIR)/lib$(b)/dummy-librt.so:
 	mkdir -p $(BUILD_DIR)/lib$(b)

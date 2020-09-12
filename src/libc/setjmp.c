@@ -1,33 +1,49 @@
 #include <setjmp.h>
 #include "../shim.h"
 
-int shim___sigsetjmp_impl(jmp_buf env, int savemask) {
-  return 0;
+#ifdef __i386__
+  _Static_assert(sizeof(jmp_buf)    <= 156, "");
+  _Static_assert(sizeof(sigjmp_buf) <= 156, "");
+#endif
+
+#ifdef __x86_64__
+  _Static_assert(sizeof(jmp_buf)    <= 200, "");
+  _Static_assert(sizeof(sigjmp_buf) <= 200, "");
+#endif
+
+int shim_setjmp(jmp_buf env) {
+  UNIMPLEMENTED();
+}
+
+__attribute__((naked))
+int shim__setjmp(jmp_buf env) {
+  __asm__("jmp _setjmp");
+}
+
+__attribute__((naked))
+int shim___sigsetjmp(jmp_buf env, int savemask) {
+  __asm__("jmp sigsetjmp");
+}
+
+SHIM_EXPORT(setjmp);
+SHIM_EXPORT(_setjmp);
+SHIM_EXPORT(__sigsetjmp);
+
+void shim_longjmp_impl(jmp_buf env, int val) {
+  //~ fprintf(stderr, "[[%s]]\n", __func__);
+  _longjmp(env, val);
 }
 
 void shim__longjmp_impl(jmp_buf env, int val) {
-  UNIMPLEMENTED();
-}
-
-int shim__setjmp_impl(jmp_buf env) {
-  return 0;
-}
-
-void shim_longjmp_impl(jmp_buf env, int val) {
-  UNIMPLEMENTED();
-}
-
-int shim_setjmp_impl(jmp_buf env) {
-  return 0;
+  //~ fprintf(stderr, "[[%s]]\n", __func__);
+  _longjmp(env, val);
 }
 
 void shim_siglongjmp_impl(sigjmp_buf env, int val) {
-  UNIMPLEMENTED();
+  //~ fprintf(stderr, "[[%s]]\n", __func__);
+  siglongjmp(env, val);
 }
 
-SHIM_WRAP(__sigsetjmp);
-SHIM_WRAP(_longjmp);
-SHIM_WRAP(_setjmp);
 SHIM_WRAP(longjmp);
-SHIM_WRAP(setjmp);
+SHIM_WRAP(_longjmp);
 SHIM_WRAP(siglongjmp);
