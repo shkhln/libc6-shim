@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <stdarg.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <sys/mman.h>
@@ -70,3 +71,9 @@ void* shim_mmap_impl(void *addr, size_t len, int prot, int linux_flags, int fd, 
 
 SHIM_WRAP(mmap);
 SHIM_WRAP(mmap64);
+
+void* shim_mremap_impl(void* old_address, size_t old_size, size_t new_size, int flags, va_list args) {
+  return (void*)-1;
+}
+
+SHIM_WRAP(mremap);
