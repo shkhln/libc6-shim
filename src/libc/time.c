@@ -25,13 +25,20 @@ void shim_tzset_impl() {
 
 SHIM_WRAP(tzset);
 
-int shim_clock_gettime_impl(linux_clockid_t clock_id, linux_timespec* tp) {
-  switch (clock_id) {
-    case LINUX_CLOCK_MONOTONIC:     return clock_gettime(CLOCK_MONOTONIC, tp);
-    case LINUX_CLOCK_MONOTONIC_RAW: return clock_gettime(CLOCK_MONOTONIC, tp);
+static clockid_t linux_to_native_clockid(linux_clockid_t linux_clock_id) {
+  switch (linux_clock_id) {
+    case LINUX_CLOCK_REALTIME:         return CLOCK_REALTIME;
+    case LINUX_CLOCK_MONOTONIC:        return CLOCK_MONOTONIC;
+    case LINUX_CLOCK_MONOTONIC_RAW:    return CLOCK_MONOTONIC_FAST;
+    case LINUX_CLOCK_REALTIME_COARSE:  return CLOCK_REALTIME_FAST;
+    case LINUX_CLOCK_MONOTONIC_COARSE: return CLOCK_MONOTONIC_FAST;
     default:
-      UNIMPLEMENTED_ARGS("%d, %p", clock_id, tp);
+      UNIMPLEMENTED_ARGS("%d", linux_clock_id);
   }
+}
+
+int shim_clock_gettime_impl(linux_clockid_t linux_clock_id, linux_timespec* tp) {
+  return clock_gettime(linux_to_native_clockid(linux_clock_id),  tp);
 }
 
 SHIM_WRAP(clock_gettime);
