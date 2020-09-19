@@ -16,8 +16,10 @@
 #define LINUX_FUTEX           240
 #define LINUX_CLOCK_GETTIME   265
 #define LINUX_GET_ROBUST_LIST 312
+#define LINUX_PIPE2           331
 #define LINUX_GETRANDOM       355
 #define LINUX_MEMFD_CREATE    356
+
 #endif
 
 #ifdef __x86_64__
@@ -27,6 +29,7 @@
 #define LINUX_FUTEX           202
 #define LINUX_CLOCK_GETTIME   228
 #define LINUX_GET_ROBUST_LIST 274
+#define LINUX_PIPE2           293
 #define LINUX_GETRANDOM       318
 #define LINUX_MEMFD_CREATE    319
 #endif
@@ -109,6 +112,21 @@ long shim_syscall_impl(long number, va_list args) {
 
     int err = get_robust_list(pid, list_head, struct_len);
     LOG("%s: get_robust_list -> %d", __func__, err);
+
+    return err;
+  }
+
+  if (number == LINUX_PIPE2) {
+
+    int shim_pipe2_impl(int[2], int);
+
+    int* fds   = va_arg(args, int*);
+    int  flags = va_arg(args, int);
+
+    LOG("%s: pipe2(%p, %d)", __func__, fds, flags);
+
+    int err = shim_pipe2_impl(fds, flags);
+    LOG("%s: pipe2 -> %d ({%d, %d})", __func__, err, fds[0], fds[1]);
 
     return err;
   }
