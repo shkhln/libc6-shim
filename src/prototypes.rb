@@ -2622,7 +2622,7 @@ define(["pthread.h"], [
 
 # PTHREAD_MUTEXATTR_GETKIND_NP(3)
 define([LINUX ? "pthread.h" : "pthread_np.h"], [
-  "int pthread_mutexattr_getkind_np(pthread_mutexattr_t attr)",
+  "int pthread_mutexattr_getkind_np(const pthread_mutexattr_t* attr, int* kind)",
   "int pthread_mutexattr_setkind_np(pthread_mutexattr_t* attr, int kind)"
 ])
 

@@ -80,6 +80,8 @@ def to_shim_type(type)
       'linux_DIR*'
     when 'pthread_mutex_t*'
       'linux_pthread_mutex_t*'
+    when /^(const |)pthread_(barrier|cond|mutex|rwlock)attr_t\*/
+      $1 + 'linux_pthread_' + $2 + 'attr_t*'
     else
       type.gsub(/struct\s+/, 'linux_')
   end

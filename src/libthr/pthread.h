@@ -7,14 +7,20 @@ struct shim_pthread_mutex {
   pthread_mutex_t _init_mutex;
 };
 
+typedef struct shim_pthread_mutex linux_pthread_mutex_t;
+
 #ifdef __i386__
-  _Static_assert(sizeof(pthread_mutex_t) == 4, "");
-  _Static_assert(sizeof(struct shim_pthread_mutex) <= 24 /* sizeof(pthread_mutex_t) on glibc/Linux */, "");
+_Static_assert(sizeof(struct shim_pthread_mutex) <= 24 /* sizeof(pthread_mutex_t) on glibc/Linux */, "");
 #endif
 
 #ifdef __x86_64__
-  _Static_assert(sizeof(pthread_mutex_t) == 8, "");
-  _Static_assert(sizeof(struct shim_pthread_mutex) <= 40 /* sizeof(pthread_mutex_t) on glibc/Linux */, "");
+_Static_assert(sizeof(struct shim_pthread_mutex) <= 40 /* sizeof(pthread_mutex_t) on glibc/Linux */, "");
 #endif
 
-typedef struct shim_pthread_mutex linux_pthread_mutex_t;
+typedef uint32_t linux_pthread_barrierattr_t;
+typedef uint32_t linux_pthread_condattr_t;
+typedef uint32_t linux_pthread_mutexattr_t;
+
+_Static_assert(sizeof(pthread_rwlockattr_t) <= 8 /* sizeof(pthread_rwlockattr_t) on glibc/Linux */, "");
+
+typedef pthread_rwlockattr_t linux_pthread_rwlockattr_t;

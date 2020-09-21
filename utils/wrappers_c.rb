@@ -74,20 +74,23 @@ def check_compat(function)
   args = [] if args.size == 1 && args.first[:type] == 'void'
 
   for type in args.map{|arg| arg[:type]} + [function[:type]]
-    if type =~ /^(const |)struct (\w+)/
-
-      struct = $2.to_sym
-
-      if not STRUCT_COMPATIBILITY.keys.include?(struct)
-        STDERR.puts "\e[31m#{$PROGRAM_NAME}: unknown struct #{struct}, skipping function #{function[:name]}\e[0m"
+    case type
+      when /^(const |)pthread_(barrier|cond|mutex)attr_t\*/
         return false
-      end
+      when /^(const |)struct (\w+)/
 
-      compatible = STRUCT_COMPATIBILITY[struct]
-      if !compatible
-        #~ STDERR.puts "\e[31m#{$PROGRAM_NAME}: found binary incompatible struct #{struct}, explicit shim impl required for function #{function[:name]}\e[0m"
-        return false
-      end
+        struct = $2.to_sym
+
+        if not STRUCT_COMPATIBILITY.keys.include?(struct)
+          STDERR.puts "\e[31m#{$PROGRAM_NAME}: unknown struct #{struct}, skipping function #{function[:name]}\e[0m"
+          return false
+        end
+
+        compatible = STRUCT_COMPATIBILITY[struct]
+        if !compatible
+          #~ STDERR.puts "\e[31m#{$PROGRAM_NAME}: found binary incompatible struct #{struct}, explicit shim impl required for function #{function[:name]}\e[0m"
+          return false
+        end
     end
   end
 
