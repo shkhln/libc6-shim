@@ -132,12 +132,16 @@ static void shim_libgl_init(int argc, char** argv, char** env) {
   LOG_EXIT();
 }
 
-void shim___cxa_finalize_impl(void* d) {
-  // do nothing
+extern int __cxa_atexit(void (*)(void*), void*, void*);
+
+int shim___cxa_atexit_impl(void (*cb)(void*), void* arg, void* dso) {
+  return __cxa_atexit(cb, arg, dso);
 }
 
-int shim___cxa_atexit_impl(void (*cb)(void*), void* arg, void* dso_handle) {
-  return 0;
+extern void __cxa_finalize(void*);
+
+void shim___cxa_finalize_impl(void* dso) {
+  __cxa_finalize(dso);
 }
 
 int shim___libc_start_main_impl(
