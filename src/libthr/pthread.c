@@ -56,9 +56,9 @@
     return err;                                                                                             \
   }
 
-NATIVE_WHATEVER_ATTRS(barrier, 10);
-NATIVE_WHATEVER_ATTRS(cond,    30);
-NATIVE_WHATEVER_ATTRS(mutex,   50);
+NATIVE_WHATEVER_ATTRS(barrier,  10);
+NATIVE_WHATEVER_ATTRS(cond,     30);
+NATIVE_WHATEVER_ATTRS(mutex,   200);
 
 enum linux_pthread_mutextype {
   LINUX_PTHREAD_MUTEX_NORMAL     = 0,
