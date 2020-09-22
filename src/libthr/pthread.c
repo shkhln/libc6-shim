@@ -222,7 +222,7 @@ SHIM_WRAP(pthread_mutex_timedlock);
 SHIM_WRAP(pthread_mutex_trylock);
 
 int shim_pthread_mutex_destroy_impl(linux_pthread_mutex_t* mutex) {
-  assert(mutex->_wrapped_mutex != 0);
+  //~ assert(mutex->_wrapped_mutex != 0);
   return pthread_mutex_destroy(NATIVE_MUTEX_T(mutex));
 }
 
