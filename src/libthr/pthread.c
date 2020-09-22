@@ -9,20 +9,29 @@
 
 #define NATIVE_WHATEVER_ATTRS(name, max_attrs) \
                                                                                                             \
-  static __thread pthread_ ## name ## attr_t name ## _attributes[max_attrs] = { NULL };                     \
+  static pthread_mutex_t name ## _attributes_mutex = PTHREAD_MUTEX_INITIALIZER;                             \
+                                                                                                            \
+  static pthread_ ## name ## attr_t name ## _attributes[max_attrs] = { NULL };                              \
+                                                                                                            \
+  static uint32_t name ## _attributes_index = 0;                                                            \
                                                                                                             \
   static int init_native_ ## name ## attr(linux_pthread_ ## name ## attr_t* attr) {                         \
                                                                                                             \
     assert(attr != NULL);                                                                                   \
                                                                                                             \
-    for (uint32_t i = 0; i < max_attrs; i++) {                                                              \
-      if (name ## _attributes[i] == NULL) {                                                                 \
-        int err = pthread_ ## name ## attr_init(& name ## _attributes[i]);                                  \
+    assert(pthread_mutex_lock(& name ## _attributes_mutex) == 0);                                           \
+                                                                                                            \
+    for (int i = 0; i < max_attrs; i++) {                                                                   \
+      uint32_t idx = name ## _attributes_index;                                                             \
+      if (name ## _attributes[idx] == NULL) {                                                               \
+        int err = pthread_ ## name ## attr_init(& name ## _attributes[idx]);                                \
         if (err == 0) {                                                                                     \
-          *attr = i ^ 0xFFFFFFFF;                                                                           \
+          *attr = idx + 1;                                                                                  \
         }                                                                                                   \
+        assert(pthread_mutex_unlock(& name ## _attributes_mutex) == 0);                                     \
         return err;                                                                                         \
       }                                                                                                     \
+      name ## _attributes_index = (idx + 1) % max_attrs;                                                    \
     }                                                                                                       \
                                                                                                             \
     assert(0);                                                                                              \
@@ -34,22 +43,21 @@
       return NULL;                                                                                          \
     }                                                                                                       \
                                                                                                             \
-    uint32_t i = *attr ^ 0xFFFFFFFF;                                                                        \
-    assert(i < max_attrs);                                                                                  \
+    assert(*attr >= 1 && *attr <= max_attrs);                                                               \
                                                                                                             \
-    return & name ## _attributes[i];                                                                        \
+    return & name ## _attributes[*attr - 1];                                                                \
   }                                                                                                         \
                                                                                                             \
   static int destroy_native_ ## name ## attr(linux_pthread_ ## name ## attr_t* attr) {                      \
                                                                                                             \
     assert(attr != NULL);                                                                                   \
+    assert(*attr >= 1 && *attr <= max_attrs);                                                               \
                                                                                                             \
-    uint32_t i = *attr ^ 0xFFFFFFFF;                                                                        \
-    assert(i < max_attrs);                                                                                  \
-                                                                                                            \
-    int err = pthread_ ## name ## attr_destroy(& name ## _attributes[i]);                                   \
+    int err = pthread_ ## name ## attr_destroy(& name ## _attributes[*attr - 1]);                           \
     if (err == 0) {                                                                                         \
-      name ## _attributes[i] = NULL;                                                                        \
+      assert(pthread_mutex_lock(& name ## _attributes_mutex) == 0);                                         \
+      name ## _attributes[*attr - 1] = NULL;                                                                \
+      assert(pthread_mutex_unlock(& name ## _attributes_mutex) == 0);                                       \
       *attr = 0;                                                                                            \
     }                                                                                                       \
                                                                                                             \
