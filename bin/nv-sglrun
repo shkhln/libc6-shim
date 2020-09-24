@@ -1,39 +1,124 @@
 #!/usr/bin/env ruby
 # encoding: UTF-8
 
-ENV['SHIM_ENABLE_LIBGL_INIT_WORKAROUND'] ||= '1'
+require 'digest'
+require 'fileutils'
+
+CACHE_ROOT = File.join(ENV['XDG_CACHE_HOME'] || File.join(ENV['HOME'], '.cache'), 'nv-sglrun')
 
 `sysctl hw.nvidia.version` =~ /^hw.nvidia.version: NVIDIA UNIX x86_64 Kernel Module  ([\d\.+]+)/
-driver_version = $1
+DRIVER_VERSION = $1
 
-raise if not driver_version
+raise "No NVIDIA kernel module found" if not DRIVER_VERSION
 
-libgl_nvidia = if ENV['SHIM_GLVND'] || driver_version.split('.').first.to_i >= 435
-  "libGLX_nvidia.so.#{driver_version}"
-else
-  "libGL.so.#{driver_version}"
+NVIDIA_LIB64_DIR = ENV['NVIDIA_LIB64_DIR'] || '/compat/linux/usr/lib64'
+NVIDIA_LIB32_DIR = ENV['NVIDIA_LIB32_DIR'] || '/compat/linux/usr/lib'
+
+DT_INIT = 12
+DT_FINI = 13
+
+#TODO: obsolete since r365432 / r365714
+def patch_init(path, out_path)
+
+  def to_number(slice)
+    case slice.length
+      when 8 then slice.unpack('Q<')[0]
+      when 4 then slice.unpack('L<')[0]
+      else
+        raise
+    end
+  end
+
+  def to_slice(number, wordsize)
+    case wordsize
+      when 8 then [number].pack('Q<')
+      when 4 then [number].pack('L<')
+      else
+        raise
+    end
+  end
+
+  def read_dynamic_section(obj, section_offset, wordsize)
+
+    entries = []
+
+    i = 0
+    while true
+      pos = section_offset + wordsize * 2 * i
+      tag = to_number(obj[ pos            ...(pos + wordsize    )]);
+      val = to_number(obj[(pos + wordsize)...(pos + wordsize * 2)]);
+
+      entries << {offset: pos, tag: tag, val: val}
+
+      break if tag == 0
+
+      i += 1
+    end
+
+    entries
+  end
+
+  def wwrite(obj, offset, number, wordsize)
+    pos = offset
+    for char in to_slice(number, wordsize).chars
+      obj[pos] = char
+      pos += 1
+    end
+  end
+
+  headers = `readelf --headers --wide "#{path}"`
+
+  headers =~ /Class:\s+(ELF32|ELF64)/
+  wordsize = $1 == 'ELF64' ? 8 : 4
+
+  headers =~ /.dynamic\s+DYNAMIC\s+\w+\s(\w+)/
+  section_offset = $1.to_i(16)
+
+  obj = IO.binread(path)
+
+  dynamic = read_dynamic_section(obj, section_offset, wordsize)
+
+  init = dynamic.find{|e| e[:tag] == DT_INIT}
+  fini = dynamic.find{|e| e[:tag] == DT_FINI}
+
+  if init[:offset] < fini[:offset]
+    wwrite(obj, init[:offset], DT_FINI, wordsize)
+  else
+    raise
+  end
+
+  IO.binwrite(out_path, obj)
 end
 
-libmap_common = [
-   "libgl_nvidia #{libgl_nvidia}",
-  ("libGL.so     #{libgl_nvidia}" if not ENV['SHIM_GLVND']),
-  ("libGL.so.1   #{libgl_nvidia}" if not ENV['SHIM_GLVND']),
-  '',
-  "libGLX_nvidia.so.0            libGLX_nvidia.so.#{driver_version}",
-  "libnvidia-ptxjitcompiler.so.1 libnvidia-ptxjitcompiler.so.#{driver_version}",
-  '',
-  "libcuda.so.1                  libcuda.so.#{driver_version}",
-  "libnvcuvid.so.1               libnvcuvid.so.#{driver_version}",
-  "libnvidia-encode.so.1         libnvidia-encode.so.#{driver_version}",
-  "libnvidia-opencl.so.1         libnvidia-opencl.so.#{driver_version}",
-].compact
+def libmap(target_dir)
 
-ENV['LD_LIBMAP']          = libmap_common.join("\n")
-ENV['LD_32_LIBMAP']       = libmap_common.join("\n")
-ENV['LD_LIBRARY_PATH']    = [__dir__ + '/../nvidia/lib64/tls', __dir__ + '/../nvidia/lib64', ENV['LD_LIBRARY_PATH']   ].compact.join(':')
-ENV['LD_32_LIBRARY_PATH'] = [__dir__ + '/../nvidia/lib32/tls', __dir__ + '/../nvidia/lib32', ENV['LD_32_LIBRARY_PATH']].compact.join(':')
+  libglx_path = File.join(CACHE_ROOT, "#{Digest::SHA256.hexdigest(target_dir)}_libGLX_nvidia.so.#{DRIVER_VERSION}.patched")
 
-ENV['OCL_ICD_VENDORS']    = __dir__ + '/../icds/ocl'
-ENV['VK_ICD_FILENAMES']   = __dir__ + '/../icds/vk/nv.json'
+  if not File.exist?(libglx_path)
+    FileUtils.mkdir_p(CACHE_ROOT)
+    patch_init(File.join(target_dir, "libGLX_nvidia.so.#{DRIVER_VERSION}"), libglx_path)
+  end
 
-exec __dir__ + '/with-glibc-shim', *ARGV
+  lmap = {
+    'libgl_nvidia'       => libglx_path,
+    'libGLX_nvidia.so.0' => libglx_path,
+    'libGL.so'           => libglx_path, # no glvnd
+    'libGL.so.1'         => libglx_path  # no glvnd
+  }
+
+  for path in Dir[File.join(target_dir, 'lib{cuda.so*,nvcuvid.so*,nvidia-*.so*}')]
+    lmap[File.basename(path)] = path
+  end
+
+  lmap.map{|k, v| '%-40s %s' % [k, v]}.sort.join("\n")
+end
+
+ENV['SHIM_ENABLE_LIBGL_INIT_WORKAROUND'] = '1'
+
+ENV['LD_LIBMAP']        = libmap(NVIDIA_LIB64_DIR)
+ENV['LD_32_LIBMAP']     = libmap(NVIDIA_LIB32_DIR)
+
+ENV['OCL_ICD_VENDORS']  = File.join(__dir__, '../icds/ocl')
+ENV['VK_ICD_FILENAMES'] = File.join(__dir__, '../icds/vk/nv.json')
+
+exec File.join(__dir__, 'with-glibc-shim'), *ARGV
