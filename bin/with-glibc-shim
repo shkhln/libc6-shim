@@ -1,32 +1,34 @@
 #!/usr/bin/env ruby
 # encoding: UTF-8
 
-shim_lib = ENV['SHIM_DEBUG'] == '1' ? 'nvshim.debug.so' : 'nvshim.so'
+SHIM_LIB =
+  if ENV['SHIM_DEBUG'] == '1'
+    'nvshim.debug.so'
+  else
+    'nvshim.so'
+  end
 
-libmap_common = [
-  "ld-linux.so.2        #{shim_lib}",
-  "ld-linux-x86-64.so.2 #{shim_lib}",
-  "libc.so.6            #{shim_lib}",
-  "libdl.so.2           #{shim_lib}",
-  "libm.so.6            #{shim_lib}",
-  "libpthread.so.0      #{shim_lib}",
-  "librt.so.1           #{shim_lib}"
-].compact
+def libmap(libdir_suffix)
 
-libmap64 = libmap_common.dup
-libmap64 << 'bsd-librt.so.1 /usr/lib/librt.so.1'
+  lmap = {
+    'ld-linux.so.2'        => SHIM_LIB,
+    'ld-linux-x86-64.so.2' => SHIM_LIB,
+    'libc.so.6'            => SHIM_LIB,
+    'libdl.so.2'           => SHIM_LIB,
+    'libm.so.6 '           => SHIM_LIB,
+    'ibpthread.so.0'       => SHIM_LIB,
+    'librt.so.1'           => SHIM_LIB,
+    'bsd-librt.so.1'       => "/usr/lib#{libdir_suffix}/librt.so.1",
+    'libcxxrt.so.1'        => ('fakecxxrt.so' if ENV['SHIM_FAKECXXRT'] == '1')
+  }
 
-libmap32 = libmap_common.dup
-libmap32 << 'bsd-librt.so.1 /usr/lib32/librt.so.1'
-
-if ENV['SHIM_FAKECXXRT'] == '1'
-  libmap64 << "libcxxrt.so.1 fakecxxrt.so" if File.exist?(__dir__ + '/../lib64/fakecxxrt.so')
-  libmap32 << "libcxxrt.so.1 fakecxxrt.so" if File.exist?(__dir__ + '/../lib32/fakecxxrt.so')
+  lmap.compact.map{|k, v| '%-40s %s' % [k, v]}.join("\n")
 end
 
-ENV['LD_LIBMAP']          = [libmap64.join("\n"), ENV['LD_LIBMAP']   ].join("\n")
-ENV['LD_32_LIBMAP']       = [libmap32.join("\n"), ENV['LD_32_LIBMAP']].join("\n")
-ENV['LD_LIBRARY_PATH']    = [__dir__ + '/../lib64', ENV['LD_LIBRARY_PATH']   ].compact.join(':')
-ENV['LD_32_LIBRARY_PATH'] = [__dir__ + '/../lib32', ENV['LD_32_LIBRARY_PATH']].compact.join(':')
+ENV['LD_LIBMAP']          = [libmap(''),   ENV['LD_LIBMAP']   ].join("\n")
+ENV['LD_32_LIBMAP']       = [libmap('32'), ENV['LD_32_LIBMAP']].join("\n")
+
+ENV['LD_LIBRARY_PATH']    = [File.join(__dir__, '../lib64'), ENV['LD_LIBRARY_PATH']   ].compact.join(':')
+ENV['LD_32_LIBRARY_PATH'] = [File.join(__dir__, '../lib32'), ENV['LD_32_LIBRARY_PATH']].compact.join(':')
 
 exec *ARGV

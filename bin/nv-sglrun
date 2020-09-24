@@ -45,8 +45,8 @@ def patch_init(path, out_path)
     i = 0
     while true
       pos = section_offset + wordsize * 2 * i
-      tag = to_number(obj[ pos            ...(pos + wordsize    )]);
-      val = to_number(obj[(pos + wordsize)...(pos + wordsize * 2)]);
+      tag = to_number(obj[ pos            ...(pos + wordsize    )])
+      val = to_number(obj[(pos + wordsize)...(pos + wordsize * 2)])
 
       entries << {offset: pos, tag: tag, val: val}
 
