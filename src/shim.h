@@ -71,10 +71,6 @@ typedef struct option linux_option;
 
 typedef struct rusage linux_rusage;
 
-#include <spawn.h>
-
-typedef struct sched_param linux_sched_param;
-
 #include <sys/types.h>
 #include <sys/ipc.h>
 #include <sys/sem.h>

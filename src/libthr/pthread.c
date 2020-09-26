@@ -4,6 +4,7 @@
 #include <pthread_np.h>
 #include <signal.h>
 #include "../shim.h"
+#include "../libc/sched.h"
 #include "../libc/time.h"
 #include "pthread.h"
 
@@ -390,3 +391,35 @@ int shim_pthread_attr_setinheritsched_impl(pthread_attr_t* attr, int linux_inher
 
 SHIM_WRAP(pthread_attr_getinheritsched);
 SHIM_WRAP(pthread_attr_setinheritsched);
+
+int shim_pthread_attr_getschedpolicy_impl(const pthread_attr_t* attr, int* linux_policy) {
+  int policy;
+  int err = pthread_attr_getschedpolicy(attr, &policy);
+  if (err == 0) {
+    *linux_policy = native_to_linux_sched_policy(policy);
+  }
+  return err;
+}
+
+int shim_pthread_attr_setschedpolicy_impl(pthread_attr_t* attr, int linux_policy) {
+  return pthread_attr_setschedpolicy(attr, linux_to_native_sched_policy(linux_policy));
+}
+
+SHIM_WRAP(pthread_attr_getschedpolicy);
+SHIM_WRAP(pthread_attr_setschedpolicy);
+
+int shim_pthread_getschedparam_impl(pthread_t thread, int* linux_policy, linux_sched_param* param) {
+  int policy;
+  int err = pthread_getschedparam(thread, &policy, param);
+  if (err == 0) {
+    *linux_policy = native_to_linux_sched_policy(policy);
+  }
+  return err;
+}
+
+int shim_pthread_setschedparam_impl(pthread_t thread, int linux_policy, const linux_sched_param* param) {
+  return pthread_setschedparam(thread, linux_to_native_sched_policy(linux_policy), param);
+}
+
+SHIM_WRAP(pthread_getschedparam);
+SHIM_WRAP(pthread_setschedparam);
