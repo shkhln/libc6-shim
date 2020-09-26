@@ -69,6 +69,29 @@ NATIVE_WHATEVER_ATTRS(barrier,  10);
 NATIVE_WHATEVER_ATTRS(cond,     30);
 NATIVE_WHATEVER_ATTRS(mutex,   200);
 
+int shim_pthread_join_impl(pthread_t thread, void** value_ptr) {
+  int err = pthread_join(thread, value_ptr);
+  if (err == 0) {
+    if (*value_ptr == PTHREAD_CANCELED) {
+      *value_ptr = LINUX_PTHREAD_CANCELED;
+    }
+  }
+  return err;
+}
+
+int shim_pthread_timedjoin_np_impl(pthread_t thread, void** value_ptr, const linux_timespec* abstime) {
+  int err = pthread_timedjoin_np(thread, value_ptr, abstime);
+  if (err == 0) {
+    if (*value_ptr == PTHREAD_CANCELED) {
+      *value_ptr = LINUX_PTHREAD_CANCELED;
+    }
+  }
+  return native_to_linux_errno(err);
+}
+
+SHIM_WRAP(pthread_join);
+SHIM_WRAP(pthread_timedjoin_np);
+
 //TODO: impl
 int shim_pthread_getaffinity_np_impl(pthread_t thread, size_t cpusetsize, /*cpu_set_t* cpuset*/ void* cpuset) {
   return native_to_linux_errno(EPERM);
@@ -247,12 +270,6 @@ int shim_pthread_rwlock_timedwrlock_impl(pthread_rwlock_t* rwlock, const linux_t
 
 SHIM_WRAP(pthread_rwlock_timedrdlock);
 SHIM_WRAP(pthread_rwlock_timedwrlock);
-
-int shim_pthread_timedjoin_np_impl(pthread_t thread, void** value_ptr, const linux_timespec* abstime) {
-  return native_to_linux_errno(pthread_timedjoin_np(thread, value_ptr, abstime));
-}
-
-SHIM_WRAP(pthread_timedjoin_np);
 
 int shim_pthread_getattr_np_impl(pthread_t thread, pthread_attr_t* attr) {
   return pthread_attr_get_np(thread, attr);

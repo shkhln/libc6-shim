@@ -1,5 +1,7 @@
 #include <pthread.h>
 
+#define LINUX_PTHREAD_CANCELED ((void*)-1)
+
 struct shim_pthread_mutex {
   pthread_mutex_t _wrapped_mutex;
   uint32_t        _pad[2];
