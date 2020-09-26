@@ -16,7 +16,7 @@ def libmap(libdir_suffix)
     'libc.so.6'            => SHIM_LIB,
     'libdl.so.2'           => SHIM_LIB,
     'libm.so.6 '           => SHIM_LIB,
-    'ibpthread.so.0'       => SHIM_LIB,
+    'libpthread.so.0'      => SHIM_LIB,
     'librt.so.1'           => SHIM_LIB,
     'bsd-librt.so.1'       => "/usr/lib#{libdir_suffix}/librt.so.1",
     'libcxxrt.so.1'        => ('fakecxxrt.so' if ENV['SHIM_FAKECXXRT'] == '1')
