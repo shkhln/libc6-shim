@@ -35,3 +35,8 @@ enum linux_pthread_inheritsched {
   LINUX_PTHREAD_INHERIT_SCHED  = 0,
   LINUX_PTHREAD_EXPLICIT_SCHED = 1
 };
+
+enum linux_pthread_contentionscope {
+  LINUX_PTHREAD_SCOPE_SYSTEM  = 0,
+  LINUX_PTHREAD_SCOPE_PROCESS = 1
+};

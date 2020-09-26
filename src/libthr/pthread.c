@@ -423,3 +423,45 @@ int shim_pthread_setschedparam_impl(pthread_t thread, int linux_policy, const li
 
 SHIM_WRAP(pthread_getschedparam);
 SHIM_WRAP(pthread_setschedparam);
+
+int shim_pthread_attr_getscope_impl(const pthread_attr_t* attr, int* linux_scope) {
+
+  int scope;
+
+  int err = pthread_attr_getscope(attr, &scope);
+  if (err == 0) {
+    switch(scope) {
+      case PTHREAD_SCOPE_SYSTEM:
+        *linux_scope = LINUX_PTHREAD_SCOPE_SYSTEM;
+        break;
+      case PTHREAD_SCOPE_PROCESS:
+        *linux_scope = LINUX_PTHREAD_SCOPE_PROCESS;
+        break;
+      default:
+        assert(0);
+    }
+  }
+
+  return err;
+}
+
+int shim_pthread_attr_setscope_impl(pthread_attr_t* attr, int linux_scope) {
+
+  int scope;
+
+  switch(linux_scope) {
+    case LINUX_PTHREAD_SCOPE_SYSTEM:
+      scope = PTHREAD_SCOPE_SYSTEM;
+      break;
+    case LINUX_PTHREAD_SCOPE_PROCESS:
+      scope = PTHREAD_SCOPE_PROCESS;
+      break;
+    default:
+      assert(0);
+  }
+
+  return pthread_attr_setscope(attr, scope);
+}
+
+SHIM_WRAP(pthread_attr_getscope);
+SHIM_WRAP(pthread_attr_setscope);
