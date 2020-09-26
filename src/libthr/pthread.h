@@ -24,3 +24,14 @@ typedef uint32_t linux_pthread_mutexattr_t;
 _Static_assert(sizeof(pthread_rwlockattr_t) <= 8 /* sizeof(pthread_rwlockattr_t) on glibc/Linux */, "");
 
 typedef pthread_rwlockattr_t linux_pthread_rwlockattr_t;
+
+enum linux_pthread_mutextype {
+  LINUX_PTHREAD_MUTEX_NORMAL     = 0,
+  LINUX_PTHREAD_MUTEX_RECURSIVE  = 1,
+  LINUX_PTHREAD_MUTEX_ERRORCHECK = 2
+};
+
+enum linux_pthread_inheritsched {
+  LINUX_PTHREAD_INHERIT_SCHED  = 0,
+  LINUX_PTHREAD_EXPLICIT_SCHED = 1
+};

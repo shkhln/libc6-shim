@@ -68,12 +68,6 @@ NATIVE_WHATEVER_ATTRS(barrier,  10);
 NATIVE_WHATEVER_ATTRS(cond,     30);
 NATIVE_WHATEVER_ATTRS(mutex,   200);
 
-enum linux_pthread_mutextype {
-  LINUX_PTHREAD_MUTEX_NORMAL     = 0,
-  LINUX_PTHREAD_MUTEX_RECURSIVE  = 1,
-  LINUX_PTHREAD_MUTEX_ERRORCHECK = 2
-};
-
 //TODO: impl
 int shim_pthread_getaffinity_np_impl(pthread_t thread, size_t cpusetsize, /*cpu_set_t* cpuset*/ void* cpuset) {
   return native_to_linux_errno(EPERM);
@@ -354,3 +348,45 @@ int shim_pthread_cond_init_impl(pthread_cond_t* cond, const linux_pthread_condat
 }
 
 SHIM_WRAP(pthread_cond_init);
+
+int shim_pthread_attr_getinheritsched_impl(const pthread_attr_t* attr, int* linux_inheritsched) {
+
+  int inheritsched;
+
+  int err = pthread_attr_getinheritsched(attr, &inheritsched);
+  if (err == 0) {
+    switch (inheritsched) {
+      case PTHREAD_INHERIT_SCHED:
+        *linux_inheritsched = LINUX_PTHREAD_INHERIT_SCHED;
+        break;
+      case PTHREAD_EXPLICIT_SCHED:
+        *linux_inheritsched = LINUX_PTHREAD_EXPLICIT_SCHED;
+        break;
+      default:
+        assert(0);
+    }
+  }
+
+  return err;
+}
+
+int shim_pthread_attr_setinheritsched_impl(pthread_attr_t* attr, int linux_inheritsched) {
+
+  int inheritsched;
+
+  switch (linux_inheritsched) {
+    case LINUX_PTHREAD_INHERIT_SCHED:
+      inheritsched = PTHREAD_INHERIT_SCHED;
+      break;
+    case LINUX_PTHREAD_EXPLICIT_SCHED:
+      inheritsched = PTHREAD_EXPLICIT_SCHED;
+      break;
+    default:
+      assert(0);
+  }
+
+  return pthread_attr_setinheritsched(attr, inheritsched);
+}
+
+SHIM_WRAP(pthread_attr_getinheritsched);
+SHIM_WRAP(pthread_attr_setinheritsched);
