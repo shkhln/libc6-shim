@@ -72,7 +72,7 @@ NATIVE_WHATEVER_ATTRS(mutex,   200);
 int shim_pthread_join_impl(pthread_t thread, void** value_ptr) {
   int err = pthread_join(thread, value_ptr);
   if (err == 0) {
-    if (*value_ptr == PTHREAD_CANCELED) {
+    if (value_ptr != NULL && *value_ptr == PTHREAD_CANCELED) {
       *value_ptr = LINUX_PTHREAD_CANCELED;
     }
   }
@@ -82,7 +82,7 @@ int shim_pthread_join_impl(pthread_t thread, void** value_ptr) {
 int shim_pthread_timedjoin_np_impl(pthread_t thread, void** value_ptr, const linux_timespec* abstime) {
   int err = pthread_timedjoin_np(thread, value_ptr, abstime);
   if (err == 0) {
-    if (*value_ptr == PTHREAD_CANCELED) {
+    if (value_ptr != NULL && *value_ptr == PTHREAD_CANCELED) {
       *value_ptr = LINUX_PTHREAD_CANCELED;
     }
   }
