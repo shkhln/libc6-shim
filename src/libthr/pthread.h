@@ -28,9 +28,10 @@ _Static_assert(sizeof(pthread_rwlockattr_t) <= 8 /* sizeof(pthread_rwlockattr_t)
 typedef pthread_rwlockattr_t linux_pthread_rwlockattr_t;
 
 enum linux_pthread_mutextype {
-  LINUX_PTHREAD_MUTEX_NORMAL     = 0,
-  LINUX_PTHREAD_MUTEX_RECURSIVE  = 1,
-  LINUX_PTHREAD_MUTEX_ERRORCHECK = 2
+  LINUX_PTHREAD_MUTEX_NORMAL      = 0,
+  LINUX_PTHREAD_MUTEX_RECURSIVE   = 1,
+  LINUX_PTHREAD_MUTEX_ERRORCHECK  = 2,
+  LINUX_PTHREAD_MUTEX_ADAPTIVE_NP = 3
 };
 
 enum linux_pthread_inheritsched {
