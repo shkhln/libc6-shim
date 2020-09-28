@@ -78,6 +78,8 @@ def check_compat(function)
     case type
       when /^(const |)pthread_(barrier|cond|mutex)attr_t\*/
         return false
+      when /ucontext_t/
+        return false
       when /^(const |)struct (\w+)/
 
         struct = $2.to_sym
