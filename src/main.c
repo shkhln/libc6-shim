@@ -193,10 +193,7 @@ extern void* __tls_get_addr(void*);
 
 __attribute__((__regparm__(1)))
 void* shim___tls_get_addr(void* ti) {
-  LOG_ENTRY("%p", ti);
-  void* p = __tls_get_addr(ti);
-  LOG_EXIT("%p", p);
-  return p;
+  return __tls_get_addr(ti);
 }
 
 extern __typeof(shim___tls_get_addr) shim____tls_get_addr __attribute__((alias("shim___tls_get_addr")));
