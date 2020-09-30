@@ -33,6 +33,13 @@ void* shim___memset_chk_impl(void* dest, int c, size_t len, size_t destlen) {
 
 SHIM_WRAP(__memset_chk);
 
+char* shim___strcat_chk_impl(char* dest, const char* src, size_t destlen) {
+  assert(strlen(src) + strlen(dest) < destlen);
+  return strcat(dest, src);
+}
+
+SHIM_WRAP(__strcat_chk);
+
 void* shim___memcpy_chk_impl(void* dst, const void* src, size_t len, size_t destlen) {
   assert(len <= destlen);
   return memcpy(dst, src, len);
