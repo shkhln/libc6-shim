@@ -280,6 +280,7 @@ SHIM_WRAP(pthread_rwlock_timedrdlock);
 SHIM_WRAP(pthread_rwlock_timedwrlock);
 
 int shim_pthread_getattr_np_impl(pthread_t thread, pthread_attr_t* attr) {
+  pthread_attr_init(attr);
   return pthread_attr_get_np(thread, attr);
 }
 
