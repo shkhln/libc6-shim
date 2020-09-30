@@ -88,3 +88,9 @@ SHIM_WRAP(__fprintf_chk);
 SHIM_WRAP(__sprintf_chk);
 SHIM_WRAP(__vasprintf_chk);
 SHIM_WRAP(__vfprintf_chk);
+
+int shim_fgetpos64_impl(FILE* stream, linux_fpos64_t* pos) {
+  return fgetpos(stream, pos);
+}
+
+SHIM_WRAP(fgetpos64);

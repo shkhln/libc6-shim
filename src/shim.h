@@ -92,3 +92,8 @@ typedef struct linux_sysinfo linux_sysinfo;
 #include <link.h>
 
 typedef struct dl_phdr_info linux_dl_phdr_info;
+
+_Static_assert(sizeof(fpos_t) <= 12 /* sizeof(fpos_t) on glibc/Linux with i386 */, "");
+
+typedef fpos_t linux_fpos_t;
+typedef fpos_t linux_fpos64_t;
