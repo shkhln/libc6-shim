@@ -31,4 +31,4 @@ ENV['LD_32_LIBMAP']       = [libmap('32'), ENV['LD_32_LIBMAP']].join("\n")
 ENV['LD_LIBRARY_PATH']    = [File.join(__dir__, '../lib64'), ENV['LD_LIBRARY_PATH']   ].compact.join(':')
 ENV['LD_32_LIBRARY_PATH'] = [File.join(__dir__, '../lib32'), ENV['LD_32_LIBRARY_PATH']].compact.join(':')
 
-exec *ARGV
+exec([ARGV[0]] * 2, *ARGV[1..-1])
