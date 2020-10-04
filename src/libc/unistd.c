@@ -136,10 +136,10 @@ linux_off64_t shim_lseek64_impl(int fd, linux_off64_t offset, int whence) {
 
 SHIM_WRAP(lseek64);
 
-static char* shim_optarg = NULL;
-static int   shim_optind = 1;
-static int   shim_optopt = 0;
-static int   shim_opterr = 1;
+char* shim_optarg = NULL;
+int   shim_optind = 1;
+int   shim_optopt = 0;
+int   shim_opterr = 1;
 
 SHIM_EXPORT(optarg);
 SHIM_EXPORT(optind);
@@ -153,10 +153,10 @@ static int*   _opterr = NULL;
 
 int shim_getopt_impl(int argc, char* const argv[], const char* optstring) {
 
-  if (!_optarg) _optarg = look_up_global_var("optarg");
-  if (!_optind) _optind = look_up_global_var("optind");
-  if (!_optopt) _optopt = look_up_global_var("optopt");
-  if (!_opterr) _opterr = look_up_global_var("opterr");
+  if (!_optarg) _optarg = look_up_global_var("optarg", &optarg);
+  if (!_optind) _optind = look_up_global_var("optind", &optind);
+  if (!_optopt) _optopt = look_up_global_var("optopt", &optopt);
+  if (!_opterr) _opterr = look_up_global_var("opterr", &opterr);
 
   optind = *_optind;
   opterr = *_opterr;

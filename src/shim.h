@@ -51,7 +51,7 @@ int linux_to_native_errno(int error);
 
 const char* redirect(const char* path);
 
-void* look_up_global_var(const char* symbol);
+void* look_up_global_var(const char* symbol, void* fallback);
 
 typedef int64_t linux_off64_t;
 

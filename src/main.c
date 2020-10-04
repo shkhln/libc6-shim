@@ -10,11 +10,9 @@
 
 #include "shim.h"
 
-static FILE std[3] = {};
-
-FILE* shim_stdin  = &std[0];
-FILE* shim_stdout = &std[1];
-FILE* shim_stderr = &std[2];
+FILE* shim_stdin  = NULL;
+FILE* shim_stdout = NULL;
+FILE* shim_stderr = NULL;
 
 SHIM_EXPORT(stdin);
 SHIM_EXPORT(stdout);
@@ -22,9 +20,9 @@ SHIM_EXPORT(stderr);
 
 #ifdef __i386__
 
-extern FILE* shim__IO_stdin_  __attribute__((alias("shim_stdin")));
-extern FILE* shim__IO_stdout_ __attribute__((alias("shim_stdout")));
-extern FILE* shim__IO_stderr_ __attribute__((alias("shim_stderr")));
+FILE* shim__IO_stdin_  = NULL;
+FILE* shim__IO_stdout_ = NULL;
+FILE* shim__IO_stderr_ = NULL;
 
 SHIM_EXPORT(_IO_stdin_);
 SHIM_EXPORT(_IO_stdout_);
@@ -32,23 +30,20 @@ SHIM_EXPORT(_IO_stderr_);
 
 #endif
 
-extern FILE* shim__IO_2_1_stdin_  __attribute__((alias("shim_stdin")));
-extern FILE* shim__IO_2_1_stdout_ __attribute__((alias("shim_stdout")));
-extern FILE* shim__IO_2_1_stderr_ __attribute__((alias("shim_stderr")));
+FILE* shim__IO_2_1_stdin_  = NULL;
+FILE* shim__IO_2_1_stdout_ = NULL;
+FILE* shim__IO_2_1_stderr_ = NULL;
 
 SHIM_EXPORT(_IO_2_1_stdin_);
 SHIM_EXPORT(_IO_2_1_stdout_);
 SHIM_EXPORT(_IO_2_1_stderr_);
 
-#define MAX_SHIM_ENV_ENTRIES 100
-
-static char* _shim_env[MAX_SHIM_ENV_ENTRIES];
-char** shim_environ = _shim_env;
+char** shim_environ = NULL;
 
 SHIM_EXPORT(environ);
 
-extern char** shim___environ __attribute__((alias("shim_environ")));
-extern char** shim__environ  __attribute__((alias("shim_environ")));
+char** shim___environ = NULL;
+char** shim__environ  = NULL;
 
 SHIM_EXPORT(__environ);
 SHIM_EXPORT(_environ);
@@ -58,8 +53,8 @@ char* shim___progname = "<progname>";
 SHIM_EXPORT(__progname);
 
 // necessary for the rtld's direct execution mode
-extern char* environ    __attribute__((alias("shim_environ")));
-extern char* __progname __attribute__((alias("shim___progname")));
+char** environ    = NULL;
+char*  __progname = "<progname>";
 
 static int    shim_argc = 0;
 static char** shim_argv = NULL;
@@ -69,17 +64,23 @@ static void shim_init(int argc, char** argv, char** env) {
 
   fprintf(stderr, "shim init\n");
 
-  memcpy(shim_stdin,  stdin,  sizeof(FILE));
-  memcpy(shim_stdout, stdout, sizeof(FILE));
-  memcpy(shim_stderr, stderr, sizeof(FILE));
+  *(FILE**)look_up_global_var("stdin",  &stdin)  = stdin;
+  *(FILE**)look_up_global_var("stdout", &stdout) = stdout;
+  *(FILE**)look_up_global_var("stderr", &stderr) = stderr;
 
-  for (int i = 0;; i++) {
-    if (env[i] == NULL) {
-      assert(i < MAX_SHIM_ENV_ENTRIES);
-      memcpy(shim_environ, env, sizeof(char*) * (i + 1));
-      break;
-    }
-  }
+#ifdef __i386__
+  *(FILE**)look_up_global_var("_IO_stdin_",  &stdin)  = stdin;
+  *(FILE**)look_up_global_var("_IO_stdout_", &stdout) = stdout;
+  *(FILE**)look_up_global_var("_IO_stderr_", &stderr) = stderr;
+#endif
+
+  *(FILE**)look_up_global_var("_IO_2_1_stdin_",  &stdin)  = stdin;
+  *(FILE**)look_up_global_var("_IO_2_1_stdout_", &stdout) = stdout;
+  *(FILE**)look_up_global_var("_IO_2_1_stderr_", &stderr) = stderr;
+
+  *(char***)look_up_global_var("__environ", &environ) = env;
+  *(char***)look_up_global_var("_environ",  &environ) = env;
+  *(char***)look_up_global_var("environ",   &environ) = env;
 
   shim_argc = argc;
   shim_argv = argv;

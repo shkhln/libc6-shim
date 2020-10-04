@@ -66,7 +66,7 @@ const char* redirect(const char* path) {
 
 static void* main_exe = NULL;
 
-void* look_up_global_var(const char* name) {
+void* look_up_global_var(const char* name, void* fallback) {
 
   if (!main_exe) {
     main_exe = dlopen(NULL, RTLD_LAZY);
@@ -74,7 +74,6 @@ void* look_up_global_var(const char* name) {
 
   void* p = dlsym(main_exe, name);
   LOG("%s: %s = %p", __func__, name, p);
-  assert(p != NULL);
 
-  return p;
+  return p ? p : fallback;
 }
