@@ -1,3 +1,4 @@
+#include <dlfcn.h>
 #include <errno.h>
 #include <string.h>
 #include "shim.h"
@@ -61,4 +62,19 @@ const char* redirect(const char* path) {
   }
 
   return path;
+}
+
+static void* main_exe = NULL;
+
+void* look_up_global_var(const char* name) {
+
+  if (!main_exe) {
+    main_exe = dlopen(NULL, RTLD_LAZY);
+  }
+
+  void* p = dlsym(main_exe, name);
+  LOG("%s: %s = %p", __func__, name, p);
+  assert(p != NULL);
+
+  return p;
 }
