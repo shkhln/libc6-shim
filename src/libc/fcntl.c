@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <errno.h>
+#include <limits.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
@@ -172,3 +173,23 @@ SHIM_WRAP(fcntl);
 SHIM_WRAP(open);
 SHIM_WRAP(open64);
 SHIM_WRAP(posix_fallocate64);
+
+int shim_shm_open_impl(const char* path, int linux_flags, mode_t mode) {
+
+  char buf[PATH_MAX];
+  snprintf(buf, sizeof(buf), "/compat/linux/dev/shm%s", path);
+
+  assert((linux_flags & (LINUX_O_RDONLY | LINUX_O_RDWR | LINUX_O_CREAT | LINUX_O_EXCL | LINUX_O_TRUNC)) == linux_flags);
+
+  int flags = 0;
+
+  if (linux_flags & LINUX_O_WRONLY) flags |= O_WRONLY;
+  if (linux_flags & LINUX_O_RDWR)   flags |= O_RDWR;
+  if (linux_flags & LINUX_O_CREAT)  flags |= O_CREAT;
+  if (linux_flags & LINUX_O_EXCL)   flags |= O_EXCL;
+  if (linux_flags & LINUX_O_TRUNC)  flags |= O_TRUNC;
+
+  return open(buf, flags, mode | O_CLOEXEC);
+}
+
+SHIM_WRAP(shm_open);
