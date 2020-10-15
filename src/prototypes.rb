@@ -3634,6 +3634,7 @@ lsb_define(["dlfcn.h"], [
 
 lsb_define([], [
   "int64_t __divdi3(int64_t a, int64_t b)",
+  "int64_t __moddi3(int64_t a, int64_t b)",
   "int __isoc99_fscanf(FILE* stream, const char* format, ...)",
   "int __libc_start_main(int (*main)(int, char**, char**), int argc, char** ubp_av, void (*init)(int, char**, char**), void (*fini)(void), void (*rtld_fini)(void), void* stack_end)",
   "locale_t __newlocale(int category_mask, const char* locale, locale_t base)",
