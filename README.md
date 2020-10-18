@@ -10,7 +10,7 @@ It's not particularly robust. Please, don't use this in a security-sensitive con
 For better stability make sure that your Linux objects:
 - do not do direct syscalls (vs using libc syscall wrapper);
 - do not poke opaque data structures;
-- do not pass libc constants or structs to FreeBSD libraries they are linked with.
+- do not pass libc constants or structs to FreeBSD objects they are linked with.
 
 Only i386/amd64 binaries are supported.
 
