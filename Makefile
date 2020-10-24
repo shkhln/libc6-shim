@@ -30,6 +30,7 @@ lib$(b):
 	ln -s $(BUILD_DIR)/lib$(b) lib$(b)
 
 $(BUILD_DIR)/versions$(b).h:
+	mkdir -p $(BUILD_DIR)
 	./utils/symver.rb src/glibc-2.17-symbols.$(b) > $(.TARGET).tmp && mv $(.TARGET).tmp $(.TARGET)
 
 $(BUILD_DIR)/wrappers$(b).h: src/prototypes.rb $(SOURCES)
@@ -49,7 +50,7 @@ $(BUILD_DIR)/lib$(b)/libc6.so:       $(SOURCES) $(BUILD_DIR)/wrappers$(b).c $(BU
 	  $(BUILD_DIR)/lib$(b)/dummy-librt.so \
 	  ${LDFLAGS$(b)}
 
-$(BUILD_DIR)/lib$(b)/libc6-debug.so: $(BUILD_DIR)/lib$(b)/nvshim.so $(BUILD_DIR)/lib$(b)/dummy-librt.so
+$(BUILD_DIR)/lib$(b)/libc6-debug.so: $(BUILD_DIR)/lib$(b)/libc6.so $(BUILD_DIR)/lib$(b)/dummy-librt.so
 	mkdir -p $(BUILD_DIR)/lib$(b)
 	$(CC) -DDEBUG -m$(b) $(CFLAGS) -o $(.TARGET) $(SOURCES) \
 	  -include $(BUILD_DIR)/versions$(b).h \
