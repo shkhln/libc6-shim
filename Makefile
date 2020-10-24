@@ -4,10 +4,10 @@
 BUILD_DIR = build
 SOURCES   = ${:!find src -name \*.c | sort!}
 
-LIBS      = $(BUILD_DIR)/lib64/nvshim.so \
-            $(BUILD_DIR)/lib64/nvshim.debug.so \
-            $(BUILD_DIR)/lib32/nvshim.so \
-            $(BUILD_DIR)/lib32/nvshim.debug.so
+LIBS      = $(BUILD_DIR)/lib64/libc6.so \
+            $(BUILD_DIR)/lib64/libc6-debug.so \
+            $(BUILD_DIR)/lib32/libc6.so \
+            $(BUILD_DIR)/lib32/libc6-debug.so
 
 CFLAGS    = -std=c99 -Wall -Wextra -Wno-unused-parameter -Wno-incompatible-pointer-types-discards-qualifiers \
  -shared -fPIC -Wl,-soname,librt.so.1 -Wl,--version-script=src/shim.map -I/usr/local/include
@@ -40,7 +40,7 @@ $(BUILD_DIR)/wrappers$(b).c: src/prototypes.rb
 	mkdir -p $(BUILD_DIR)
 	./utils/wrappers_c.rb src/glibc-2.17-symbols.$(b) > $(.TARGET).tmp && mv $(.TARGET).tmp $(.TARGET)
 
-$(BUILD_DIR)/lib$(b)/nvshim.so:       $(SOURCES) $(BUILD_DIR)/wrappers$(b).c $(BUILD_DIR)/wrappers$(b).h $(BUILD_DIR)/versions$(b).h $(BUILD_DIR)/lib$(b)/dummy-librt.so
+$(BUILD_DIR)/lib$(b)/libc6.so:       $(SOURCES) $(BUILD_DIR)/wrappers$(b).c $(BUILD_DIR)/wrappers$(b).h $(BUILD_DIR)/versions$(b).h $(BUILD_DIR)/lib$(b)/dummy-librt.so
 	mkdir -p $(BUILD_DIR)/lib$(b)
 	$(CC) -O2     -m$(b) $(CFLAGS) -o $(.TARGET) $(SOURCES) \
 	  -include $(BUILD_DIR)/versions$(b).h \
@@ -49,7 +49,7 @@ $(BUILD_DIR)/lib$(b)/nvshim.so:       $(SOURCES) $(BUILD_DIR)/wrappers$(b).c $(B
 	  $(BUILD_DIR)/lib$(b)/dummy-librt.so \
 	  ${LDFLAGS$(b)}
 
-$(BUILD_DIR)/lib$(b)/nvshim.debug.so: $(BUILD_DIR)/lib$(b)/nvshim.so $(BUILD_DIR)/lib$(b)/dummy-librt.so
+$(BUILD_DIR)/lib$(b)/libc6-debug.so: $(BUILD_DIR)/lib$(b)/nvshim.so $(BUILD_DIR)/lib$(b)/dummy-librt.so
 	mkdir -p $(BUILD_DIR)/lib$(b)
 	$(CC) -DDEBUG -m$(b) $(CFLAGS) -o $(.TARGET) $(SOURCES) \
 	  -include $(BUILD_DIR)/versions$(b).h \

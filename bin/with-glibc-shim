@@ -1,12 +1,7 @@
 #!/usr/bin/env ruby
 # encoding: UTF-8
 
-SHIM_LIB =
-  if ENV['SHIM_DEBUG'] == '1'
-    'nvshim.debug.so'
-  else
-    'nvshim.so'
-  end
+SHIM_LIB = ENV['SHIM_DEBUG'] == '1' ? 'libc6-debug.so' : 'libc6.so'
 
 def libmap(libdir_suffix)
 
