@@ -1,6 +1,11 @@
 #!/usr/bin/env ruby
 # encoding: UTF-8
 
+if ARGV.length == 0
+  STDERR.puts "run application with glibc shim:\n\s\s[env SHIM_DEBUG=1] #{File.basename($PROGRAM_NAME)} <application> [application args]"
+  exit(0)
+end
+
 SHIM_LIB = ENV['SHIM_DEBUG'] == '1' ? 'libc6-debug.so' : 'libc6.so'
 
 def libmap(libdir_suffix)

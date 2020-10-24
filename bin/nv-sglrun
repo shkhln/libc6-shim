@@ -4,6 +4,11 @@
 require 'digest'
 require 'fileutils'
 
+if ARGV.length == 0
+  STDERR.puts "substitute Nvidia's Linux OpenGL/Vulkan libraries:\n\s\s[env SHIM_DEBUG=1] #{File.basename($PROGRAM_NAME)} <application> [application args]"
+  exit(1)
+end
+
 CACHE_ROOT = File.join(ENV['XDG_CACHE_HOME'] || File.join(ENV['HOME'], '.cache'), 'nv-sglrun')
 
 `sysctl hw.nvidia.version` =~ /^hw.nvidia.version: NVIDIA UNIX x86_64 Kernel Module  ([\d\.+]+)/
@@ -115,8 +120,8 @@ end
 
 ENV['SHIM_ENABLE_LIBGL_INIT_WORKAROUND'] = '1'
 
-ENV['LD_LIBMAP']        = libmap(NVIDIA_LIB64_DIR)
-ENV['LD_32_LIBMAP']     = libmap(NVIDIA_LIB32_DIR)
+ENV['LD_LIBMAP']        = [libmap(NVIDIA_LIB64_DIR), ENV['LD_LIBMAP']   ].join("\n")
+ENV['LD_32_LIBMAP']     = [libmap(NVIDIA_LIB32_DIR), ENV['LD_32_LIBMAP']].join("\n")
 
 ENV['OCL_ICD_VENDORS']  = File.join(__dir__, '../icds/ocl')
 ENV['VK_ICD_FILENAMES'] = File.join(__dir__, '../icds/vk/nv.json')
