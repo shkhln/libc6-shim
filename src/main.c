@@ -201,3 +201,12 @@ extern __typeof(shim___tls_get_addr) shim____tls_get_addr __attribute__((alias("
 
 __asm__(".symver shim___tls_get_addr,__tls_get_addr@GLIBC_2.3");
 __asm__(".symver shim____tls_get_addr,___tls_get_addr@GLIBC_2.3");
+
+#define LINUX_AT_SYSINFO_EHDR 33
+
+unsigned long shim_getauxval_impl(unsigned long type) {
+  assert(type == LINUX_AT_SYSINFO_EHDR);
+  return 0;
+}
+
+SHIM_WRAP(getauxval);
