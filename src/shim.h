@@ -83,10 +83,6 @@ typedef struct sembuf linux_sembuf;
 
 typedef struct pollfd linux_pollfd;
 
-struct linux_rlimit {};
-
-typedef struct linux_rlimit linux_rlimit;
-
 struct linux_sysinfo;
 
 typedef struct linux_sysinfo linux_sysinfo;

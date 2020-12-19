@@ -3650,6 +3650,7 @@ lsb_define([], [
   "FILE* fopen64(const char* filename, const char* type)",
   "int ftruncate64(int fd, off64_t length)",
   "unsigned long getauxval(unsigned long type)",
+  "int getrlimit64(int resource, struct rlimit64* rlp)",
   "int get_nprocs(void)",
   "off64_t lseek64(int fd, off64_t offset, int whence)",
   "struct mallinfo mallinfo(void)",
