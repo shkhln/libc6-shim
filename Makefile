@@ -31,7 +31,7 @@ lib$(b):
 
 $(BUILD_DIR)/versions$(b).h:
 	mkdir -p $(BUILD_DIR)
-	./utils/symver.rb src/glibc-2.17-symbols.$(b) > $(.TARGET).tmp && mv $(.TARGET).tmp $(.TARGET)
+	./utils/symver.rb src/glibc-symbols.$(b) > $(.TARGET).tmp && mv $(.TARGET).tmp $(.TARGET)
 
 $(BUILD_DIR)/wrappers$(b).h: src/prototypes.rb $(SOURCES)
 	mkdir -p $(BUILD_DIR)
@@ -39,7 +39,7 @@ $(BUILD_DIR)/wrappers$(b).h: src/prototypes.rb $(SOURCES)
 
 $(BUILD_DIR)/wrappers$(b).c: src/prototypes.rb
 	mkdir -p $(BUILD_DIR)
-	./utils/wrappers_c.rb src/glibc-2.17-symbols.$(b) > $(.TARGET).tmp && mv $(.TARGET).tmp $(.TARGET)
+	./utils/wrappers_c.rb src/glibc-symbols.$(b) > $(.TARGET).tmp && mv $(.TARGET).tmp $(.TARGET)
 
 $(BUILD_DIR)/lib$(b)/libc6.so:       $(SOURCES) $(BUILD_DIR)/wrappers$(b).c $(BUILD_DIR)/wrappers$(b).h $(BUILD_DIR)/versions$(b).h $(BUILD_DIR)/lib$(b)/dummy-librt.so
 	mkdir -p $(BUILD_DIR)/lib$(b)
