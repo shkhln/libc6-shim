@@ -1,4 +1,5 @@
 SHIM  { global: shim_*; __progname; environ; local: *; };
+
 GLIBC_2.0   {} SHIM;
 GLIBC_2.1   {} SHIM;
 GLIBC_2.1.1 {} SHIM;
@@ -29,6 +30,14 @@ GLIBC_2.14  {} SHIM;
 GLIBC_2.15  {} SHIM;
 GLIBC_2.16  {} SHIM;
 GLIBC_2.17  {} SHIM;
+GLIBC_2.18  {} SHIM;
+GLIBC_2.22  {} SHIM;
+GLIBC_2.23  {} SHIM;
+GLIBC_2.24  {} SHIM;
+GLIBC_2.25  {} SHIM;
+GLIBC_2.26  {} SHIM;
+GLIBC_2.27  {} SHIM;
+GLIBC_2.28  {} SHIM;
 
 # we don't export any FBSD symbols, but due to a librt.so.1 name collision
 # we still must pass a dynamic linker's sanity check
