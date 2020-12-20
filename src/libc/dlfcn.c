@@ -40,7 +40,7 @@ void* shim_dlopen_impl(const char* path, int linux_mode) {
 
 #ifdef DEBUG
   if (p == NULL) {
-    LOG("%s: %s\n", __func__, dlerror());
+    LOG("%s: %s", __func__, dlerror());
   }
 #endif
 
