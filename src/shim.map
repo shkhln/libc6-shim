@@ -39,6 +39,12 @@ GLIBC_2.26  {} SHIM;
 GLIBC_2.27  {} SHIM;
 GLIBC_2.28  {} SHIM;
 
+# 32-bit libnvidia-glvkspirv.so.460.27.04
+
+GCC_3.0 {
+  global: _Unwind_Find_FDE;
+};
+
 # we don't export any FBSD symbols, but due to a librt.so.1 name collision
 # we still must pass a dynamic linker's sanity check
 

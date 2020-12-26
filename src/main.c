@@ -210,3 +210,10 @@ unsigned long shim_getauxval_impl(unsigned long type) {
 }
 
 SHIM_WRAP(getauxval);
+
+// 32-bit libnvidia-glvkspirv.so.460.27.04
+#ifdef __i386__
+void _Unwind_Find_FDE() {
+  UNIMPLEMENTED();
+}
+#endif
