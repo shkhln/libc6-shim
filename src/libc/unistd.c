@@ -146,26 +146,16 @@ SHIM_EXPORT(optind);
 SHIM_EXPORT(optopt);
 SHIM_EXPORT(opterr);
 
-static char** _optarg = NULL;
-static int*   _optind = NULL;
-static int*   _optopt = NULL;
-static int*   _opterr = NULL;
-
 int shim_getopt_impl(int argc, char* const argv[], const char* optstring) {
 
-  if (!_optarg) _optarg = look_up_global_var("optarg", &optarg);
-  if (!_optind) _optind = look_up_global_var("optind", &optind);
-  if (!_optopt) _optopt = look_up_global_var("optopt", &optopt);
-  if (!_opterr) _opterr = look_up_global_var("opterr", &opterr);
-
-  optind = *_optind;
-  opterr = *_opterr;
+  optind = *globals.optind;
+  opterr = *globals.opterr;
 
   int err = getopt(argc, argv, optstring);
 
-  *_optarg = optarg;
-  *_optind = optind;
-  *_optopt = optopt;
+  *globals.optarg = optarg;
+  *globals.optind = optind;
+  *globals.optopt = optopt;
 
   return err;
 }

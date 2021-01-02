@@ -56,6 +56,8 @@ SHIM_EXPORT(__progname);
 char** environ    = NULL;
 char*  __progname = "<progname>";
 
+struct globals globals;
+
 static int    shim_argc = 0;
 static char** shim_argv = NULL;
 
@@ -64,23 +66,58 @@ static void shim_init(int argc, char** argv, char** env) {
 
   fprintf(stderr, "shim init\n");
 
-  *(FILE**)look_up_global_var("stdin",  &stdin)  = stdin;
-  *(FILE**)look_up_global_var("stdout", &stdout) = stdout;
-  *(FILE**)look_up_global_var("stderr", &stderr) = stderr;
-
-#ifdef __i386__
-  *(FILE**)look_up_global_var("_IO_stdin_",  &stdin)  = stdin;
-  *(FILE**)look_up_global_var("_IO_stdout_", &stdout) = stdout;
-  *(FILE**)look_up_global_var("_IO_stderr_", &stderr) = stderr;
+#ifdef __amd64__
+  globals._IO_2_1_stderr_ = dlvsym(RTLD_DEFAULT, "_IO_2_1_stderr_", "GLIBC_2.2.5");
+  globals._IO_2_1_stdin_  = dlvsym(RTLD_DEFAULT, "_IO_2_1_stdin_",  "GLIBC_2.2.5");
+  globals._IO_2_1_stdout_ = dlvsym(RTLD_DEFAULT, "_IO_2_1_stdout_", "GLIBC_2.2.5");
+  globals.__environ       = dlvsym(RTLD_DEFAULT, "__environ",       "GLIBC_2.2.5");
+  globals._environ        = dlvsym(RTLD_DEFAULT, "_environ",        "GLIBC_2.2.5");
+  globals.environ         = dlvsym(RTLD_DEFAULT, "environ",         "GLIBC_2.2.5");
+  globals.stdin           = dlvsym(RTLD_DEFAULT, "stdin",           "GLIBC_2.2.5");
+  globals.stderr          = dlvsym(RTLD_DEFAULT, "stderr",          "GLIBC_2.2.5");
+  globals.stdout          = dlvsym(RTLD_DEFAULT, "stdout",          "GLIBC_2.2.5");
+  globals.optarg          = dlvsym(RTLD_DEFAULT, "optarg",          "GLIBC_2.2.5");
+  globals.opterr          = dlvsym(RTLD_DEFAULT, "opterr",          "GLIBC_2.2.5");
+  globals.optind          = dlvsym(RTLD_DEFAULT, "optind",          "GLIBC_2.2.5");
+  globals.optopt          = dlvsym(RTLD_DEFAULT, "optopt",          "GLIBC_2.2.5");
 #endif
 
-  *(FILE**)look_up_global_var("_IO_2_1_stdin_",  &stdin)  = stdin;
-  *(FILE**)look_up_global_var("_IO_2_1_stdout_", &stdout) = stdout;
-  *(FILE**)look_up_global_var("_IO_2_1_stderr_", &stderr) = stderr;
+#ifdef __i386__
+  globals._IO_stderr_     = dlvsym(RTLD_DEFAULT, "_IO_stderr_",     "GLIBC_2.0");
+  globals._IO_stdin_      = dlvsym(RTLD_DEFAULT, "_IO_stdin_",      "GLIBC_2.0");
+  globals._IO_stdout_     = dlvsym(RTLD_DEFAULT, "_IO_stdout_",     "GLIBC_2.0");
+  globals._IO_2_1_stderr_ = dlvsym(RTLD_DEFAULT, "_IO_2_1_stderr_", "GLIBC_2.1");
+  globals._IO_2_1_stdin_  = dlvsym(RTLD_DEFAULT, "_IO_2_1_stdin_",  "GLIBC_2.1");
+  globals._IO_2_1_stdout_ = dlvsym(RTLD_DEFAULT, "_IO_2_1_stdout_", "GLIBC_2.1");
+  globals.__environ       = dlvsym(RTLD_DEFAULT, "__environ",       "GLIBC_2.0");
+  globals._environ        = dlvsym(RTLD_DEFAULT, "_environ",        "GLIBC_2.0");
+  globals.environ         = dlvsym(RTLD_DEFAULT, "environ",         "GLIBC_2.0");
+  globals.stdin           = dlvsym(RTLD_DEFAULT, "stdin",           "GLIBC_2.0");
+  globals.stderr          = dlvsym(RTLD_DEFAULT, "stderr",          "GLIBC_2.0");
+  globals.stdout          = dlvsym(RTLD_DEFAULT, "stdout",          "GLIBC_2.0");
+  globals.optarg          = dlvsym(RTLD_DEFAULT, "optarg",          "GLIBC_2.0");
+  globals.opterr          = dlvsym(RTLD_DEFAULT, "opterr",          "GLIBC_2.0");
+  globals.optind          = dlvsym(RTLD_DEFAULT, "optind",          "GLIBC_2.0");
+  globals.optopt          = dlvsym(RTLD_DEFAULT, "optopt",          "GLIBC_2.0");
+#endif
 
-  *(char***)look_up_global_var("__environ", &environ) = env;
-  *(char***)look_up_global_var("_environ",  &environ) = env;
-  *(char***)look_up_global_var("environ",   &environ) = env;
+  *globals.stdin  = stdin;
+  *globals.stdout = stdin;
+  *globals.stderr = stdin;
+
+#ifdef __i386__
+  *globals._IO_stdin_  = stdin;
+  *globals._IO_stdout_ = stdout;
+  *globals._IO_stderr_ = stderr;
+#endif
+
+  *globals._IO_2_1_stdin_  = stdin;
+  *globals._IO_2_1_stdout_ = stdout;
+  *globals._IO_2_1_stderr_ = stderr;
+
+  *globals.__environ = env;
+  *globals._environ  = env;
+  *globals.environ   = env;
 
   shim_argc = argc;
   shim_argv = argv;

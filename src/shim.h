@@ -51,7 +51,28 @@ int linux_to_native_errno(int error);
 
 const char* redirect(const char* path);
 
-void* look_up_global_var(const char* symbol, void* fallback);
+struct globals {
+#ifdef __i386__
+  FILE**  _IO_stderr_;
+  FILE**  _IO_stdin_;
+  FILE**  _IO_stdout_;
+#endif
+  FILE**  _IO_2_1_stderr_;
+  FILE**  _IO_2_1_stdin_;
+  FILE**  _IO_2_1_stdout_;
+  char*** __environ;
+  char*** _environ;
+  char*** environ;
+  FILE**  stdin;
+  FILE**  stderr;
+  FILE**  stdout;
+  char**  optarg;
+  int*    opterr;
+  int*    optind;
+  int*    optopt;
+};
+
+extern struct globals globals;
 
 typedef int64_t linux_off64_t;
 
