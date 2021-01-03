@@ -31,8 +31,20 @@ struct linux_flock {
 
 #endif
 
+#define LINUX_F_RDLCK 0
+#define LINUX_F_WRLCK 1
+#define LINUX_F_UNLCK 2
+
 static void copy_linux_flock(struct flock* dst, struct linux_flock* src) {
-  dst->l_type   = src->l_type;
+
+  switch (src->l_type) {
+    case LINUX_F_RDLCK: dst->l_type = F_RDLCK; break;
+    case LINUX_F_WRLCK: dst->l_type = F_WRLCK; break;
+    case LINUX_F_UNLCK: dst->l_type = F_UNLCK; break;
+    default:
+      assert(0);
+  }
+
   dst->l_whence = src->l_whence;
   dst->l_start  = src->l_start;
   dst->l_len    = src->l_len;
