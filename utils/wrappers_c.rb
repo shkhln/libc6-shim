@@ -13,6 +13,7 @@ SUBSTITUTIONS = {
 }
 
 STRUCT_COMPATIBILITY = {
+  FTW:          true,
   cmsghdr:      false, # compatible on i386
   dirent:       false,
   dl_phdr_info: true,
