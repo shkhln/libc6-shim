@@ -30,6 +30,8 @@ def format_specifier(decl)
       '%f'
     #~ when 'off_t', 'off64_t'
       #~ '%jd'
+    when 'locale_t'
+      '%p'
     else
       '_'
   end
@@ -46,12 +48,15 @@ def log_args(args)
     log_args      << arg[:name] if f.include?('%')
   end
 
-  fmt_string = log_fmt_parts.map{|p| p =~ /%[^a-z]*s/ ? '\"' + p + '\"' : p}.join(', ')
-
-  if log_args.empty?
+  if log_fmt_parts.empty?
     "LOG_ENTRY();"
   else
-    "LOG_ENTRY(\"#{fmt_string}\", #{log_args.join(', ')});"
+    fmt_string = log_fmt_parts.map{|p| p =~ /%[^a-z]*s/ ? '\"' + p + '\"' : p}.join(', ')
+    if log_args.empty?
+      "LOG_ENTRY(\"#{fmt_string}\");"
+    else
+      "LOG_ENTRY(\"#{fmt_string}\", #{log_args.join(', ')});"
+    end
   end
 end
 
