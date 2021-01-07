@@ -22,6 +22,7 @@ _Static_assert(sizeof(struct shim_pthread_mutex) <= 40 /* sizeof(pthread_mutex_t
 typedef uint32_t linux_pthread_barrierattr_t;
 typedef uint32_t linux_pthread_condattr_t;
 typedef uint32_t linux_pthread_mutexattr_t;
+typedef uint32_t linux_pthread_once_t;
 
 _Static_assert(sizeof(pthread_rwlockattr_t) <= 8 /* sizeof(pthread_rwlockattr_t) on glibc/Linux */, "");
 

@@ -491,3 +491,27 @@ int shim_pthread_attr_setscope_impl(pthread_attr_t* attr, int linux_scope) {
 
 SHIM_WRAP(pthread_attr_getscope);
 SHIM_WRAP(pthread_attr_setscope);
+
+#define MAX_ONCES 100
+
+static pthread_mutex_t onces_mutex = PTHREAD_MUTEX_INITIALIZER;
+
+static pthread_once_t onces[MAX_ONCES] = { PTHREAD_ONCE_INIT };
+static uint32_t onces_index = 0;
+
+int shim_pthread_once_impl(linux_pthread_once_t* linux_once, void (*routine)(void)) {
+
+  assert(pthread_mutex_lock(&onces_mutex) == 0);
+
+  if (*linux_once == 0) {
+    assert(onces_index < MAX_ONCES);
+    *linux_once = onces_index;
+    onces_index++;
+  }
+
+  assert(pthread_mutex_unlock(&onces_mutex) == 0);
+
+  return pthread_once(&onces[*linux_once], routine);
+}
+
+SHIM_WRAP(pthread_once);
