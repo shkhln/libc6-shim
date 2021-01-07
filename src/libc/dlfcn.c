@@ -56,7 +56,7 @@ void* shim_dlmopen_impl(Lmid_t lmid, const char* path, int mode) {
 #define GLIBC_RTLD_NEXT    ((void*)-1)
 #define GLIBC_RTLD_DEFAULT ((void*) 0)
 
-void* shim_dlsym_impl(void* handle, const char* symbol) {
+static void* _shim_dlvsym(void* linux_handle, const char* symbol, const char* version) {
 
   char buf[100];
   snprintf(buf, sizeof(buf), "shim_%s", symbol);
@@ -73,17 +73,27 @@ void* shim_dlsym_impl(void* handle, const char* symbol) {
   if (strcmp(symbol, "__free_hook")     == 0) return NULL;
   if (strcmp(symbol, "__memalign_hook") == 0) return NULL;
 
-  if (handle == GLIBC_RTLD_DEFAULT)
-    return dlsym(RTLD_DEFAULT, symbol);
+  void* handle;
+  switch ((uintptr_t)linux_handle) {
+    case  (uintptr_t)GLIBC_RTLD_DEFAULT: handle = RTLD_DEFAULT; break;
+    case  (uintptr_t)GLIBC_RTLD_NEXT:    handle = RTLD_NEXT;    break;
+    default:
+      handle = linux_handle;
+  }
 
-  if (handle == GLIBC_RTLD_NEXT)
-    return dlsym(RTLD_NEXT, symbol);
+  if (version == NULL) {
+    return dlsym(handle, symbol);
+  } else {
+    return dlvsym(handle, symbol, version);
+  }
+}
 
-  return dlsym(handle, symbol);
+void* shim_dlsym_impl(void* handle, const char* symbol) {
+  return _shim_dlvsym(handle, symbol, NULL);
 }
 
 void* shim_dlvsym_impl(void* handle, const char* symbol, const char* version) {
-  return shim_dlsym_impl(handle, symbol);
+  return _shim_dlvsym(handle, symbol, version);
 }
 
 SHIM_WRAP(dladdr1);
