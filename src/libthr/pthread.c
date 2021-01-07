@@ -515,3 +515,29 @@ int shim_pthread_once_impl(linux_pthread_once_t* linux_once, void (*routine)(voi
 }
 
 SHIM_WRAP(pthread_once);
+
+int shim_pthread_spin_destroy_impl(pthread_spinlock_t* lock) {
+  UNIMPLEMENTED();
+}
+
+int shim_pthread_spin_init_impl(pthread_spinlock_t* lock, int pshared) {
+  UNIMPLEMENTED();
+}
+
+int shim_pthread_spin_lock_impl(pthread_spinlock_t* lock) {
+  UNIMPLEMENTED();
+}
+
+int shim_pthread_spin_trylock_impl(pthread_spinlock_t* lock) {
+  UNIMPLEMENTED();
+}
+
+int shim_pthread_spin_unlock_impl(pthread_spinlock_t* lock) {
+  UNIMPLEMENTED();
+}
+
+SHIM_WRAP(pthread_spin_destroy);
+SHIM_WRAP(pthread_spin_init);
+SHIM_WRAP(pthread_spin_lock);
+SHIM_WRAP(pthread_spin_trylock);
+SHIM_WRAP(pthread_spin_unlock);
