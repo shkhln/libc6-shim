@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include "../shim.h"
+#include "locale.h"
 
 // TODO: __ctype32_b, __ctype32_tolower, __ctype32_toupper?
 
@@ -50,7 +51,7 @@ static int32_t  shim_ctype_toupper_table[384];
 
 __attribute__((constructor))
 static void ctype_init() {
-
+  // TODO: set locale to C here?
   for (int i = 0; i < 384; i++) {
     shim_ctype_tolower_table[i] = (i == 127 ? -1 : tolower((uint8_t)(i + 128)));
     shim_ctype_toupper_table[i] = (i == 127 ? -1 : toupper((uint8_t)(i + 128)));
@@ -75,3 +76,75 @@ SHIM_WRAP(__ctype_b_loc);
 SHIM_WRAP(__ctype_get_mb_cur_max);
 SHIM_WRAP(__ctype_tolower_loc);
 SHIM_WRAP(__ctype_toupper_loc);
+
+int shim_isalnum_l_impl(int c, linux_locale_t loc) {
+  return isalnum_l(c, loc->native_locale);
+}
+
+int shim_isalpha_l_impl(int c, linux_locale_t loc) {
+  return isalpha_l(c, loc->native_locale);
+}
+
+int shim_isblank_l_impl(int c, linux_locale_t loc) {
+  return isblank_l(c, loc->native_locale);
+}
+
+int shim_iscntrl_l_impl(int c, linux_locale_t loc) {
+  return iscntrl_l(c, loc->native_locale);
+}
+
+int shim_isdigit_l_impl(int c, linux_locale_t loc) {
+  return isdigit_l(c, loc->native_locale);
+}
+
+int shim_isgraph_l_impl(int c, linux_locale_t loc) {
+  return isgraph_l(c, loc->native_locale);
+}
+
+int shim_islower_l_impl(int c, linux_locale_t loc) {
+  return islower_l(c, loc->native_locale);
+}
+
+int shim_isprint_l_impl(int c, linux_locale_t loc) {
+  return isprint_l(c, loc->native_locale);
+}
+
+int shim_ispunct_l_impl(int c, linux_locale_t loc) {
+  return ispunct_l(c, loc->native_locale);
+}
+
+int shim_isspace_l_impl(int c, linux_locale_t loc) {
+  return isspace_l(c, loc->native_locale);
+}
+
+int shim_isupper_l_impl(int c, linux_locale_t loc) {
+  return isupper_l(c, loc->native_locale);
+}
+
+int shim_isxdigit_l_impl(int c, linux_locale_t loc) {
+  return isxdigit_l(c, loc->native_locale);
+}
+
+SHIM_WRAP(isalnum_l);
+SHIM_WRAP(isalpha_l);
+SHIM_WRAP(isblank_l);
+SHIM_WRAP(iscntrl_l);
+SHIM_WRAP(isdigit_l);
+SHIM_WRAP(isgraph_l);
+SHIM_WRAP(islower_l);
+SHIM_WRAP(isprint_l);
+SHIM_WRAP(ispunct_l);
+SHIM_WRAP(isspace_l);
+SHIM_WRAP(isupper_l);
+SHIM_WRAP(isxdigit_l);
+
+int shim_tolower_l_impl(int c, linux_locale_t loc) {
+  return tolower_l(c, loc->native_locale);
+}
+
+int shim_toupper_l_impl(int c, linux_locale_t loc) {
+  return toupper_l(c, loc->native_locale);
+}
+
+SHIM_WRAP(tolower_l);
+SHIM_WRAP(toupper_l);

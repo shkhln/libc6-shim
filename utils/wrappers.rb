@@ -95,6 +95,8 @@ def to_shim_type(type)
       'linux_fpos64_t*'
     when 'DIR*'
       'linux_DIR*'
+    when 'locale_t'
+      'linux_locale_t'
     when 'pthread_once_t*'
       'linux_pthread_once_t*'
     when 'pthread_mutex_t*'

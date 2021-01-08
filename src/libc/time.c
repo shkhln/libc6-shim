@@ -1,6 +1,8 @@
 #include <string.h>
+#include <xlocale.h>
 #include "time.h"
 #include "../shim.h"
+#include "locale.h"
 
 long int shim_timezone = 0;
 SHIM_EXPORT(timezone);
@@ -42,3 +44,14 @@ int shim_clock_gettime_impl(linux_clockid_t linux_clock_id, linux_timespec* tp) 
 }
 
 SHIM_WRAP(clock_gettime);
+
+size_t shim_strftime_l_impl(char* restrict buf, size_t maxsize, const char* restrict format, const linux_tm* restrict timeptr, linux_locale_t loc) {
+  return strftime_l(buf, maxsize, format, timeptr, loc->native_locale);
+}
+
+char* shim_strptime_l_impl(const char* restrict buf, const char* restrict format, linux_tm* restrict timeptr, linux_locale_t loc) {
+  return strptime_l(buf, format, timeptr, loc->native_locale);
+}
+
+SHIM_WRAP(strftime_l);
+SHIM_WRAP(strptime_l);

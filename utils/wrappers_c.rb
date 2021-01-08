@@ -54,6 +54,7 @@ puts <<E
 
 #include "../src/shim.h"
 #include "../src/libc/dirent.h"
+#include "../src/libc/locale.h"
 #include "../src/libc/netdb.h"
 #include "../src/libc/sched.h"
 #include "../src/libc/time.h"
