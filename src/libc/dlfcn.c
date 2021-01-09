@@ -23,7 +23,12 @@
 )
 
 int shim_dladdr1_impl(void* address, Dl_info* info, void** extra_info, int flags) {
-  return dladdr(address, info);
+  int err = dladdr(address, info);
+  if (err != 0) {
+    LOG("%s: \"%s\", %p, \"%s\", %p", __func__, info->dli_fname, info->dli_fbase, info->dli_sname, info->dli_saddr);
+    *extra_info = NULL; // ?
+  }
+  return err;
 }
 
 void* shim_dlopen_impl(const char* path, int linux_mode) {
