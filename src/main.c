@@ -102,8 +102,8 @@ static void shim_init(int argc, char** argv, char** env) {
 #endif
 
   *globals.stdin  = stdin;
-  *globals.stdout = stdin;
-  *globals.stderr = stdin;
+  *globals.stdout = stdout;
+  *globals.stderr = stderr;
 
 #ifdef __i386__
   *globals._IO_stdin_  = stdin;
