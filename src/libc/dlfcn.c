@@ -86,6 +86,8 @@ static void* _shim_dlvsym(void* linux_handle, const char* symbol, const char* ve
       handle = linux_handle;
   }
 
+  dlerror(); // reset error
+
   if (version == NULL) {
     return dlsym(handle, symbol);
   } else {
