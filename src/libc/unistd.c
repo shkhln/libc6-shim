@@ -136,16 +136,6 @@ linux_off64_t shim_lseek64_impl(int fd, linux_off64_t offset, int whence) {
 
 SHIM_WRAP(lseek64);
 
-char* shim_optarg = NULL;
-int   shim_optind = 1;
-int   shim_optopt = 0;
-int   shim_opterr = 1;
-
-SHIM_EXPORT(optarg);
-SHIM_EXPORT(optind);
-SHIM_EXPORT(optopt);
-SHIM_EXPORT(opterr);
-
 int shim_getopt_impl(int argc, char* const argv[], const char* optstring) {
 
   optind = *globals.optind;

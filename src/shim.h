@@ -70,6 +70,10 @@ struct globals {
   int*    opterr;
   int*    optind;
   int*    optopt;
+  char**  __progname;
+  char**  __progname_full;
+  char**  program_invocation_name;
+  char**  program_invocation_short_name;
 };
 
 extern struct globals globals;
