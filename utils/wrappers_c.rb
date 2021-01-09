@@ -22,6 +22,7 @@ STRUCT_COMPATIBILITY = {
   hostent:      true,
   msghdr:       false, # compatible on i386
   option:       true,
+  passwd:       false,
   pollfd:       true,
   rlimit:       false, # compatible on x86_64
   rusage:       true,
