@@ -10,7 +10,7 @@ extern int32_t** shim___ctype_toupper_loc();
 
 linux_locale_t shim___newlocale_impl(int category_mask, const char* locale, linux_locale_t base) {
 
-  assert(category_mask == 64); // LC_ALL_MASK
+  assert(category_mask == 64 || category_mask == 8127); // LC_ALL_MASK
   assert(strcmp(locale, "C") == 0);
 
   linux_locale_t linux_locale = malloc(sizeof(struct linux_locale));
