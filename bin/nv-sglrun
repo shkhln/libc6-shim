@@ -120,8 +120,8 @@ end
 
 ENV['SHIM_ENABLE_LIBGL_INIT_WORKAROUND'] = '1'
 
-ENV['LD_LIBMAP']        = [libmap(NVIDIA_LIB64_DIR), ENV['LD_LIBMAP']   ].join("\n")
-ENV['LD_32_LIBMAP']     = [libmap(NVIDIA_LIB32_DIR), ENV['LD_32_LIBMAP']].join("\n")
+ENV['LD_LIBMAP']        = [libmap(NVIDIA_LIB64_DIR), ENV['LD_LIBMAP']   ].compact.join("\n")
+ENV['LD_32_LIBMAP']     = [libmap(NVIDIA_LIB32_DIR), ENV['LD_32_LIBMAP']].compact.join("\n")
 
 ENV['OCL_ICD_VENDORS']  = File.join(__dir__, '../icds/ocl')
 ENV['VK_ICD_FILENAMES'] = File.join(__dir__, '../icds/vk/nv.json')

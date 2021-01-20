@@ -6,29 +6,29 @@ if ARGV.length == 0
   exit(0)
 end
 
-SHIM_LIB = ENV['SHIM_DEBUG'] == '1' ? 'libc6-debug.so' : 'libc6.so'
+SHIM_LIB64_DIR = File.join(__dir__, '../lib64')
+SHIM_LIB32_DIR = File.join(__dir__, '../lib32')
 
-def libmap(libdir_suffix)
+def libmap(target_dir, libdir_suffix)
+
+  shim_path = File.expand_path(ENV['SHIM_DEBUG'] == '1' ? 'libc6-debug.so' : 'libc6.so', target_dir)
 
   lmap = {
-    'ld-linux.so.2'        => SHIM_LIB,
-    'ld-linux-x86-64.so.2' => SHIM_LIB,
-    'libc.so.6'            => SHIM_LIB,
-    'libdl.so.2'           => SHIM_LIB,
-    'libm.so.6 '           => SHIM_LIB,
-    'libpthread.so.0'      => SHIM_LIB,
-    'librt.so.1'           => SHIM_LIB,
+    'ld-linux.so.2'        => shim_path,
+    'ld-linux-x86-64.so.2' => shim_path,
+    'libc.so.6'            => shim_path,
+    'libdl.so.2'           => shim_path,
+    'libm.so.6 '           => shim_path,
+    'libpthread.so.0'      => shim_path,
+    'librt.so.1'           => shim_path,
     'bsd-librt.so.1'       => "/usr/lib#{libdir_suffix}/librt.so.1",
-    'libcxxrt.so.1'        => ('fakecxxrt.so' if ENV['SHIM_FAKECXXRT'] == '1')
+    'libcxxrt.so.1'        => (File.expand_path('fakecxxrt.so', target_dir) if ENV['SHIM_FAKECXXRT'] == '1')
   }
 
   lmap.compact.map{|k, v| '%-40s %s' % [k, v]}.join("\n")
 end
 
-ENV['LD_LIBMAP']          = [libmap(''),   ENV['LD_LIBMAP']   ].join("\n")
-ENV['LD_32_LIBMAP']       = [libmap('32'), ENV['LD_32_LIBMAP']].join("\n")
-
-ENV['LD_LIBRARY_PATH']    = [File.join(__dir__, '../lib64'), ENV['LD_LIBRARY_PATH']   ].compact.join(':')
-ENV['LD_32_LIBRARY_PATH'] = [File.join(__dir__, '../lib32'), ENV['LD_32_LIBRARY_PATH']].compact.join(':')
+ENV['LD_LIBMAP']    = [libmap(SHIM_LIB64_DIR, ''),   ENV['LD_LIBMAP']   ].compact.join("\n")
+ENV['LD_32_LIBMAP'] = [libmap(SHIM_LIB32_DIR, '32'), ENV['LD_32_LIBMAP']].compact.join("\n")
 
 exec([ARGV[0]] * 2, *ARGV[1..-1])
