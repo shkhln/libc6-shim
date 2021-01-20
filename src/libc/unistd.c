@@ -82,11 +82,16 @@ ssize_t shim_readlink_impl(const char* path, char* buf, size_t bufsize) {
 //~ }
 
 #define GLIBC_SC_PAGESIZE          30
+#define GLIBC_SC_NPROCESSORS_CONF  83
 #define GLIBC_SC_NPROCESSORS_ONLN  84
 #define GLIBC_SC_PHYS_PAGES        85
 #define GLIBC_SC_MONOTONIC_CLOCK  149
 
 long shim_sysconf_impl(int name) {
+
+  if (name == GLIBC_SC_NPROCESSORS_CONF) {
+    return sysconf(_SC_NPROCESSORS_CONF);
+  }
 
   if (name == GLIBC_SC_NPROCESSORS_ONLN) {
     return sysconf(_SC_NPROCESSORS_ONLN);
