@@ -167,6 +167,11 @@ define(["aio.h"], [
   "int aio_write(struct aiocb* iocb)"
 ])
 
+# BASENAME(3)
+define(["libgen.h"], [
+  "char* basename(const char* path)"
+])
+
 # BIND(2)
 define(["sys/types.h", "sys/socket.h"], [
   "int bind(int s, const struct sockaddr* addr, socklen_t addrlen)"
@@ -3491,7 +3496,6 @@ lsb_define([
   "char argz_next(const char* argz, size_t argz_len, const char* entry)",
   "error_t argz_replace(char** argz, size_t* argz_len, const char* str, const char* with, unsigned int* replace_count)",
   "void argz_stringify(char* argz, size_t argz_len, int sep)",
-  "char* basename(const char* path)",
   "char* bind_textdomain_codeset(const char* domainname, const char* codeset)",
   "char* bindtextdomain(const char* domainname, const char* dirname)",
   "char* dcgettext(const char* domainname, const char* msgid, int category)",
