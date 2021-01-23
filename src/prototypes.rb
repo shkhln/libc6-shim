@@ -3670,6 +3670,7 @@ lsb_define([], [
   "int pthread_mutexattr_setpshared(pthread_mutexattr_t* attr, int pshared)",
   "int pthread_setname_np(pthread_t thread, const char *name)",
   "struct dirent64* readdir64(DIR* dirp)",
+  "char* secure_getenv(const char* name)",
   "int sigaction(int signum, const struct sigaction* act, struct sigaction* oldact)",
   "sig_t signal(int sig, sig_t func)"
 ])

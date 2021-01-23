@@ -1,6 +1,7 @@
 #include <limits.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 #include "../shim.h"
 
 #define STRTONUM_INTERNAL_I(ret_type, name) \
@@ -43,3 +44,9 @@ char* shim___realpath_chk_impl(const char* path, char* resolved_path, size_t res
 }
 
 SHIM_WRAP(__realpath_chk);
+
+char* shim_secure_getenv_impl(const char* name) {
+  return issetugid() == 0 ? getenv(name) : NULL;
+}
+
+SHIM_WRAP(secure_getenv);
