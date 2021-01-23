@@ -11,6 +11,8 @@
 #include "../../shim.h"
 
 #ifdef __i386__
+#define LINUX_WRITE             4
+#define LINUX_OPEN              5
 #define LINUX_GETPID           20
 #define LINUX_GETTID          224
 #define LINUX_FUTEX           240
@@ -19,10 +21,11 @@
 #define LINUX_PIPE2           331
 #define LINUX_GETRANDOM       355
 #define LINUX_MEMFD_CREATE    356
-
 #endif
 
 #ifdef __x86_64__
+#define LINUX_WRITE             1
+#define LINUX_OPEN              2
 #define LINUX_MMAP              9
 #define LINUX_GETPID           39
 #define LINUX_GETTID          186
@@ -35,21 +38,49 @@
 #endif
 
 void* shim_mmap_impl(void*, size_t, int, int, int, linux_off_t);
+int   shim_open_impl(const char*, int, va_list);
 
 long shim_syscall_impl(long number, va_list args) {
 
+  if (number == LINUX_WRITE) {
+
+    int    fd     = va_arg(args, int);
+    void*  buf    = va_arg(args, void*);
+    size_t nbytes = va_arg(args, size_t);
+
+    LOG("%s: write(%d, %p, %zu)", __func__, fd, buf, nbytes);
+
+    int n = write(fd, buf, nbytes);
+    LOG("%s: write -> %d", __func__, n);
+
+    return n;
+  }
+
+  if (number == LINUX_OPEN) {
+
+    char*  path  = va_arg(args, void*);
+    int    flags = va_arg(args, int);
+
+    LOG("%s: open(\"%s\", 0x%x, ...)", __func__, path, flags);
+
+    int fd = shim_open_impl(path, flags, args);
+    LOG("%s: open -> %d", __func__, fd);
+
+    return fd;
+  }
+
 #ifdef __x86_64__
   if (number == LINUX_MMAP) {
-    uintptr_t   addr     = va_arg(args, unsigned long);
-    size_t      len      = va_arg(args, unsigned long);
-    int         prot     = va_arg(args, unsigned long);
-    int         flags    = va_arg(args, unsigned long);
-    int         fd       = va_arg(args, unsigned long);
-    linux_off_t pgoffset = va_arg(args, unsigned long);
+    void*       addr     = va_arg(args, void*);
+    size_t      len      = va_arg(args, size_t);
+    int         prot     = va_arg(args, int);
+    int         flags    = va_arg(args, int);
+    int         fd       = va_arg(args, int);
+    linux_off_t pgoffset = va_arg(args, linux_off_t);
 
-    LOG("%s: mmap(%p, %zu, %d, %d, %d, %ld)", __func__, (void*)addr, len, prot, flags, fd, pgoffset);
+    LOG("%s: mmap(%p, %zu, %d, %d, %d, %ld)", __func__, addr, len, prot, flags, fd, pgoffset);
 
-    void* p = shim_mmap_impl((void*)addr, len, prot, flags, fd, pgoffset);
+    void* p = shim_mmap_impl(addr, len, prot, flags, fd, pgoffset);
     LOG("%s: mmap -> %p", __func__, p);
 
     return (uintptr_t)p;
