@@ -3652,6 +3652,7 @@ lsb_define([], [
   "int dladdr1(void* addr, Dl_info* info, void** extra_info, int flags)",
   "void* dlmopen(Lmid_t lmid, const char* path, int mode)",
   "int eventfd(unsigned int initval, int flags)",
+  "int fcntl64(int fd, int cmd, ...)",
   "int fgetpos64(FILE* stream, fpos64_t* pos)",
   "FILE* fopen64(const char* filename, const char* type)",
   "int ftruncate64(int fd, off64_t length)",

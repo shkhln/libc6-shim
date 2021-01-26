@@ -136,6 +136,10 @@ int shim_fcntl_impl(int fd, int cmd, va_list args) {
   UNIMPLEMENTED_ARGS("%d, %d, ...", fd, cmd);
 }
 
+int shim_fcntl64_impl(int fd, int cmd, va_list args) {
+  return shim_fcntl_impl(fd, cmd, args);
+}
+
 int shim_open_impl(const char* path, int linux_flags, va_list args) {
 
   char* p = redirect(path);
@@ -182,6 +186,7 @@ int shim_posix_fallocate64_impl(int fd, linux_off64_t offset, linux_off64_t len)
 }
 
 SHIM_WRAP(fcntl);
+SHIM_WRAP(fcntl64);
 SHIM_WRAP(open);
 SHIM_WRAP(open64);
 SHIM_WRAP(posix_fallocate64);
