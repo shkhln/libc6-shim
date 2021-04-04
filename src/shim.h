@@ -1,9 +1,11 @@
 #pragma once
 
 #include <assert.h>
+#include <execinfo.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <unistd.h>
 
 #define __HEAD(head, ...) head
 #define __TAIL(head, ...) __VA_ARGS__
@@ -12,7 +14,6 @@
 
 #include <errno.h>
 #include <pthread_np.h>
-#include <unistd.h>
 
 extern __thread int what_was_that_error;
 
@@ -33,8 +34,21 @@ extern __thread int what_was_that_error;
 
 #endif
 
-#define UNIMPLEMENTED()         { fprintf(stderr, "%s is not implemented\n", __func__);                                               assert(0); }
-#define UNIMPLEMENTED_ARGS(...) { fprintf(stderr, "%s(" __HEAD(__VA_ARGS__) ") is not implemented\n", __func__, __TAIL(__VA_ARGS__)); assert(0); }
+#define UNIMPLEMENTED()         {\
+  fprintf(stderr, "%s is not implemented\n", __func__);\
+  void* buffer[100];\
+  int nframes = backtrace(buffer, 100);\
+  backtrace_symbols_fd(buffer, nframes, STDERR_FILENO);\
+  assert(0);\
+}
+
+#define UNIMPLEMENTED_ARGS(...) {\
+  fprintf(stderr, "%s(" __HEAD(__VA_ARGS__) ") is not implemented\n", __func__, __TAIL(__VA_ARGS__));\
+  void* buffer[100];\
+  int nframes = backtrace(buffer, 100);\
+  backtrace_symbols_fd(buffer, nframes, STDERR_FILENO);\
+  assert(0);\
+}
 
 #ifndef SHIM_EXPORT
 #define SHIM_EXPORT(sym) SHIM_EXPORT_ ##sym

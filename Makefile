@@ -12,8 +12,8 @@ LIBS      = $(BUILD_DIR)/lib64/libc6.so \
 CFLAGS    = -std=c99 -Wall -Wextra -Wno-unused-parameter -Wno-incompatible-pointer-types-discards-qualifiers \
  -shared -fPIC -Wl,-soname,librt.so.1 -Wl,--version-script=src/shim.map -I/usr/local/include
 
-LDFLAGS64 = -lm -pthread
-LDFLAGS32 = -lm -pthread -Wl,-z,notext # "relocation R_386_PC32 cannot be used against symbol _setjmp"
+LDFLAGS64 = -lexecinfo -lm -pthread
+LDFLAGS32 = -lexecinfo -lm -pthread -Wl,-z,notext # "relocation R_386_PC32 cannot be used against symbol _setjmp"
 
 GCC_VER ?= 9
 
