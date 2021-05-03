@@ -12,7 +12,14 @@ int shim_uname_impl(struct linux_utsname* linux_name) {
     memset(linux_name, 0, sizeof(struct linux_utsname));
 
     strlcpy(linux_name->machine,
-      strcmp(name.machine, "amd64") == 0 ? "x86_64" : name.machine, 65);
+#ifdef __x86_64__
+      "x86_64"
+#elif defined(__i386__)
+      access("/libexec/ld-elf32.so.1", F_OK) == 0 ? "x86_64" : name.machine
+#else
+      name.machine
+#endif
+      , 65);
 
     strlcpy(linux_name->sysname,    name.sysname,  65);
     strlcpy(linux_name->nodename,   name.nodename, 65);
