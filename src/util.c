@@ -61,5 +61,10 @@ const char* redirect(const char* path) {
     return NULL;
   }
 
+  // Steam
+  if (strcmp(path, "/etc/ssl/certs/ca-certificates.crt") == 0) {
+    return "/etc/ssl/cert.pem";
+  }
+
   return path;
 }

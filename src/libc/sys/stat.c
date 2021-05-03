@@ -77,7 +77,7 @@ int shim___lxstat_impl(int ver, const char* path, linux_stat* stat_buf) {
 
   struct stat sb;
 
-  int err = lstat(path, &sb);
+  int err = lstat(redirect(path), &sb);
   if (err == 0) {
     copy_stat_buf(stat_buf, &sb);
   }
@@ -89,7 +89,7 @@ int shim___lxstat64_impl(int ver, const char* path, linux_stat64* stat_buf) {
 
   struct stat sb;
 
-  int err = lstat(path, &sb);
+  int err = lstat(redirect(path), &sb);
   if (err == 0) {
     copy_stat_buf64(stat_buf, &sb);
   }
