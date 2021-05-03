@@ -5,6 +5,9 @@
 #include <sys/un.h>
 #include <netinet/in.h>
 
+#define LINUX_PF_UNIX PF_UNIX
+#define LINUX_PF_INET PF_INET
+
 #define LINUX_SOL_IP      0
 #define LINUX_SOL_SOCKET  1
 #define LINUX_SOL_TCP     6
@@ -105,6 +108,11 @@ struct linux_sockaddr_in {
   uint8_t       sin_zero[8];
 };
 
+struct linux_sockaddr_un {
+  uint16_t sun_family;
+  char     sun_path[108];
+};
+
 struct linux_msghdr {
   void*        msg_name;
   socklen_t    msg_namelen;
@@ -122,6 +130,8 @@ struct linux_cmsghdr {
   // unsigned char cmsg_data[];
 };
 
-typedef struct linux_cmsghdr  linux_cmsghdr;
-typedef struct linux_msghdr   linux_msghdr;
-typedef struct linux_sockaddr linux_sockaddr;
+typedef struct linux_cmsghdr     linux_cmsghdr;
+typedef struct linux_msghdr      linux_msghdr;
+typedef struct linux_sockaddr    linux_sockaddr;
+typedef struct linux_sockaddr_in linux_sockaddr_in;
+typedef struct linux_sockaddr_un linux_sockaddr_un;
