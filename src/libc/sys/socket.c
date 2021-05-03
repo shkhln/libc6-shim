@@ -6,6 +6,7 @@
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <netinet/in.h>
+#include <netinet/tcp.h>
 
 #include "../../shim.h"
 #include "socket.h"
@@ -332,3 +333,54 @@ ssize_t shim___recv_chk_impl(int fd, void* buf, size_t len, size_t buflen, int f
 }
 
 SHIM_WRAP(__recv_chk);
+
+static int linux_to_native_so_opt(int optname) {
+  switch (optname) {
+    case LINUX_SO_BROADCAST: return SO_BROADCAST;
+    case LINUX_SO_SNDBUF:    return SO_SNDBUF;
+    case LINUX_SO_RCVBUF:    return SO_RCVBUF;
+    case LINUX_SO_KEEPALIVE: return SO_KEEPALIVE;
+    default:
+      assert(0);
+  }
+}
+
+static int linux_to_native_tcp_opt(int optname) {
+  switch (optname) {
+    case LINUX_TCP_NODELAY:      return TCP_NODELAY;
+    case LINUX_TCP_USER_TIMEOUT: return -1; // ?
+    default:
+      assert(0);
+  }
+}
+
+int shim_getsockopt_impl(int s, int linux_level, int linux_optname, void* restrict optval, socklen_t* restrict optlen) {
+  switch (linux_level) {
+    case LINUX_SOL_SOCKET: return getsockopt(s, SOL_SOCKET,  linux_to_native_so_opt (linux_optname), optval, optlen);
+    case LINUX_SOL_TCP:    return getsockopt(s, IPPROTO_TCP, linux_to_native_tcp_opt(linux_optname), optval, optlen);
+    default:
+      assert(0);
+  }
+}
+
+int shim_setsockopt_impl(int s, int linux_level, int linux_optname, const void* optval, socklen_t optlen) {
+  int err;
+  switch (linux_level) {
+    case LINUX_SOL_SOCKET:
+      if (linux_optname == LINUX_SO_SNDBUF && optval && *((int*)optval) == 0) {
+        err = 0; // ?
+      } else {
+        err = setsockopt(s, SOL_SOCKET,  linux_to_native_so_opt(linux_optname), optval, optlen);
+      }
+      break;
+    case LINUX_SOL_TCP:
+      err = setsockopt(s, IPPROTO_TCP, linux_to_native_tcp_opt(linux_optname), optval, optlen);
+      break;
+    default:
+      assert(0);
+  }
+  return err;
+}
+
+SHIM_WRAP(getsockopt);
+SHIM_WRAP(setsockopt);
