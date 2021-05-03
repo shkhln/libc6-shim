@@ -280,22 +280,20 @@ static void native_to_linux_msghdr(struct linux_msghdr* linux_msg, const struct 
   }
 }
 
-ssize_t shim_sendmsg_impl(int s, const struct linux_msghdr* linux_msg, int linux_flags) {
-
-  struct msghdr msg;
-  uint8_t buf[linux_msg->msg_controllen];
-
-  msg.msg_control    = &buf;
-  msg.msg_controllen = sizeof(buf);
-
-  linux_to_native_msghdr(&msg, linux_msg);
-
-  int err = sendmsg(s, &msg, linux_to_native_msg_flags(linux_flags));
-  if (err == -1) {
+ssize_t shim_recv_impl(int s, void* buf, size_t len, int linux_flags) {
+  ssize_t nbytes = recv(s, buf, len, linux_to_native_msg_flags(linux_flags));
+  if (nbytes == -1) {
     errno = native_to_linux_errno(errno);
   }
+  return nbytes;
+}
 
-  return err;
+ssize_t shim_send_impl(int s, const void* msg, size_t len, int linux_flags) {
+  ssize_t nbytes = send(s, msg, len, linux_to_native_msg_flags(linux_flags));
+  if (nbytes == -1) {
+    errno = native_to_linux_errno(errno);
+  }
+  return nbytes;
 }
 
 ssize_t shim_recvmsg_impl(int s, struct linux_msghdr* linux_msg, int linux_flags) {
@@ -311,26 +309,44 @@ ssize_t shim_recvmsg_impl(int s, struct linux_msghdr* linux_msg, int linux_flags
   msg.msg_controllen = sizeof(buf);
   msg.msg_flags      = linux_to_native_msg_flags(linux_msg->msg_flags);
 
-  int err = recvmsg(s, &msg, linux_to_native_msg_flags(linux_flags));
-  if (err != -1) {
+  ssize_t nbytes = recvmsg(s, &msg, linux_to_native_msg_flags(linux_flags));
+  if (nbytes != -1) {
     native_to_linux_msghdr(linux_msg, &msg);
   } else {
     errno = native_to_linux_errno(errno);
   }
 
-  return err;
+  return nbytes;
+}
+
+ssize_t shim_sendmsg_impl(int s, const struct linux_msghdr* linux_msg, int linux_flags) {
+
+  struct msghdr msg;
+  uint8_t buf[linux_msg->msg_controllen];
+
+  msg.msg_control    = &buf;
+  msg.msg_controllen = sizeof(buf);
+
+  linux_to_native_msghdr(&msg, linux_msg);
+
+  ssize_t nbytes = sendmsg(s, &msg, linux_to_native_msg_flags(linux_flags));
+  if (nbytes == -1) {
+    errno = native_to_linux_errno(errno);
+  }
+
+  return nbytes;
 }
 
 ssize_t shim_recvfrom_impl(int s, void* buf, size_t len, int linux_flags, linux_sockaddr* restrict linux_from, socklen_t* restrict linux_fromlen) {
 
-  int err;
+  ssize_t nbytes;
   if (linux_from != NULL) {
 
     uint8_t   from[110]; // ?
     socklen_t fromlen = sizeof(from);
 
-    err = recvfrom(s, buf, len, linux_to_native_msg_flags(linux_flags), (struct sockaddr*)&from, &fromlen);
-    if (err != -1) {
+    nbytes = recvfrom(s, buf, len, linux_to_native_msg_flags(linux_flags), (struct sockaddr*)&from, &fromlen);
+    if (nbytes != -1) {
       switch (((struct sockaddr*)&from)->sa_family) {
         case PF_INET: native_to_linux_sockaddr_in((linux_sockaddr_in*)linux_from, (struct sockaddr_in*)&from, fromlen); break;
         case PF_UNIX: native_to_linux_sockaddr_un((linux_sockaddr_un*)linux_from, (struct sockaddr_un*)&from, fromlen); break;
@@ -340,26 +356,26 @@ ssize_t shim_recvfrom_impl(int s, void* buf, size_t len, int linux_flags, linux_
     }
 
   } else {
-    err = recvfrom(s, buf, len, linux_to_native_msg_flags(linux_flags), NULL, linux_fromlen);
+    nbytes = recvfrom(s, buf, len, linux_to_native_msg_flags(linux_flags), NULL, linux_fromlen);
   }
 
-  if (err == -1) {
+  if (nbytes == -1) {
     errno = native_to_linux_errno(errno);
   }
 
-  return err;
+  return nbytes;
 }
 
 ssize_t shim_sendto_impl(int s, const void* msg, size_t len, int linux_flags, const linux_sockaddr* linux_to, socklen_t tolen) {
 
-  int err;
+  ssize_t nbytes;
   switch (linux_to->sa_family) {
 
     case LINUX_PF_UNIX:
     {
       struct sockaddr_un to;
       linux_to_native_sockaddr_un(&to, (linux_sockaddr_un*)linux_to, tolen);
-      err = sendto(s, msg, len, linux_to_native_msg_flags(linux_flags), (struct sockaddr*)&to, sizeof(to));
+      nbytes = sendto(s, msg, len, linux_to_native_msg_flags(linux_flags), (struct sockaddr*)&to, sizeof(to));
     }
     break;
 
@@ -367,7 +383,7 @@ ssize_t shim_sendto_impl(int s, const void* msg, size_t len, int linux_flags, co
     {
       struct sockaddr_in to;
       linux_to_native_sockaddr_in(&to, (linux_sockaddr_in*)linux_to, tolen);
-      err = sendto(s, msg, len, linux_to_native_msg_flags(linux_flags), (struct sockaddr*)&to, sizeof(to));
+      nbytes = sendto(s, msg, len, linux_to_native_msg_flags(linux_flags), (struct sockaddr*)&to, sizeof(to));
     }
     break;
 
@@ -375,15 +391,17 @@ ssize_t shim_sendto_impl(int s, const void* msg, size_t len, int linux_flags, co
       assert(0);
   }
 
-  if (err == -1) {
+  if (nbytes == -1) {
     errno = native_to_linux_errno(errno);
   }
 
-  return err;
+  return nbytes;
 }
 
 SHIM_WRAP(bind);
 SHIM_WRAP(connect);
+SHIM_WRAP(recv);
+SHIM_WRAP(send);
 SHIM_WRAP(recvmsg);
 SHIM_WRAP(sendmsg);
 SHIM_WRAP(recvfrom);
