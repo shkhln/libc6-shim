@@ -6,6 +6,7 @@
 #include <time.h>
 #include <unistd.h>
 #include <sys/types.h>
+#include <sys/thr.h>
 
 #include "../time.h"
 #include "../../shim.h"
@@ -17,6 +18,7 @@
 #define LINUX_GETTID          224
 #define LINUX_FUTEX           240
 #define LINUX_CLOCK_GETTIME   265
+#define LINUX_TGKILL          270
 #define LINUX_GET_ROBUST_LIST 312
 #define LINUX_PIPE2           331
 #define LINUX_GETRANDOM       355
@@ -31,6 +33,7 @@
 #define LINUX_GETTID          186
 #define LINUX_FUTEX           202
 #define LINUX_CLOCK_GETTIME   228
+#define LINUX_TGKILL          234
 #define LINUX_GET_ROBUST_LIST 274
 #define LINUX_PIPE2           293
 #define LINUX_GETRANDOM       318
@@ -121,6 +124,23 @@ long shim_syscall_impl(long number, va_list args) {
 
     int err = shim_clock_gettime_impl(clock_id, tp);
     LOG("%s: clock_gettime -> %d", __func__, err);
+
+    return err;
+  }
+
+  if (number == LINUX_TGKILL) {
+
+    pid_t tgid = va_arg(args, pid_t);
+    pid_t tid  = va_arg(args, pid_t);
+    int   sig  = va_arg(args, int);
+
+    LOG("%s: tgkill(%d, %d, %d)", __func__, tgid, tid, sig);
+
+    assert(tgid == getpid());
+    assert(sig  == 0);
+
+    int err = thr_kill(tid, sig);
+    LOG("%s: tgkill -> %d", __func__, err);
 
     return err;
   }
