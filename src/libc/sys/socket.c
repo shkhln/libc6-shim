@@ -94,9 +94,7 @@ static int native_to_linux_msg_flags(int flags) {
   return linux_flags;
 }
 
-static void linux_to_native_sockaddr_in(struct sockaddr_in* dest, const linux_sockaddr_in* src, socklen_t addrlen) {
-
-  assert(addrlen == sizeof(struct linux_sockaddr_in));
+static void linux_to_native_sockaddr_in(struct sockaddr_in* dest, const linux_sockaddr_in* src) {
 
   dest->sin_len    = 0;
   dest->sin_family = PF_INET;
@@ -106,9 +104,7 @@ static void linux_to_native_sockaddr_in(struct sockaddr_in* dest, const linux_so
   memcpy(dest->sin_zero, src->sin_zero, sizeof(dest->sin_zero));
 }
 
-static void linux_to_native_sockaddr_un(struct sockaddr_un* dest, const linux_sockaddr_un* src, socklen_t addrlen) {
-
-  assert(addrlen == sizeof(linux_sockaddr_un));
+static void linux_to_native_sockaddr_un(struct sockaddr_un* dest, const linux_sockaddr_un* src) {
 
   dest->sun_len    = 0;
   dest->sun_family = PF_UNIX;
@@ -121,14 +117,14 @@ static void linux_to_native_sockaddr_un(struct sockaddr_un* dest, const linux_so
   }
 }
 
-static void native_to_linux_sockaddr_in(linux_sockaddr_in* dest, const struct sockaddr_in* src, socklen_t addrlen) {
+static void native_to_linux_sockaddr_in(linux_sockaddr_in* dest, const struct sockaddr_in* src) {
   dest->sin_family = LINUX_PF_INET;
   dest->sin_port   = src->sin_port;
   dest->sin_addr   = src->sin_addr;
   memcpy(dest->sin_zero, src->sin_zero, sizeof(dest->sin_zero));
 }
 
-static void native_to_linux_sockaddr_un(linux_sockaddr_un* dest, const struct sockaddr_un* src, socklen_t addrlen) {
+static void native_to_linux_sockaddr_un(linux_sockaddr_un* dest, const struct sockaddr_un* src) {
   dest->sun_family = LINUX_PF_UNIX;
   size_t nbytes = strlcpy(dest->sun_path, src->sun_path, sizeof(dest->sun_path));
   assert(nbytes < sizeof(dest->sun_path));
@@ -151,7 +147,8 @@ int shim_bind_impl(int s, const linux_sockaddr* linux_addr, socklen_t addrlen) {
     case LINUX_PF_UNIX:
       {
         struct sockaddr_un addr;
-        linux_to_native_sockaddr_un(&addr, (linux_sockaddr_un*)linux_addr, addrlen);
+        assert(addrlen <= sizeof(struct linux_sockaddr_un));
+        linux_to_native_sockaddr_un(&addr, (linux_sockaddr_un*)linux_addr);
 
         int err = bind(s, (struct sockaddr*)&addr, sizeof(addr));
         if (err == 0) {
@@ -164,7 +161,8 @@ int shim_bind_impl(int s, const linux_sockaddr* linux_addr, socklen_t addrlen) {
     case LINUX_PF_INET:
       {
         struct sockaddr_in addr;
-        linux_to_native_sockaddr_in(&addr, (linux_sockaddr_in*)linux_addr, addrlen);
+        assert(addrlen == sizeof(struct linux_sockaddr_in));
+        linux_to_native_sockaddr_in(&addr, (linux_sockaddr_in*)linux_addr);
         return bind(s, (struct sockaddr*)&addr, sizeof(addr));
       }
 
@@ -180,7 +178,8 @@ int shim_connect_impl(int s, const linux_sockaddr* linux_name, socklen_t namelen
     case LINUX_PF_UNIX:
       {
         struct sockaddr_un addr;
-        linux_to_native_sockaddr_un(&addr, (linux_sockaddr_un*)linux_name, namelen);
+        assert(namelen <= sizeof(struct linux_sockaddr_un));
+        linux_to_native_sockaddr_un(&addr, (linux_sockaddr_un*)linux_name);
         LOG("%s: path = %s", __func__, addr.sun_path);
         return connect(s, (struct sockaddr*)&addr, sizeof(addr));
       }
@@ -188,7 +187,8 @@ int shim_connect_impl(int s, const linux_sockaddr* linux_name, socklen_t namelen
     case LINUX_PF_INET:
       {
         struct sockaddr_in addr;
-        linux_to_native_sockaddr_in(&addr, (linux_sockaddr_in*)linux_name, namelen);
+        assert(namelen == sizeof(struct linux_sockaddr_in));
+        linux_to_native_sockaddr_in(&addr, (linux_sockaddr_in*)linux_name);
         return connect(s, (struct sockaddr*)&addr, sizeof(addr));
       }
 
@@ -348,8 +348,14 @@ ssize_t shim_recvfrom_impl(int s, void* buf, size_t len, int linux_flags, linux_
     nbytes = recvfrom(s, buf, len, linux_to_native_msg_flags(linux_flags), (struct sockaddr*)&from, &fromlen);
     if (nbytes != -1) {
       switch (((struct sockaddr*)&from)->sa_family) {
-        case PF_INET: native_to_linux_sockaddr_in((linux_sockaddr_in*)linux_from, (struct sockaddr_in*)&from, fromlen); break;
-        case PF_UNIX: native_to_linux_sockaddr_un((linux_sockaddr_un*)linux_from, (struct sockaddr_un*)&from, fromlen); break;
+        case PF_UNIX:
+          assert(*linux_fromlen >= sizeof(struct linux_sockaddr_un));
+          native_to_linux_sockaddr_un((linux_sockaddr_un*)linux_from, (struct sockaddr_un*)&from);
+          break;
+        case PF_INET:
+          assert(*linux_fromlen >= sizeof(struct linux_sockaddr_in));
+          native_to_linux_sockaddr_in((linux_sockaddr_in*)linux_from, (struct sockaddr_in*)&from);
+          break;
         default:
           assert(0);
       }
@@ -374,7 +380,8 @@ ssize_t shim_sendto_impl(int s, const void* msg, size_t len, int linux_flags, co
     case LINUX_PF_UNIX:
     {
       struct sockaddr_un to;
-      linux_to_native_sockaddr_un(&to, (linux_sockaddr_un*)linux_to, tolen);
+      assert(tolen <= sizeof(struct linux_sockaddr_un));
+      linux_to_native_sockaddr_un(&to, (linux_sockaddr_un*)linux_to);
       nbytes = sendto(s, msg, len, linux_to_native_msg_flags(linux_flags), (struct sockaddr*)&to, sizeof(to));
     }
     break;
@@ -382,7 +389,8 @@ ssize_t shim_sendto_impl(int s, const void* msg, size_t len, int linux_flags, co
     case LINUX_PF_INET:
     {
       struct sockaddr_in to;
-      linux_to_native_sockaddr_in(&to, (linux_sockaddr_in*)linux_to, tolen);
+      assert(tolen == sizeof(struct linux_sockaddr_in));
+      linux_to_native_sockaddr_in(&to, (linux_sockaddr_in*)linux_to);
       nbytes = sendto(s, msg, len, linux_to_native_msg_flags(linux_flags), (struct sockaddr*)&to, sizeof(to));
     }
     break;
