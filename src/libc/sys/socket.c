@@ -224,7 +224,7 @@ static void linux_to_native_msghdr(struct msghdr* msg, const struct linux_msghdr
 
 #ifdef __x86_64__
       memcpy((uint8_t*)cmsg + 16, (uint8_t*)linux_cmsg + 16, linux_cmsg->cmsg_len - 16);
-#elif  __i386__
+#elif defined(__i386__)
       memcpy((uint8_t*)cmsg + 12, (uint8_t*)linux_cmsg + 12, linux_cmsg->cmsg_len - 12);
 #else
   #error
@@ -265,7 +265,7 @@ static void native_to_linux_msghdr(struct linux_msghdr* linux_msg, const struct 
 
 #ifdef __x86_64__
       memcpy((uint8_t*)linux_cmsg + 16, (uint8_t*)cmsg + 16, cmsg->cmsg_len - 16);
-#elif  __i386__
+#elif defined(__i386__)
       memcpy((uint8_t*)linux_cmsg + 12, (uint8_t*)cmsg + 12, cmsg->cmsg_len - 12);
 #else
   #error
