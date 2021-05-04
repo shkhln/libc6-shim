@@ -474,3 +474,29 @@ int shim_setsockopt_impl(int s, int linux_level, int linux_optname, const void* 
 
 SHIM_WRAP(getsockopt);
 SHIM_WRAP(setsockopt);
+
+int shim_getsockname_impl(int s, linux_sockaddr* restrict linux_name, socklen_t* restrict linux_namelen) {
+
+  uint8_t   name[110]; // ?
+  socklen_t namelen = sizeof(name);
+
+  int err = getsockname(s, (struct sockaddr*)&name, &namelen);
+  if (err != -1) {
+    switch (((struct sockaddr*)&name)->sa_family) {
+      case PF_UNIX:
+        assert(*linux_namelen >= sizeof(struct linux_sockaddr_un));
+        native_to_linux_sockaddr_un((linux_sockaddr_un*)linux_name, (struct sockaddr_un*)&name);
+        break;
+      case PF_INET:
+        assert(*linux_namelen >= sizeof(struct linux_sockaddr_in));
+        native_to_linux_sockaddr_in((linux_sockaddr_in*)linux_name, (struct sockaddr_in*)&name);
+        break;
+      default:
+        assert(0);
+    }
+  }
+
+  return err;
+}
+
+SHIM_WRAP(getsockname);
