@@ -8,6 +8,7 @@
 #include <sys/un.h>
 #include <netinet/in.h>
 #include <netinet/tcp.h>
+#include <arpa/inet.h>
 
 #include "../../shim.h"
 #include "socket.h"
@@ -558,3 +559,23 @@ int shim_getsockname_impl(int s, linux_sockaddr* restrict linux_name, socklen_t*
 }
 
 SHIM_WRAP(getsockname);
+
+const char* shim_inet_ntop_impl(int af, const void* restrict src, char* restrict dst, socklen_t size) {
+  assert(af == LINUX_PF_INET || af == LINUX_PF_INET6);
+  return inet_ntop(linux_to_native_domain(af), src, dst, size);
+}
+
+int shim_inet_pton_impl(int af, const char* restrict src, void* restrict dst) {
+  assert(af == LINUX_PF_INET || af == LINUX_PF_INET6);
+  return inet_pton(linux_to_native_domain(af), src, dst);
+}
+
+#ifdef SHIM_SCAN
+#undef inet_ntop
+#undef inet_pton
+SHIM_WRAP(inet_ntop);
+SHIM_WRAP(inet_pton);
+#else
+SHIM_WRAPPER_inet_ntop
+SHIM_WRAPPER_inet_pton
+#endif
