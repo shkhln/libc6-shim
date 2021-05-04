@@ -57,3 +57,11 @@ SHIM_EXPORT(optarg);
 SHIM_EXPORT(optind);
 SHIM_EXPORT(optopt);
 SHIM_EXPORT(opterr);
+
+#include <netinet/in.h>
+
+const struct in6_addr shim_in6addr_any      = IN6ADDR_ANY_INIT;
+const struct in6_addr shim_in6addr_loopback = IN6ADDR_LOOPBACK_INIT;
+
+SHIM_EXPORT(in6addr_any);
+SHIM_EXPORT(in6addr_loopback);

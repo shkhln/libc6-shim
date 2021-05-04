@@ -104,6 +104,15 @@ static void linux_to_native_sockaddr_in(struct sockaddr_in* dest, const linux_so
   memcpy(dest->sin_zero, src->sin_zero, sizeof(dest->sin_zero));
 }
 
+static void linux_to_native_sockaddr_in6(struct sockaddr_in6* dest, const linux_sockaddr_in6* src) {
+  dest->sin6_len      = 0;
+  dest->sin6_family   = PF_INET6;
+  dest->sin6_port     = src->sin6_port;
+  dest->sin6_flowinfo = src->sin6_flowinfo;
+  memcpy(dest->sin6_addr.s6_addr, src->sin6_addr.s6_addr, sizeof(dest->sin6_addr.s6_addr));
+  dest->sin6_scope_id = src->sin6_scope_id;
+}
+
 static void linux_to_native_sockaddr_un(struct sockaddr_un* dest, const linux_sockaddr_un* src) {
 
   dest->sun_len    = 0;
@@ -124,20 +133,36 @@ static void native_to_linux_sockaddr_in(linux_sockaddr_in* dest, const struct so
   memcpy(dest->sin_zero, src->sin_zero, sizeof(dest->sin_zero));
 }
 
+static void native_to_linux_sockaddr_in6(linux_sockaddr_in6* dest, const struct sockaddr_in6* src) {
+  dest->sin6_family   = LINUX_PF_INET6;
+  dest->sin6_port     = src->sin6_port;
+  dest->sin6_flowinfo = src->sin6_flowinfo;
+  memcpy(dest->sin6_addr.s6_addr, src->sin6_addr.s6_addr, sizeof(dest->sin6_addr.s6_addr));
+  dest->sin6_scope_id = src->sin6_scope_id;
+}
+
 static void native_to_linux_sockaddr_un(linux_sockaddr_un* dest, const struct sockaddr_un* src) {
   dest->sun_family = LINUX_PF_UNIX;
   size_t nbytes = strlcpy(dest->sun_path, src->sun_path, sizeof(dest->sun_path));
   assert(nbytes < sizeof(dest->sun_path));
 }
 
+static int linux_to_native_domain(int domain) {
+  switch (domain) {
+    case LINUX_PF_UNIX:  return PF_UNIX;
+    case LINUX_PF_INET:  return PF_INET;
+    case LINUX_PF_INET6: return PF_INET6;
+    default:
+      assert(0);
+  }
+}
+
 int shim_socket_impl(int domain, int type, int protocol) {
-  assert(domain == LINUX_PF_UNIX || domain == LINUX_PF_INET);
-  return socket(domain, linux_to_native_sock_type(type), protocol);
+  return socket(linux_to_native_domain(domain), linux_to_native_sock_type(type), protocol);
 }
 
 int shim_socketpair_impl(int domain, int type, int protocol, int* sv) {
-  assert(domain == LINUX_PF_UNIX || domain == LINUX_PF_INET);
-  return socketpair(domain, linux_to_native_sock_type(type), protocol, sv);
+  return socketpair(linux_to_native_domain(domain), linux_to_native_sock_type(type), protocol, sv);
 }
 
 int shim_bind_impl(int s, const linux_sockaddr* linux_addr, socklen_t addrlen) {
@@ -166,6 +191,14 @@ int shim_bind_impl(int s, const linux_sockaddr* linux_addr, socklen_t addrlen) {
         return bind(s, (struct sockaddr*)&addr, sizeof(addr));
       }
 
+    case LINUX_PF_INET6:
+      {
+        struct sockaddr_in6 addr;
+        assert(addrlen == sizeof(struct linux_sockaddr_in6));
+        linux_to_native_sockaddr_in6(&addr, (linux_sockaddr_in6*)linux_addr);
+        return bind(s, (struct sockaddr*)&addr, sizeof(addr));
+      }
+
     default:
       assert(0);
   }
@@ -189,6 +222,14 @@ int shim_connect_impl(int s, const linux_sockaddr* linux_name, socklen_t namelen
         struct sockaddr_in addr;
         assert(namelen == sizeof(struct linux_sockaddr_in));
         linux_to_native_sockaddr_in(&addr, (linux_sockaddr_in*)linux_name);
+        return connect(s, (struct sockaddr*)&addr, sizeof(addr));
+      }
+
+    case LINUX_PF_INET6:
+      {
+        struct sockaddr_in6 addr;
+        assert(namelen == sizeof(struct linux_sockaddr_in6));
+        linux_to_native_sockaddr_in6(&addr, (linux_sockaddr_in6*)linux_name);
         return connect(s, (struct sockaddr*)&addr, sizeof(addr));
       }
 
@@ -356,6 +397,10 @@ ssize_t shim_recvfrom_impl(int s, void* buf, size_t len, int linux_flags, linux_
           assert(*linux_fromlen >= sizeof(struct linux_sockaddr_in));
           native_to_linux_sockaddr_in((linux_sockaddr_in*)linux_from, (struct sockaddr_in*)&from);
           break;
+        case PF_INET6:
+          assert(*linux_fromlen >= sizeof(struct linux_sockaddr_in6));
+          native_to_linux_sockaddr_in6((linux_sockaddr_in6*)linux_from, (struct sockaddr_in6*)&from);
+          break;
         default:
           assert(0);
       }
@@ -391,6 +436,15 @@ ssize_t shim_sendto_impl(int s, const void* msg, size_t len, int linux_flags, co
       struct sockaddr_in to;
       assert(tolen == sizeof(struct linux_sockaddr_in));
       linux_to_native_sockaddr_in(&to, (linux_sockaddr_in*)linux_to);
+      nbytes = sendto(s, msg, len, linux_to_native_msg_flags(linux_flags), (struct sockaddr*)&to, sizeof(to));
+    }
+    break;
+
+    case LINUX_PF_INET6:
+    {
+      struct sockaddr_in6 to;
+      assert(tolen == sizeof(struct linux_sockaddr_in6));
+      linux_to_native_sockaddr_in6(&to, (linux_sockaddr_in6*)linux_to);
       nbytes = sendto(s, msg, len, linux_to_native_msg_flags(linux_flags), (struct sockaddr*)&to, sizeof(to));
     }
     break;
@@ -490,6 +544,10 @@ int shim_getsockname_impl(int s, linux_sockaddr* restrict linux_name, socklen_t*
       case PF_INET:
         assert(*linux_namelen >= sizeof(struct linux_sockaddr_in));
         native_to_linux_sockaddr_in((linux_sockaddr_in*)linux_name, (struct sockaddr_in*)&name);
+        break;
+      case PF_INET6:
+        assert(*linux_namelen >= sizeof(struct linux_sockaddr_in6));
+        native_to_linux_sockaddr_in6((linux_sockaddr_in6*)linux_name, (struct sockaddr_in6*)&name);
         break;
       default:
         assert(0);

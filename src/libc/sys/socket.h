@@ -5,8 +5,9 @@
 #include <sys/un.h>
 #include <netinet/in.h>
 
-#define LINUX_PF_UNIX PF_UNIX
-#define LINUX_PF_INET PF_INET
+#define LINUX_PF_UNIX  PF_UNIX
+#define LINUX_PF_INET  PF_INET
+#define LINUX_PF_INET6      10
 
 #define LINUX_SOL_IP      0
 #define LINUX_SOL_SOCKET  1
@@ -93,8 +94,9 @@
   MSG_CMSG_CLOEXEC               \
 )
 
-typedef struct in_addr linux_in_addr;
-typedef struct iovec   linux_iovec;
+typedef struct in_addr  linux_in_addr;
+typedef struct in6_addr linux_in6_addr;
+typedef struct iovec    linux_iovec;
 
 struct linux_sockaddr {
   uint16_t sa_family;
@@ -106,6 +108,14 @@ struct linux_sockaddr_in {
   uint16_t      sin_port;
   linux_in_addr sin_addr;
   uint8_t       sin_zero[8];
+};
+
+struct linux_sockaddr_in6 {
+   uint16_t       sin6_family;
+   uint16_t       sin6_port;
+   uint32_t       sin6_flowinfo;
+   linux_in6_addr sin6_addr;
+   uint32_t       sin6_scope_id;
 };
 
 struct linux_sockaddr_un {
@@ -130,8 +140,9 @@ struct linux_cmsghdr {
   // unsigned char cmsg_data[];
 };
 
-typedef struct linux_cmsghdr     linux_cmsghdr;
-typedef struct linux_msghdr      linux_msghdr;
-typedef struct linux_sockaddr    linux_sockaddr;
-typedef struct linux_sockaddr_in linux_sockaddr_in;
-typedef struct linux_sockaddr_un linux_sockaddr_un;
+typedef struct linux_cmsghdr      linux_cmsghdr;
+typedef struct linux_msghdr       linux_msghdr;
+typedef struct linux_sockaddr     linux_sockaddr;
+typedef struct linux_sockaddr_in  linux_sockaddr_in;
+typedef struct linux_sockaddr_in6 linux_sockaddr_in6;
+typedef struct linux_sockaddr_un  linux_sockaddr_un;
