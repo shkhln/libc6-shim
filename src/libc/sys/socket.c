@@ -499,10 +499,19 @@ static int linux_to_native_tcp_opt(int optname) {
   }
 }
 
+static int linux_to_native_ip6_opt(int optname) {
+  switch (optname) {
+    case LINUX_IPV6_V6ONLY: return IPV6_V6ONLY;
+    default:
+      assert(0);
+  }
+}
+
 int shim_getsockopt_impl(int s, int linux_level, int linux_optname, void* restrict optval, socklen_t* restrict optlen) {
   switch (linux_level) {
     case LINUX_SOL_SOCKET: return getsockopt(s, SOL_SOCKET,  linux_to_native_so_opt (linux_optname), optval, optlen);
     case LINUX_SOL_TCP:    return getsockopt(s, IPPROTO_TCP, linux_to_native_tcp_opt(linux_optname), optval, optlen);
+    case LINUX_SOL_IPV6:   return getsockopt(s, IPPROTO_TCP, linux_to_native_ip6_opt(linux_optname), optval, optlen);
     default:
       assert(0);
   }
@@ -520,6 +529,9 @@ int shim_setsockopt_impl(int s, int linux_level, int linux_optname, const void* 
       break;
     case LINUX_SOL_TCP:
       err = setsockopt(s, IPPROTO_TCP, linux_to_native_tcp_opt(linux_optname), optval, optlen);
+      break;
+    case LINUX_SOL_IPV6:
+      err = setsockopt(s, IPPROTO_TCP, linux_to_native_ip6_opt(linux_optname), optval, optlen);
       break;
     default:
       assert(0);
