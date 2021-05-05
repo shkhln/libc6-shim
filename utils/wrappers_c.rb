@@ -14,6 +14,7 @@ SUBSTITUTIONS = {
 
 STRUCT_COMPATIBILITY = {
   FTW:          true,
+  addrinfo:     false,
   cmsghdr:      false, # compatible on i386
   dirent:       false,
   dl_phdr_info: true,

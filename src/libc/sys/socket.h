@@ -5,9 +5,15 @@
 #include <sys/un.h>
 #include <netinet/in.h>
 
-#define LINUX_PF_UNIX  PF_UNIX
-#define LINUX_PF_INET  PF_INET
-#define LINUX_PF_INET6      10
+#define LINUX_PF_UNSPEC  0
+#define LINUX_PF_UNIX    1
+#define LINUX_PF_INET    2
+#define LINUX_PF_INET6  10
+
+#define LINUX_AF_UNSPEC LINUX_PF_UNSPEC
+#define LINUX_AF_UNIX   LINUX_PF_UNIX
+#define LINUX_AF_INET   LINUX_PF_INET
+#define LINUX_AF_INET6  LINUX_PF_INET6
 
 #define LINUX_SOL_IP      0
 #define LINUX_SOL_SOCKET  1
@@ -17,15 +23,19 @@
 
 #define LINUX_SCM_RIGHTS 1
 
-#define LINUX_SOCK_STREAM    0x00001
-#define LINUX_SOCK_DGRAM     0x00002
-#define LINUX_SOCK_SEQPACKET 0x00005
+#define LINUX_SOCK_STREAM          1
+#define LINUX_SOCK_DGRAM           2
+#define LINUX_SOCK_RAW             3
+#define LINUX_SOCK_RDM             4
+#define LINUX_SOCK_SEQPACKET       5
 #define LINUX_SOCK_NONBLOCK  0x00800
 #define LINUX_SOCK_CLOEXEC   0x80000
 
 #define KNOWN_LINUX_SOCKET_TYPES ( \
   LINUX_SOCK_STREAM    |           \
   LINUX_SOCK_DGRAM     |           \
+  LINUX_SOCK_RAW       |           \
+  LINUX_SOCK_RDM       |           \
   LINUX_SOCK_SEQPACKET |           \
   LINUX_SOCK_NONBLOCK  |           \
   LINUX_SOCK_CLOEXEC               \
@@ -149,3 +159,9 @@ typedef struct linux_sockaddr     linux_sockaddr;
 typedef struct linux_sockaddr_in  linux_sockaddr_in;
 typedef struct linux_sockaddr_in6 linux_sockaddr_in6;
 typedef struct linux_sockaddr_un  linux_sockaddr_un;
+
+int linux_to_native_sock_type(int linux_type);
+int native_to_linux_sock_type(int linux_type);
+
+void native_to_linux_sockaddr_in(linux_sockaddr_in* dest, const struct sockaddr_in* src);
+void native_to_linux_sockaddr_in6(linux_sockaddr_in6* dest, const struct sockaddr_in6* src);

@@ -35,18 +35,37 @@ static int native_to_linux_sock_level(int level) {
   }
 }
 
-static int linux_to_native_sock_type(int linux_type) {
+_Static_assert(LINUX_SOCK_STREAM    == SOCK_STREAM,    "");
+_Static_assert(LINUX_SOCK_DGRAM     == SOCK_DGRAM,     "");
+_Static_assert(LINUX_SOCK_RAW       == SOCK_RAW,       "");
+_Static_assert(LINUX_SOCK_RDM       == SOCK_RDM,       "");
+_Static_assert(LINUX_SOCK_SEQPACKET == SOCK_SEQPACKET, "");
+
+int linux_to_native_sock_type(int linux_type) {
 
   assert((linux_type & KNOWN_LINUX_SOCKET_TYPES) == linux_type);
 
-  int type = 0;
+  int type = linux_type & 0xFF;
 
-  if (linux_type & LINUX_SOCK_STREAM)   type |= SOCK_STREAM;
-  if (linux_type & LINUX_SOCK_DGRAM)    type |= SOCK_DGRAM;
   if (linux_type & LINUX_SOCK_NONBLOCK) type |= SOCK_NONBLOCK;
   if (linux_type & LINUX_SOCK_CLOEXEC)  type |= SOCK_CLOEXEC;
 
   return type;
+}
+
+int native_to_linux_sock_type(int type) {
+
+  assert((type & (SOCK_STREAM | SOCK_DGRAM | SOCK_RAW | SOCK_SEQPACKET | SOCK_NONBLOCK | SOCK_CLOEXEC)) == type);
+
+  _Static_assert(SOCK_NONBLOCK > 0xFF, "");
+  _Static_assert(SOCK_CLOEXEC  > 0xFF, "");
+
+  int linux_type = type & 0xFF;
+
+  if (type & SOCK_NONBLOCK) linux_type |= LINUX_SOCK_NONBLOCK;
+  if (type & SOCK_CLOEXEC)  linux_type |= LINUX_SOCK_CLOEXEC;
+
+  return linux_type;
 }
 
 static int linux_to_native_msg_flags(int linux_flags) {
@@ -127,14 +146,14 @@ static void linux_to_native_sockaddr_un(struct sockaddr_un* dest, const linux_so
   }
 }
 
-static void native_to_linux_sockaddr_in(linux_sockaddr_in* dest, const struct sockaddr_in* src) {
+void native_to_linux_sockaddr_in(linux_sockaddr_in* dest, const struct sockaddr_in* src) {
   dest->sin_family = LINUX_PF_INET;
   dest->sin_port   = src->sin_port;
   dest->sin_addr   = src->sin_addr;
   memcpy(dest->sin_zero, src->sin_zero, sizeof(dest->sin_zero));
 }
 
-static void native_to_linux_sockaddr_in6(linux_sockaddr_in6* dest, const struct sockaddr_in6* src) {
+void native_to_linux_sockaddr_in6(linux_sockaddr_in6* dest, const struct sockaddr_in6* src) {
   dest->sin6_family   = LINUX_PF_INET6;
   dest->sin6_port     = src->sin6_port;
   dest->sin6_flowinfo = src->sin6_flowinfo;
