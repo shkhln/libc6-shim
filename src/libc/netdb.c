@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <string.h>
 #include "../shim.h"
 #include "sys/socket.h"
 #include "netdb.h"
@@ -9,9 +10,9 @@ int* shim___h_errno_location_impl() {
 
 SHIM_WRAP(__h_errno_location);
 
-typedef struct shim_addrinfo linux_addrinfo;
+typedef struct linux_addrinfo linux_addrinfo;
 
-struct shim_addrinfo {
+struct linux_addrinfo {
   int              ai_flags;
   int              ai_family;
   int              ai_socktype;
@@ -20,7 +21,6 @@ struct shim_addrinfo {
   linux_sockaddr*  ai_addr;
   char*            ai_canonname;
   linux_addrinfo*  ai_next;
-  struct addrinfo* native_addrinfo;
 };
 
 #define LINUX_AI_PASSIVE      0x01
@@ -44,14 +44,14 @@ static int linux_to_native_ai_flags(int linux_flags) {
   return flags;
 }
 
-static struct shim_addrinfo* copy_addrinfo(struct addrinfo* info) {
+static linux_addrinfo* copy_addrinfo(struct addrinfo* info) {
 
-  struct shim_addrinfo* linux_info = malloc(sizeof(struct shim_addrinfo));
+  linux_addrinfo* linux_info = malloc(sizeof(linux_addrinfo));
 
   linux_info->ai_flags     = 0;
   linux_info->ai_socktype  = native_to_linux_sock_type(info->ai_socktype);
   linux_info->ai_protocol  = info->ai_protocol;
-  linux_info->ai_canonname = info->ai_canonname;
+  linux_info->ai_canonname = info->ai_canonname != NULL ? strdup(info->ai_canonname) : NULL;
 
   switch (info->ai_family) {
     case PF_INET:
@@ -69,8 +69,6 @@ static struct shim_addrinfo* copy_addrinfo(struct addrinfo* info) {
     default:
       assert(0);
   }
-
-  linux_info->native_addrinfo = info;
 
   return linux_info;
 }
@@ -100,10 +98,11 @@ int shim_getaddrinfo_impl(const char* hostname, const char* servname, const linu
   hints.ai_canonname = NULL;
   hints.ai_next      = NULL;
 
-  struct addrinfo* info;
-  int err = getaddrinfo(hostname, servname, &hints, &info);
+  struct addrinfo* list_head;
+  int err = getaddrinfo(hostname, servname, &hints, &list_head);
   if (err == 0) {
-    struct shim_addrinfo* linux_info = copy_addrinfo(info);
+    struct addrinfo* info       = list_head;
+    linux_addrinfo*  linux_info = copy_addrinfo(info);
     *res = linux_info;
     info = info->ai_next;
 
@@ -112,17 +111,19 @@ int shim_getaddrinfo_impl(const char* hostname, const char* servname, const linu
       linux_info = linux_info->ai_next;
       info = info->ai_next;
     }
+
+    freeaddrinfo(list_head);
   }
 
   return err;
 }
 
 void shim_freeaddrinfo_impl(linux_addrinfo* ai) {
-
-  freeaddrinfo(ai->native_addrinfo);
-
   while (ai != NULL) {
     linux_addrinfo* next = ai->ai_next;
+    if (ai->ai_canonname != NULL) {
+      free(ai->ai_canonname);
+    }
     free(ai->ai_addr);
     free(ai);
     ai = next;
