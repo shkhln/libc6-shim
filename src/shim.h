@@ -112,12 +112,6 @@ typedef struct option linux_option;
 
 typedef struct rusage linux_rusage;
 
-#include <sys/types.h>
-#include <sys/ipc.h>
-#include <sys/sem.h>
-
-typedef struct sembuf linux_sembuf;
-
 #include <rpc/rpc.h>
 
 typedef struct pollfd linux_pollfd;
