@@ -87,3 +87,9 @@ SHIM_WRAP(strcasecmp_l);
 SHIM_WRAP(strcoll_l);
 SHIM_WRAP(strncasecmp_l);
 SHIM_WRAP(strxfrm_l);
+
+int shim___xpg_strerror_r_impl(int errnum, char* buf, size_t buflen) {
+  return strerror_r(linux_to_native_errno(errnum), buf, buflen);
+}
+
+SHIM_WRAP(__xpg_strerror_r);
