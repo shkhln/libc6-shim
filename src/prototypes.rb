@@ -3304,6 +3304,17 @@ define(["link.h"], [
   "int dl_iterate_phdr(int (*callback)(struct dl_phdr_info*, size_t, void*), void* data)"
 ])
 
+define([
+  "sys/types.h",
+  "sys/socket.h",
+  "netdb.h"
+], [
+  "int getaddrinfo(const char* restrict node, const char* restrict service, const struct addrinfo* restrict hints, struct addrinfo** restrict res)",
+  "void freeaddrinfo(struct addrinfo* res)",
+  "int getnameinfo(const struct sockaddr* restrict addr, socklen_t addrlen, char* restrict host, socklen_t hostlen, char* restrict serv, socklen_t servlen, int flags)",
+  "const char* gai_strerror(int ecode)"
+])
+
 # 14.5. Interface Definitions for libc
 lsb_define([
   "unistd.h",

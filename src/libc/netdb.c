@@ -132,3 +132,58 @@ void shim_freeaddrinfo_impl(linux_addrinfo* ai) {
 
 SHIM_WRAP(getaddrinfo);
 SHIM_WRAP(freeaddrinfo);
+
+#define LINUX_NI_NUMERICHOST  1
+#define LINUX_NI_NUMERICSERV  2
+#define LINUX_NI_NOFQDN       4
+#define LINUX_NI_NAMEREQD     8
+#define LINUX_NI_DGRAM       16
+
+static int linux_to_native_ni_flags(int linux_flags) {
+
+  assert((linux_flags & (LINUX_NI_NUMERICHOST | LINUX_NI_NUMERICSERV | LINUX_NI_NOFQDN | LINUX_NI_NAMEREQD | LINUX_NI_DGRAM)) == linux_flags);
+
+  int flags = 0;
+
+  if (linux_flags & LINUX_NI_NUMERICHOST) flags |= NI_NUMERICHOST;
+  if (linux_flags & LINUX_NI_NUMERICSERV) flags |= NI_NUMERICSERV;
+  if (linux_flags & LINUX_NI_NOFQDN)      flags |= NI_NOFQDN;
+  if (linux_flags & LINUX_NI_NAMEREQD)    flags |= NI_NAMEREQD;
+  if (linux_flags & LINUX_NI_DGRAM)       flags |= NI_DGRAM;
+
+  return flags;
+}
+
+int shim_getnameinfo_impl(const linux_sockaddr* linux_addr, socklen_t linux_addrlen, char* host, size_t hostlen, char* serv, size_t servlen, int linux_flags) {
+
+  switch (linux_addr->sa_family) {
+    case LINUX_AF_UNIX:
+      {
+        struct sockaddr_un addr;
+        assert(linux_addrlen <= sizeof(struct linux_sockaddr_un));
+        linux_to_native_sockaddr_un(&addr, (linux_sockaddr_un*)linux_addr);
+        return getnameinfo((struct sockaddr*)&addr, sizeof(addr), host, hostlen, serv, servlen, linux_to_native_ni_flags(linux_flags));
+      }
+      break;
+    case LINUX_AF_INET:
+      {
+        struct sockaddr_in addr;
+        assert(linux_addrlen == sizeof(struct linux_sockaddr_in));
+        linux_to_native_sockaddr_in(&addr, (linux_sockaddr_in*)linux_addr);
+        return getnameinfo((struct sockaddr*)&addr, sizeof(addr), host, hostlen, serv, servlen, linux_to_native_ni_flags(linux_flags));
+      }
+      break;
+    case LINUX_AF_INET6:
+      {
+        struct sockaddr_in6 addr;
+        assert(linux_addrlen == sizeof(struct linux_sockaddr_in6));
+        linux_to_native_sockaddr_in6(&addr, (linux_sockaddr_in6*)linux_addr);
+        return getnameinfo((struct sockaddr*)&addr, sizeof(addr), host, hostlen, serv, servlen, linux_to_native_ni_flags(linux_flags));
+      }
+      break;
+    default:
+      assert(0);
+  }
+}
+
+SHIM_WRAP(getnameinfo);

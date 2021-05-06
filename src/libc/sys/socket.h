@@ -163,5 +163,11 @@ typedef struct linux_sockaddr_un  linux_sockaddr_un;
 int linux_to_native_sock_type(int linux_type);
 int native_to_linux_sock_type(int linux_type);
 
+void linux_to_native_sockaddr_in(struct sockaddr_in* dest, const linux_sockaddr_in* src);
 void native_to_linux_sockaddr_in(linux_sockaddr_in* dest, const struct sockaddr_in* src);
+
+void linux_to_native_sockaddr_in6(struct sockaddr_in6* dest, const linux_sockaddr_in6* src);
 void native_to_linux_sockaddr_in6(linux_sockaddr_in6* dest, const struct sockaddr_in6* src);
+
+void linux_to_native_sockaddr_un(struct sockaddr_un* dest, const linux_sockaddr_un* src);
+void native_to_linux_sockaddr_un(linux_sockaddr_un* dest, const struct sockaddr_un* src);

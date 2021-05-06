@@ -114,7 +114,7 @@ static int native_to_linux_msg_flags(int flags) {
   return linux_flags;
 }
 
-static void linux_to_native_sockaddr_in(struct sockaddr_in* dest, const linux_sockaddr_in* src) {
+void linux_to_native_sockaddr_in(struct sockaddr_in* dest, const linux_sockaddr_in* src) {
 
   dest->sin_len    = 0;
   dest->sin_family = PF_INET;
@@ -124,7 +124,7 @@ static void linux_to_native_sockaddr_in(struct sockaddr_in* dest, const linux_so
   memcpy(dest->sin_zero, src->sin_zero, sizeof(dest->sin_zero));
 }
 
-static void linux_to_native_sockaddr_in6(struct sockaddr_in6* dest, const linux_sockaddr_in6* src) {
+void linux_to_native_sockaddr_in6(struct sockaddr_in6* dest, const linux_sockaddr_in6* src) {
   dest->sin6_len      = 0;
   dest->sin6_family   = PF_INET6;
   dest->sin6_port     = src->sin6_port;
@@ -133,7 +133,7 @@ static void linux_to_native_sockaddr_in6(struct sockaddr_in6* dest, const linux_
   dest->sin6_scope_id = src->sin6_scope_id;
 }
 
-static void linux_to_native_sockaddr_un(struct sockaddr_un* dest, const linux_sockaddr_un* src) {
+void linux_to_native_sockaddr_un(struct sockaddr_un* dest, const linux_sockaddr_un* src) {
 
   dest->sun_len    = 0;
   dest->sun_family = PF_UNIX;
@@ -161,7 +161,7 @@ void native_to_linux_sockaddr_in6(linux_sockaddr_in6* dest, const struct sockadd
   dest->sin6_scope_id = src->sin6_scope_id;
 }
 
-static void native_to_linux_sockaddr_un(linux_sockaddr_un* dest, const struct sockaddr_un* src) {
+void native_to_linux_sockaddr_un(linux_sockaddr_un* dest, const struct sockaddr_un* src) {
   dest->sun_family = LINUX_PF_UNIX;
   size_t nbytes = strlcpy(dest->sun_path, src->sun_path, sizeof(dest->sun_path));
   assert(nbytes < sizeof(dest->sun_path));
