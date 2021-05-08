@@ -403,7 +403,7 @@ ssize_t shim_recvfrom_impl(int s, void* buf, size_t len, int linux_flags, linux_
   ssize_t nbytes;
   if (linux_from != NULL) {
 
-    uint8_t   from[110]; // ?
+    uint8_t   from[110] __attribute__((aligned(8))); // ?
     socklen_t fromlen = sizeof(from);
 
     nbytes = recvfrom(s, buf, len, linux_to_native_msg_flags(linux_flags), (struct sockaddr*)&from, &fromlen);
@@ -563,7 +563,7 @@ SHIM_WRAP(setsockopt);
 
 int shim_getsockname_impl(int s, linux_sockaddr* restrict linux_name, socklen_t* restrict linux_namelen) {
 
-  uint8_t   name[110]; // ?
+  uint8_t   name[110] __attribute__((aligned(8))); // ?
   socklen_t namelen = sizeof(name);
 
   int err = getsockname(s, (struct sockaddr*)&name, &namelen);
