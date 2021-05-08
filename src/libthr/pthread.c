@@ -111,7 +111,7 @@ int shim_pthread_setname_np_impl(pthread_t tid, const char* name) {
 }
 
 int shim_pthread_kill_impl(pthread_t thread, int sig) {
-  if (sig == 0) {
+  if (sig == 0 || sig == 9) {
     return pthread_kill(thread, sig);
   } else {
     UNIMPLEMENTED_ARGS("%p, %d", thread, sig);
