@@ -528,7 +528,16 @@ static int linux_to_native_ip6_opt(int optname) {
 
 int shim_getsockopt_impl(int s, int linux_level, int linux_optname, void* restrict optval, socklen_t* restrict optlen) {
   switch (linux_level) {
-    case LINUX_SOL_SOCKET: return getsockopt(s, SOL_SOCKET,  linux_to_native_so_opt (linux_optname), optval, optlen);
+    case LINUX_SOL_SOCKET:
+      if (linux_optname == LINUX_SO_PASSCRED) {
+#ifdef LOCAL_CREDS_PERSISTENT
+        return getsockopt(s, SOL_LOCAL, LOCAL_CREDS_PERSISTENT, optval, optlen);
+#else
+        return -1;
+#endif
+      } else {
+        return getsockopt(s, SOL_SOCKET, linux_to_native_so_opt(linux_optname), optval, optlen);
+      }
     case LINUX_SOL_TCP:    return getsockopt(s, IPPROTO_TCP, linux_to_native_tcp_opt(linux_optname), optval, optlen);
     case LINUX_SOL_IPV6:   return getsockopt(s, IPPROTO_TCP, linux_to_native_ip6_opt(linux_optname), optval, optlen);
     default:
@@ -542,8 +551,14 @@ int shim_setsockopt_impl(int s, int linux_level, int linux_optname, const void* 
     case LINUX_SOL_SOCKET:
       if (linux_optname == LINUX_SO_SNDBUF && optval && *((int*)optval) == 0) {
         err = 0; // ?
+      } else if (linux_optname == LINUX_SO_PASSCRED) {
+#ifdef LOCAL_CREDS_PERSISTENT
+        err = setsockopt(s, SOL_LOCAL, LOCAL_CREDS_PERSISTENT, optval, optlen);
+#else
+        err = -1;
+#endif
       } else {
-        err = setsockopt(s, SOL_SOCKET,  linux_to_native_so_opt(linux_optname), optval, optlen);
+        err = setsockopt(s, SOL_SOCKET, linux_to_native_so_opt(linux_optname), optval, optlen);
       }
       break;
     case LINUX_SOL_TCP:
