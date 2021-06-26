@@ -10,6 +10,8 @@
 #define LINUX_F_SETOWN 8
 #define LINUX_F_GETOWN 9
 
+#define LINUX_F_ADD_SEALS 1033
+
 #define LINUX_O_RDONLY    0x00000
 #define LINUX_O_WRONLY    0x00001
 #define LINUX_O_RDWR      0x00002

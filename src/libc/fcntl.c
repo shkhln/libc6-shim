@@ -127,10 +127,18 @@ int shim_fcntl_impl(int fd, int cmd, va_list args) {
   }
 
   if (cmd == LINUX_F_GETOWN) {
-#ifdef DEBUG
     LOG("%s: cmd = F_GETOWN", __func__);
-#endif
     assert(0);
+  }
+
+  if (cmd == LINUX_F_ADD_SEALS) {
+#if __FreeBSD_version >= 1300139
+    int flags = va_arg(args, int);
+    LOG("%s: cmd = LINUX_F_ADD_SEALS, arg = 0x%x", __func__, flags);
+    return fcntl(fd, F_ADD_SEALS, flags);
+#else
+    return -1;
+#endif
   }
 
   UNIMPLEMENTED_ARGS("%d, %d, ...", fd, cmd);
