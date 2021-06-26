@@ -6,6 +6,7 @@
 #include <time.h>
 #include <unistd.h>
 #include <sys/types.h>
+#include <sys/mman.h>
 #include <sys/thr.h>
 
 #include "../time.h"
@@ -188,8 +189,23 @@ long shim_syscall_impl(long number, va_list args) {
   }
 
   if (number == LINUX_MEMFD_CREATE) {
+#if __FreeBSD_version >= 1300139
+    char* name  = va_arg(args, char*);
+    int   flags = va_arg(args, int);
+
+    LOG("%s: memfd_create(\"%s\", 0x%x)", __func__, name, flags);
+
+    assert((flags & (MFD_CLOEXEC | MFD_ALLOW_SEALING)) == flags);
+
+    int err = memfd_create(name, flags);
+
+    LOG("%s: memfd_create -> %d", __func__, err);
+
+    return err;
+#else
     errno = native_to_linux_errno(ENOSYS);
     return -1;
+#endif
   }
 
   UNIMPLEMENTED_ARGS("%ld, ...", number);
