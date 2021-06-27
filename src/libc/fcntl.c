@@ -179,7 +179,7 @@ int shim_open_impl(const char* path, int linux_flags, va_list args) {
   mode_t mode = 0;
 
   if (flags & O_CREAT) {
-    mode = va_arg(args, int);
+    mode = va_arg(args, linux_mode_t);
   }
 
   return open(p, flags, mode);
@@ -199,7 +199,7 @@ SHIM_WRAP(open);
 SHIM_WRAP(open64);
 SHIM_WRAP(posix_fallocate64);
 
-int shim_shm_open_impl(const char* path, int linux_flags, mode_t mode) {
+int shim_shm_open_impl(const char* path, int linux_flags, linux_mode_t mode) {
 
   char buf[PATH_MAX];
   snprintf(buf, sizeof(buf), "/compat/linux/dev/shm%s", path);

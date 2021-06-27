@@ -92,6 +92,8 @@ struct globals {
 
 extern struct globals globals;
 
+typedef int32_t linux_mode_t;
+
 typedef int64_t linux_off64_t;
 
 #ifdef __i386__

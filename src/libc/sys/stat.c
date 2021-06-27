@@ -97,7 +97,7 @@ int shim___lxstat64_impl(int ver, const char* path, linux_stat64* stat_buf) {
   return err;
 }
 
-int shim___xmknod_impl(int ver, const char* path, mode_t mode, dev_t* dev) {
+int shim___xmknod_impl(int ver, const char* path, linux_mode_t mode, dev_t* dev) {
   UNIMPLEMENTED();
 }
 
@@ -125,7 +125,7 @@ int shim___xstat64_impl(int ver, const char* path, linux_stat64* stat_buf) {
   return err;
 }
 
-int shim_chmod_impl(const char* path, mode_t mode) {
+int shim_chmod_impl(const char* path, linux_mode_t mode) {
   assert(!str_starts_with(path, "/dev/"));
   return chmod(path, mode);
 }
