@@ -808,12 +808,6 @@ define(["sys/types.h", "sys/socket.h"], [
   "int socketpair(int domain, int type, int protocol, int* sv)"
 ])
 
-# SWAPON(2)
-define(["unistd.h"], [
-  "int swapon(const char* special)",
-  "int swapoff(const char* special)"
-])
-
 # SYMLINK(2)
 define(["unistd.h"], [
   "int symlink(const char* name1, const char* name2)",
@@ -3685,4 +3679,9 @@ lsb_define([], [
   "char* secure_getenv(const char* name)",
   "int sigaction(int signum, const struct sigaction* act, struct sigaction* oldact)",
   "sig_t signal(int sig, sig_t func)"
+])
+
+lsb_define(['sys/swap.h'], [
+  "int swapon(const char* path, int swapflags)",
+  "int swapoff(const char* path)"
 ])
