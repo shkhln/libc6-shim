@@ -87,6 +87,8 @@ FUNCTION_POINTER_TYPE = /^(.+)?\(([\*\^])\)\s*(\([^\)]+\))$/
 
 def to_shim_type(type)
   case type
+    when 'cpu_set_t*'
+      'linux_cpu_set_t*'
     when 'mode_t'
       'linux_mode_t'
     when 'off_t'
