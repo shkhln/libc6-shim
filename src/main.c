@@ -82,53 +82,6 @@ static void shim_init(int argc, char** argv, char** env) {
   shim_argv = argv;
 }
 
-__attribute__((constructor(102)))
-static void shim_libgl_init(int argc, char** argv, char** env) {
-
-  char* should_run_init = getenv("SHIM_ENABLE_LIBGL_INIT_WORKAROUND");
-  if (!(should_run_init && strcmp(should_run_init, "1") == 0))
-    return;
-
-  LOG_ENTRY("%d, %p, %p", argc, argv, env);
-
-  void* libgl = dlopen("libgl_nvidia", RTLD_LAZY);
-  assert(libgl != NULL);
-
-  Link_map* map = NULL;
-
-  int err = dlinfo(libgl, RTLD_DI_LINKMAP, &map);
-  assert(err == 0);
-
-  while (map != NULL) {
-
-    int dt_fini_count = 0;
-    for (const Elf_Dyn* dyn = map->l_ld; dyn->d_tag != DT_NULL; dyn++) {
-      if (dyn->d_tag == DT_FINI) {
-        dt_fini_count++;
-      }
-    }
-
-    if (dt_fini_count == 2) {
-
-      for (const Elf_Dyn* dyn = map->l_ld; dyn->d_tag != DT_NULL; dyn++) {
-        if (dyn->d_tag == DT_FINI) {
-
-          LOG("%s: calling init function for %s", __func__, map->l_name);
-
-          void (*init)(int, char**, char**) = (void*)(map->l_addr + dyn->d_un.d_ptr);
-          init(argc, argv, env);
-
-          break;
-        }
-      }
-    }
-
-    map = map->l_next;
-  }
-
-  LOG_EXIT();
-}
-
 extern int __cxa_atexit(void (*)(void*), void*, void*);
 
 int shim___cxa_atexit_impl(void (*cb)(void*), void* arg, void* dso) {
