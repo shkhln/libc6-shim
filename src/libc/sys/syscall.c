@@ -16,6 +16,7 @@
 #define LINUX_WRITE             4
 #define LINUX_OPEN              5
 #define LINUX_GETPID           20
+#define LINUX_CAPGET          184
 #define LINUX_GETTID          224
 #define LINUX_FUTEX           240
 #define LINUX_CLOCK_GETTIME   265
@@ -31,6 +32,7 @@
 #define LINUX_OPEN              2
 #define LINUX_MMAP              9
 #define LINUX_GETPID           39
+#define LINUX_CAPGET          125
 #define LINUX_GETTID          186
 #define LINUX_FUTEX           202
 #define LINUX_CLOCK_GETTIME   228
@@ -109,6 +111,12 @@ long shim_syscall_impl(long number, va_list args) {
     LOG("%s: gettid -> %d", __func__, tid);
 
     return tid;
+  }
+
+  if (number == LINUX_CAPGET) {
+    LOG("%s: capget(...)", __func__);
+    errno = native_to_linux_errno(EPERM);
+    return -1;
   }
 
   if (number == LINUX_FUTEX) {
