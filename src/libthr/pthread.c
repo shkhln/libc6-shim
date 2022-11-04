@@ -492,7 +492,7 @@ int shim_pthread_attr_setscope_impl(pthread_attr_t* attr, int linux_scope) {
 SHIM_WRAP(pthread_attr_getscope);
 SHIM_WRAP(pthread_attr_setscope);
 
-#define MAX_ONCES 200
+#define MAX_ONCES 250
 
 static pthread_mutex_t onces_mutex = PTHREAD_MUTEX_INITIALIZER;
 
