@@ -66,7 +66,7 @@
   }
 
 NATIVE_WHATEVER_ATTRS(barrier,  10);
-NATIVE_WHATEVER_ATTRS(cond,     50);
+NATIVE_WHATEVER_ATTRS(cond,    100);
 NATIVE_WHATEVER_ATTRS(mutex,   200);
 
 int shim_pthread_join_impl(pthread_t thread, void** value_ptr) {
@@ -492,7 +492,7 @@ int shim_pthread_attr_setscope_impl(pthread_attr_t* attr, int linux_scope) {
 SHIM_WRAP(pthread_attr_getscope);
 SHIM_WRAP(pthread_attr_setscope);
 
-#define MAX_ONCES 100
+#define MAX_ONCES 200
 
 static pthread_mutex_t onces_mutex = PTHREAD_MUTEX_INITIALIZER;
 
