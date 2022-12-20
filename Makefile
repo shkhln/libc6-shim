@@ -12,6 +12,11 @@ LIBS      = $(BUILD_DIR)/lib64/libc6.so \
 CFLAGS    = -std=c99 -Wall -Wextra -Wno-unused-parameter -Wno-incompatible-pointer-types-discards-qualifiers \
  -shared -fPIC -Wl,-soname,librt.so.1 -Wl,--version-script=src/shim.map -I/usr/local/include
 
+CCTYPE != $(CC) --version | grep -q clang && echo clang || true
+.if $(CCTYPE) == "clang"
+CFLAGS32  = -mstack-alignment=16 # helps with movaps (?) crashes in steamclient.so a bit
+.endif
+
 LDFLAGS64 = -lexecinfo -lm -pthread
 LDFLAGS32 = -lexecinfo -lm -pthread -Wl,-z,notext # "relocation R_386_PC32 cannot be used against symbol _setjmp"
 
@@ -43,7 +48,7 @@ $(BUILD_DIR)/wrappers$(b).c: src/prototypes.rb
 
 $(BUILD_DIR)/lib$(b)/libc6.so:       $(SOURCES) $(BUILD_DIR)/wrappers$(b).c $(BUILD_DIR)/wrappers$(b).h $(BUILD_DIR)/versions$(b).h $(BUILD_DIR)/lib$(b)/dummy-librt.so
 	mkdir -p $(BUILD_DIR)/lib$(b)
-	$(CC) -O2     -m$(b) $(CFLAGS) -o $(.TARGET) $(SOURCES) \
+	$(CC) -O2     -m$(b) $(CFLAGS) ${CFLAGS$(b)} -o $(.TARGET) $(SOURCES) \
 	  -include $(BUILD_DIR)/versions$(b).h \
 	  -include $(BUILD_DIR)/wrappers$(b).h \
 	  $(BUILD_DIR)/wrappers$(b).c \
@@ -52,7 +57,7 @@ $(BUILD_DIR)/lib$(b)/libc6.so:       $(SOURCES) $(BUILD_DIR)/wrappers$(b).c $(BU
 
 $(BUILD_DIR)/lib$(b)/libc6-debug.so: $(BUILD_DIR)/lib$(b)/libc6.so $(BUILD_DIR)/lib$(b)/dummy-librt.so
 	mkdir -p $(BUILD_DIR)/lib$(b)
-	$(CC) -DDEBUG -m$(b) $(CFLAGS) -o $(.TARGET) $(SOURCES) \
+	$(CC) -DDEBUG -m$(b) $(CFLAGS) ${CFLAGS$(b)} -o $(.TARGET) $(SOURCES) \
 	  -include $(BUILD_DIR)/versions$(b).h \
 	  -include $(BUILD_DIR)/wrappers$(b).h \
 	  $(BUILD_DIR)/wrappers$(b).c \
