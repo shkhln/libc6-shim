@@ -58,6 +58,11 @@ char* shim___strcpy_chk_impl(char* dest, const char* src, size_t destlen) {
   return strcpy(dest, src);
 }
 
+char* shim___stpcpy_chk_impl(char* dest, const char* src, size_t destlen) {
+  assert(strlen(src) < destlen);
+  return stpcpy(dest, src);
+}
+
 char* shim___strncpy_chk_impl(char* s1, const char* s2, size_t n, size_t s1len) {
   assert(n <= s1len);
   return strncpy(s1, s2, n);
@@ -65,6 +70,7 @@ char* shim___strncpy_chk_impl(char* s1, const char* s2, size_t n, size_t s1len) 
 
 SHIM_WRAP(__memcpy_chk);
 SHIM_WRAP(__strcpy_chk);
+SHIM_WRAP(__stpcpy_chk);
 SHIM_WRAP(__strncpy_chk);
 
 int shim_strcasecmp_l_impl(const char* s1, const char* s2, linux_locale_t loc) {
