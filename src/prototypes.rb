@@ -289,6 +289,12 @@ define(["sys/param.h", "sys/mount.h", ("sys/statfs.h" if LINUX)].compact, [
   "int fstatfs(int fd, struct statfs* buf)"
 ])
 
+# STATVFS
+define(["sys/param.h", "sys/mount.h", ("sys/statvfs.h" if LINUX)].compact, [
+  "int statvfs64(const char* path, void* buf)",
+  "int fstatvfs64(int fd, void* buf)"
+])
+
 # TRUNCATE(2)
 define(["unistd.h"], [
   "int truncate(const char* path, off_t length)",
