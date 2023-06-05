@@ -7,6 +7,7 @@
 #define LINUX_CLOCK_MONOTONIC_RAW    4
 #define LINUX_CLOCK_REALTIME_COARSE  5
 #define LINUX_CLOCK_MONOTONIC_COARSE 6
+#define LINUX_CLOCK_BOOTTIME         7
 
 typedef clockid_t linux_clockid_t;
 

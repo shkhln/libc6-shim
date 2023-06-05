@@ -34,6 +34,7 @@ static clockid_t linux_to_native_clockid(linux_clockid_t linux_clock_id) {
     case LINUX_CLOCK_MONOTONIC_RAW:    return CLOCK_MONOTONIC_FAST;
     case LINUX_CLOCK_REALTIME_COARSE:  return CLOCK_REALTIME_FAST;
     case LINUX_CLOCK_MONOTONIC_COARSE: return CLOCK_MONOTONIC_FAST;
+    case LINUX_CLOCK_BOOTTIME:         return CLOCK_BOOTTIME;
     default:
       UNIMPLEMENTED_ARGS("%d", linux_clock_id);
   }
