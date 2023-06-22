@@ -4,6 +4,8 @@
 SUBSTITUTIONS = {
   __getdelim:      'getdelim',
   __isoc99_sscanf: 'sscanf',
+  __libc_free:     'free',
+  __libc_malloc:   'malloc',
   __strdup:        'strdup',
   __strndup:       'strndup',
   _exit:           '_Exit',

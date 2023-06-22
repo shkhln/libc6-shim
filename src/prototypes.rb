@@ -3685,3 +3685,8 @@ lsb_define(['sys/swap.h'], [
   "int swapon(const char* path, int swapflags)",
   "int swapoff(const char* path)"
 ])
+
+lsb_define(['stdlib.h'], [
+  "void* __libc_malloc(size_t size)",
+  "void __libc_free(void* ptr)"
+])
