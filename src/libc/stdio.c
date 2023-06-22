@@ -42,7 +42,7 @@ FILE* shim_fopen64_impl(const char* path, const char* mode) {
 }
 
 int shim_remove_impl(const char* path) {
-  assert(!str_starts_with(path, "/dev/"));
+  assert(str_starts_with(path, "/dev/char/195:") || !str_starts_with(path, "/dev/"));
   return remove(path);
 }
 

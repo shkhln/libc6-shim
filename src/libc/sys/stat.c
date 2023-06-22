@@ -101,6 +101,21 @@ int shim___xmknod_impl(int ver, const char* path, linux_mode_t mode, dev_t* dev)
   UNIMPLEMENTED();
 }
 
+static uint64_t make_dev_id(uint32_t major, uint32_t minor) {
+  return
+    (((uint64_t)(major & 0x00000fffu)) <<  8) |
+    (((uint64_t)(major & 0xfffff000u)) << 32) |
+    (((uint64_t)(minor & 0x000000ffu)) <<  0) |
+    (((uint64_t)(minor & 0xffffff00u)) << 12);
+}
+
+#define FIX_NV_DEV_ID(path, stat_buf) \
+  if (str_starts_with(path, "/dev/")) {                                                      \
+    if (strcmp(path, "/dev/nvidia0")        == 0) stat_buf->st_rdev = make_dev_id(195, 0);   \
+    if (strcmp(path, "/dev/nvidiactl")      == 0) stat_buf->st_rdev = make_dev_id(195, 255); \
+    if (strcmp(path, "/dev/nvidia-modeset") == 0) stat_buf->st_rdev = make_dev_id(195, 254); \
+  }
+
 int shim___xstat_impl(int ver, const char* path, linux_stat* stat_buf) {
 
   struct stat sb;
@@ -108,6 +123,7 @@ int shim___xstat_impl(int ver, const char* path, linux_stat* stat_buf) {
   int err = stat(path, &sb);
   if (err == 0) {
     copy_stat_buf(stat_buf, &sb);
+    FIX_NV_DEV_ID(path, stat_buf);
   }
 
   return err;
@@ -120,6 +136,7 @@ int shim___xstat64_impl(int ver, const char* path, linux_stat64* stat_buf) {
   int err = stat(path, &sb);
   if (err == 0) {
     copy_stat_buf64(stat_buf, &sb);
+    FIX_NV_DEV_ID(path, stat_buf);
   }
 
   return err;
