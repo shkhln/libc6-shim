@@ -27,6 +27,10 @@ void shim_tzset_impl() {
 
 SHIM_WRAP(tzset);
 
+#ifndef CLOCK_BOOTTIME
+#define CLOCK_BOOTTIME CLOCK_UPTIME
+#endif
+
 static clockid_t linux_to_native_clockid(linux_clockid_t linux_clock_id) {
   switch (linux_clock_id) {
     case LINUX_CLOCK_REALTIME:         return CLOCK_REALTIME;
