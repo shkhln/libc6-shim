@@ -110,10 +110,12 @@ static uint64_t make_dev_id(uint32_t major, uint32_t minor) {
 }
 
 #define FIX_NV_DEV_ID(path, stat_buf) \
-  if (str_starts_with(path, "/dev/")) {                                                      \
-    if (strcmp(path, "/dev/nvidia0")        == 0) stat_buf->st_rdev = make_dev_id(195, 0);   \
-    if (strcmp(path, "/dev/nvidiactl")      == 0) stat_buf->st_rdev = make_dev_id(195, 255); \
-    if (strcmp(path, "/dev/nvidia-modeset") == 0) stat_buf->st_rdev = make_dev_id(195, 254); \
+  if (str_starts_with(path, "/dev/nvidia")) {                     \
+    switch (path[sizeof("/dev/nvidia") - 1]) {                    \
+      case 'c': stat_buf->st_rdev = make_dev_id(195, 255); break; \
+      case '-': stat_buf->st_rdev = make_dev_id(195, 254); break; \
+      default:  stat_buf->st_rdev = make_dev_id(195, 0);          \
+    }                                                             \
   }
 
 int shim___xstat_impl(int ver, const char* path, linux_stat* stat_buf) {
