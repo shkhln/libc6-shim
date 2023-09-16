@@ -22,13 +22,39 @@
  LINUX_RTLD_NODELETE                    \
 )
 
-int shim_dladdr1_impl(void* address, Dl_info* info, void** extra_info, int flags) {
-  int err = dladdr(address, info);
-  if (err != 0) {
+#define LINUX_RTLD_DI_LINKMAP 2
+
+int shim_dladdr1_impl(void* address, Dl_info* info, void** extra_info, int extra_info_type) {
+
+  int dladdr_err = dladdr(address, info);
+  if (dladdr_err != 0) {
+
     LOG("%s: \"%s\", %p, \"%s\", %p", __func__, info->dli_fname, info->dli_fbase, info->dli_sname, info->dli_saddr);
-    *extra_info = NULL; // ?
+
+    switch (extra_info_type) {
+      case LINUX_RTLD_DI_LINKMAP:
+
+        assert(info->dli_fname != NULL);
+
+        void* handle = dlopen(info->dli_fname, RTLD_NOLOAD);
+        if (handle != NULL) {
+          int dlinfo_err = dlinfo(handle, RTLD_DI_LINKMAP, extra_info);
+          dlclose(handle); // ?
+          if (dlinfo_err != 0) {
+            return 0;
+          }
+        } else {
+          *extra_info = NULL; // ?
+        }
+
+        break;
+
+      default:
+        assert(0);
+    }
   }
-  return err;
+
+  return dladdr_err;
 }
 
 void* shim_dlopen_impl(const char* path, int linux_mode) {
