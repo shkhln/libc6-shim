@@ -21,9 +21,14 @@ def libmap(target_dir, libdir_suffix)
     'libm.so.6 '           => shim_path,
     'libpthread.so.0'      => shim_path,
     'librt.so.1'           => shim_path,
-    'bsd-librt.so.1'       => "/usr/lib#{libdir_suffix}/librt.so.1",
     'libcxxrt.so.1'        => (File.expand_path('fakecxxrt.so', target_dir) if ENV['SHIM_FAKECXXRT'] == '1')
   }
+
+  if libdir_suffix == '' && File.exist?("/usr/librt.so.1")
+    lmap['bsd-librt.so.1'] = "/lib/librt.so.1"
+  else
+    lmap['bsd-librt.so.1'] = "/usr/lib#{libdir_suffix}/librt.so.1"
+  end
 
   lmap.compact.map{|k, v| '%-40s %s' % [k, v]}.join("\n")
 end
