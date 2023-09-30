@@ -24,7 +24,7 @@ def libmap(target_dir, libdir_suffix)
     'libcxxrt.so.1'        => (File.expand_path('fakecxxrt.so', target_dir) if ENV['SHIM_FAKECXXRT'] == '1')
   }
 
-  if libdir_suffix == '' && File.exist?("/usr/librt.so.1")
+  if libdir_suffix == '' && File.exist?("/lib/librt.so.1")
     lmap['bsd-librt.so.1'] = "/lib/librt.so.1"
   else
     lmap['bsd-librt.so.1'] = "/usr/lib#{libdir_suffix}/librt.so.1"
