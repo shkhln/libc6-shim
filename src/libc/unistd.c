@@ -156,3 +156,16 @@ int shim_getopt_impl(int argc, char* const argv[], const char* optstring) {
 }
 
 SHIM_WRAP(getopt);
+
+int shim_access_impl(const char* path, int mode) {
+
+  char* p = redirect(path);
+  if (p == NULL) {
+    errno = EACCES;
+    return -1;
+  }
+
+  return access(p, mode);
+}
+
+SHIM_WRAP(access);
