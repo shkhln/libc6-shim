@@ -1,6 +1,11 @@
 #include <dlfcn.h>
 #include <errno.h>
+#include <stdlib.h>
 #include <string.h>
+#include <sys/param.h>
+#include <sys/types.h>
+#include <sys/sysctl.h>
+
 #include "shim.h"
 
 #ifdef DEBUG
@@ -36,6 +41,43 @@ int linux_to_native_errno(int error) {
   }
 }
 
+static char** procfs_redirects = NULL;
+
+__attribute__((constructor))
+static void init_redirects() {
+
+  int capacity = 5;
+  procfs_redirects = malloc(sizeof(char*) * capacity);
+
+  char linux_emul_path[MAXPATHLEN];
+  size_t linux_emul_path_size = MAXPATHLEN;
+
+  int err = sysctlbyname("compat.linux.emul_path", linux_emul_path, &linux_emul_path_size, NULL, 0);
+  assert(err == 0);
+
+  int i = 0;
+
+  // CUDA init
+  procfs_redirects[i++] = "/proc/self/maps";
+  procfs_redirects[i++] = "/dev/null";
+
+  // Steam
+  //~ asprintf(&procfs_redirects[i++], "/proc/%d/status", getpid());
+  //~ asprintf(&procfs_redirects[i++], "%s/proc/%d/status", linux_emul_path, getpid());
+
+  procfs_redirects[i++] = "/proc/cpuinfo";
+  asprintf(&procfs_redirects[i++], "%s/%s", linux_emul_path, "/proc/cpuinfo");
+
+  //~ procfs_redirects[i++] = "/proc/net/route";
+  //~ asprintf(&procfs_redirects[i++], "%s/%s", linux_emul_path, "/proc/net/route");
+
+  //~ procfs_redirects[i++] = "/proc/version";
+  //~ asprintf(&procfs_redirects[i++], "%s/%s", linux_emul_path, "/proc/version");
+
+  procfs_redirects[i++] = NULL;
+  assert(i <= capacity);
+}
+
 const char* redirect(const char* path) {
 
   if (strcmp("/dev/nvidia-uvm", path) == 0) {
@@ -44,14 +86,10 @@ const char* redirect(const char* path) {
 
   if (str_starts_with(path, "/proc/")) {
 
-    // CUDA init
-    if (strcmp(path, "/proc/self/maps") == 0) {
-      return "/dev/null";
-    }
-
-    // Steam, Widevine
-    if (strcmp(path, "/proc/cpuinfo") == 0) {
-      return "/compat/linux/proc/cpuinfo";
+    for (int i = 0; procfs_redirects[i] != NULL; i += 2) {
+      if (strcmp(path, procfs_redirects[i]) == 0) {
+        return procfs_redirects[i + 1];
+      }
     }
 
     return NULL;
