@@ -76,17 +76,33 @@ linux_lconv_t shim___localeconv_impl(void) {
   _fake_linux_lconv.mon_grouping = _freebsd_lconv->mon_grouping;
   _fake_linux_lconv.positive_sign = _freebsd_lconv->positive_sign;
   _fake_linux_lconv.negative_sign = _freebsd_lconv->negative_sign;
+  _fake_linux_lconv.int_frac_digits = _freebsd_lconv->int_frac_digits;
   _fake_linux_lconv.frac_digits = _freebsd_lconv->frac_digits;
   _fake_linux_lconv.p_cs_precedes = _freebsd_lconv->p_cs_precedes;
-  _fake_linux_lconv.n_cs_precedes = _freebsd_lconv->n_cs_precedes;
   _fake_linux_lconv.p_sep_by_space = _freebsd_lconv->p_sep_by_space;
+  _fake_linux_lconv.n_cs_precedes = _freebsd_lconv->n_cs_precedes;
   _fake_linux_lconv.n_sep_by_space = _freebsd_lconv->n_sep_by_space;
   _fake_linux_lconv.p_sign_posn = _freebsd_lconv->p_sign_posn;
   _fake_linux_lconv.n_sign_posn = _freebsd_lconv->n_sign_posn;
-  _fake_linux_lconv.int_frac_digits = _freebsd_lconv->int_frac_digits;
   _fake_linux_lconv.int_p_cs_precedes = _freebsd_lconv->int_p_cs_precedes;
+
+  /*
+   * NOTE: The Linux ordering of int_p_sep_by_space and int_n_cs_precedes
+   * differs in comparsion to the FreeBSD lconv struct.
+   *
+   * Linux ordering is:
+   *    char int_p_sep_by_space;
+   *    char int_n_cs_precedes;
+   * FreeBSD ordering is:
+   *    char int_n_cs_precedes;
+   *    char int_p_sep_by_space;
+   *
+   * At the time of writing, everything else is in the same position.
+   */
+
   _fake_linux_lconv.int_p_sep_by_space = _freebsd_lconv->int_p_sep_by_space;
   _fake_linux_lconv.int_n_cs_precedes = _freebsd_lconv->int_n_cs_precedes;
+
   _fake_linux_lconv.int_n_sep_by_space = _freebsd_lconv->int_n_sep_by_space;
   _fake_linux_lconv.int_p_sign_posn = _freebsd_lconv->int_p_sign_posn;
   _fake_linux_lconv.int_n_sign_posn = _freebsd_lconv->int_n_sign_posn;
