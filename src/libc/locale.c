@@ -8,6 +8,8 @@ extern const unsigned short** shim___ctype_b_loc();
 extern int32_t** shim___ctype_tolower_loc();
 extern int32_t** shim___ctype_toupper_loc();
 
+static struct linux_lconv _fake_linux_lconv = {0};
+
 linux_locale_t shim___newlocale_impl(int category_mask, const char* locale, linux_locale_t base) {
 
   assert(category_mask == 64 || category_mask == 8127); // LC_ALL_MASK
@@ -62,8 +64,34 @@ void shim___freelocale_impl(linux_locale_t locale) {
 }
 
 linux_lconv_t shim___localeconv_impl(void) {
-  linux_lconv_t  r = (linux_lconv_t)localeconv();
-  return r;
+  struct lconv * _freebsd_lconv = localeconv();
+
+  _fake_linux_lconv.decimal_point = _freebsd_lconv->decimal_point;
+  _fake_linux_lconv.thousands_sep = _freebsd_lconv->thousands_sep;
+  _fake_linux_lconv.grouping = _freebsd_lconv->grouping;
+  _fake_linux_lconv.mon_decimal_point = _freebsd_lconv->mon_decimal_point;
+  _fake_linux_lconv.mon_thousands_sep = _freebsd_lconv->mon_thousands_sep;
+  _fake_linux_lconv.mon_grouping = _freebsd_lconv->mon_grouping;
+  _fake_linux_lconv.positive_sign = _freebsd_lconv->positive_sign;
+  _fake_linux_lconv.negative_sign = _freebsd_lconv->negative_sign;
+  _fake_linux_lconv.currency_symbol = _freebsd_lconv->currency_symbol;
+  _fake_linux_lconv.frac_digits = _freebsd_lconv->frac_digits;
+  _fake_linux_lconv.p_cs_precedes = _freebsd_lconv->p_cs_precedes;
+  _fake_linux_lconv.n_cs_precedes = _freebsd_lconv->n_cs_precedes;
+  _fake_linux_lconv.p_sep_by_space = _freebsd_lconv->p_sep_by_space;
+  _fake_linux_lconv.n_sep_by_space = _freebsd_lconv->n_sep_by_space;
+  _fake_linux_lconv.p_sign_posn = _freebsd_lconv->p_sign_posn;
+  _fake_linux_lconv.n_sign_posn = _freebsd_lconv->n_sign_posn;
+  _fake_linux_lconv.int_curr_symbol = _freebsd_lconv->int_curr_symbol;
+  _fake_linux_lconv.int_frac_digits = _freebsd_lconv->int_frac_digits;
+  _fake_linux_lconv.int_p_cs_precedes = _freebsd_lconv->int_p_cs_precedes;
+  _fake_linux_lconv.int_n_cs_precedes = _freebsd_lconv->int_n_cs_precedes;
+  _fake_linux_lconv.int_p_sep_by_space = _freebsd_lconv->int_p_sep_by_space;
+  _fake_linux_lconv.int_n_sep_by_space = _freebsd_lconv->int_n_sep_by_space;
+  _fake_linux_lconv.int_p_sign_posn = _freebsd_lconv->int_p_sign_posn;
+  _fake_linux_lconv.int_n_sign_posn = _freebsd_lconv->int_n_sign_posn;
+
+  return (linux_lconv_t)&_fake_linux_lconv;
 }
 
 SHIM_WRAP(__newlocale);
