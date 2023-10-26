@@ -8,7 +8,8 @@ extern const unsigned short** shim___ctype_b_loc();
 extern int32_t** shim___ctype_tolower_loc();
 extern int32_t** shim___ctype_toupper_loc();
 
-static struct linux_lconv _fake_linux_lconv = {0};
+__thread linux_lconv_t thread_linux_lconv = {0};
+__thread struct lconv * thread_freebsd_lconv = 0;
 
 linux_locale_t shim___newlocale_impl(int category_mask, const char* locale, linux_locale_t base) {
 
@@ -64,50 +65,35 @@ void shim___freelocale_impl(linux_locale_t locale) {
 }
 
 linux_lconv_t shim___localeconv_impl(void) {
-  struct lconv * _freebsd_lconv = localeconv();
+  return thread_linux_lconv;
+}
 
-  _fake_linux_lconv.decimal_point = _freebsd_lconv->decimal_point;
-  _fake_linux_lconv.thousands_sep = _freebsd_lconv->thousands_sep;
-  _fake_linux_lconv.grouping = _freebsd_lconv->grouping;
-  _fake_linux_lconv.int_curr_symbol = _freebsd_lconv->int_curr_symbol;
-  _fake_linux_lconv.currency_symbol = _freebsd_lconv->currency_symbol;
-  _fake_linux_lconv.mon_decimal_point = _freebsd_lconv->mon_decimal_point;
-  _fake_linux_lconv.mon_thousands_sep = _freebsd_lconv->mon_thousands_sep;
-  _fake_linux_lconv.mon_grouping = _freebsd_lconv->mon_grouping;
-  _fake_linux_lconv.positive_sign = _freebsd_lconv->positive_sign;
-  _fake_linux_lconv.negative_sign = _freebsd_lconv->negative_sign;
-  _fake_linux_lconv.int_frac_digits = _freebsd_lconv->int_frac_digits;
-  _fake_linux_lconv.frac_digits = _freebsd_lconv->frac_digits;
-  _fake_linux_lconv.p_cs_precedes = _freebsd_lconv->p_cs_precedes;
-  _fake_linux_lconv.p_sep_by_space = _freebsd_lconv->p_sep_by_space;
-  _fake_linux_lconv.n_cs_precedes = _freebsd_lconv->n_cs_precedes;
-  _fake_linux_lconv.n_sep_by_space = _freebsd_lconv->n_sep_by_space;
-  _fake_linux_lconv.p_sign_posn = _freebsd_lconv->p_sign_posn;
-  _fake_linux_lconv.n_sign_posn = _freebsd_lconv->n_sign_posn;
-  _fake_linux_lconv.int_p_cs_precedes = _freebsd_lconv->int_p_cs_precedes;
-
-  /*
-   * NOTE: The Linux ordering of int_p_sep_by_space and int_n_cs_precedes
-   * differs in comparsion to the FreeBSD lconv struct.
-   *
-   * Linux ordering is:
-   *    char int_p_sep_by_space;
-   *    char int_n_cs_precedes;
-   * FreeBSD ordering is:
-   *    char int_n_cs_precedes;
-   *    char int_p_sep_by_space;
-   *
-   * At the time of writing, everything else is in the same position.
-   */
-
-  _fake_linux_lconv.int_p_sep_by_space = _freebsd_lconv->int_p_sep_by_space;
-  _fake_linux_lconv.int_n_cs_precedes = _freebsd_lconv->int_n_cs_precedes;
-
-  _fake_linux_lconv.int_n_sep_by_space = _freebsd_lconv->int_n_sep_by_space;
-  _fake_linux_lconv.int_p_sign_posn = _freebsd_lconv->int_p_sign_posn;
-  _fake_linux_lconv.int_n_sign_posn = _freebsd_lconv->int_n_sign_posn;
-
-  return (linux_lconv_t)&_fake_linux_lconv;
+char* shim___setlocale_impl(int category, const char* locale){
+  char * result = setlocale(category, locale);
+  struct lconv* freebsd_current_locale = localeconv();
+  if(thread_freebsd_lconv != freebsd_current_locale){
+    thread_freebsd_lconv = freebsd_current_locale;
+    *thread_linux_lconv = *(struct linux_lconv*)freebsd_current_locale;
+    /*
+    * NOTE: The Linux ordering of int_p_sep_by_space and int_n_cs_precedes
+    * differs in comparsion to the FreeBSD lconv struct.
+    *
+    * Linux ordering is:
+    *    char int_p_sep_by_space;
+    *    char int_n_cs_precedes;
+    * FreeBSD ordering is:
+    *    char int_n_cs_precedes;
+    *    char int_p_sep_by_space;
+    *
+    * Because of this, after copying the values, we must reassign the swapped values;
+    * this is done below.
+    *
+    * At the time of writing, everything else is in the same position.
+    */
+    thread_linux_lconv->int_p_sep_by_space = freebsd_current_locale->int_p_sep_by_space;
+    thread_linux_lconv->int_n_cs_precedes = freebsd_current_locale->int_n_cs_precedes;
+  }
+  return result;
 }
 
 SHIM_WRAP(__newlocale);
@@ -115,6 +101,7 @@ SHIM_WRAP(__duplocale);
 SHIM_WRAP(__uselocale);
 SHIM_WRAP(__freelocale);
 SHIM_WRAP(__localeconv);
+SHIM_WRAP(__setlocale);
 
 linux_locale_t shim_newlocale_impl(int mask, const char* locale, linux_locale_t base) {
   return shim___newlocale_impl(mask, locale, base);
@@ -136,8 +123,13 @@ linux_lconv_t shim_localeconv_impl(void) {
   return shim___localeconv_impl();
 }
 
+char* shim_setlocale_impl(int category, const char* locale){
+  return shim___setlocale_impl(category, locale);
+}
+
 SHIM_WRAP(newlocale);
 SHIM_WRAP(duplocale);
 SHIM_WRAP(uselocale);
 SHIM_WRAP(freelocale);
 SHIM_WRAP(localeconv);
+SHIM_WRAP(setlocale);

@@ -542,6 +542,7 @@ fun __secure_getenv: GLIBC_2.0
 fun __select: GLIBC_2.0
 fun __send: GLIBC_2.0
 fun __setmntent: GLIBC_2.2
+fun __setlocale: GLIBC_2.0
 fun __setpgid: GLIBC_2.0
 fun __sigaction: GLIBC_2.0
 fun __sigaddset: GLIBC_2.0
