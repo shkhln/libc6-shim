@@ -3308,6 +3308,11 @@ define([
   "int getnameinfo(const struct sockaddr* restrict addr, socklen_t addrlen, char* restrict host, socklen_t hostlen, char* restrict serv, socklen_t servlen, int flags)",
   "const char* gai_strerror(int ecode)"
 ])
+# EPOLL_CREATE1(2)
+define(["sys/epoll.h"], [
+    "int epoll_create1(int linux_flags)",
+])
+
 
 # 14.5. Interface Definitions for libc
 lsb_define([
@@ -3649,6 +3654,7 @@ lsb_define([], [
   "locale_t __newlocale(int category_mask, const char* locale, locale_t base)",
   "locale_t __duplocale(locale_t locale)",
   "locale_t __uselocale(locale_t locale)",
+  "struct lconv* __localeconv(void)",
   "void __freelocale(locale_t locale)",
   "uint64_t __udivdi3(uint64_t a, uint64_t b)",
   "uint64_t __umoddi3(uint64_t a, uint64_t b)",

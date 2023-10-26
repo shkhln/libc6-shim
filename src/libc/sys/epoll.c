@@ -30,6 +30,27 @@ int shim_epoll_wait_impl(int epfd, linux_epoll_event*events, int maxevents, int 
   return -1; // ?
 }
 
+#define LINUX_EFD_NONBLOCK 0x00800
+#define LINUX_EFD_CLOEXEC  0x80000
+
+int shim_epoll_create1_impl(int linux_flags) {
+
+  assert((linux_flags & ~(LINUX_EFD_CLOEXEC | LINUX_EFD_NONBLOCK)) == 0);
+
+  int flags = 0;
+  if (linux_flags & LINUX_EFD_NONBLOCK) flags |= O_NONBLOCK;
+  if (linux_flags & LINUX_EFD_CLOEXEC)  flags |= O_CLOEXEC;
+
+  int inout[2];
+  {
+    int err = pipe2(inout, flags);
+    assert(err == 0);
+  }
+
+  return inout[1];
+}
+
+SHIM_WRAP(epoll_create1);
 SHIM_WRAP(epoll_create);
 SHIM_WRAP(epoll_ctl);
 SHIM_WRAP(epoll_wait);

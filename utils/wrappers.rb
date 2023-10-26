@@ -103,6 +103,8 @@ def to_shim_type(type)
       'linux_DIR*'
     when 'locale_t'
       'linux_locale_t'
+    when 'struct lconv*'
+      'linux_lconv_t'
     when 'pthread_once_t*'
       'linux_pthread_once_t*'
     when 'pthread_mutex_t*'

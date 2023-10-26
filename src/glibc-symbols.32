@@ -263,6 +263,7 @@ fun __freadable: GLIBC_2.2
 fun __freading: GLIBC_2.2
 obj __free_hook: GLIBC_2.0
 fun __freelocale: GLIBC_2.1
+fun __localeconv: GLIBC_2.0, GLIBC_2.2
 fun __fsetlocking: GLIBC_2.2
 fun __fwprintf_chk: GLIBC_2.4
 fun __fwritable: GLIBC_2.2

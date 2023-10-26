@@ -61,10 +61,16 @@ void shim___freelocale_impl(linux_locale_t locale) {
   free(locale);
 }
 
+linux_lconv_t shim___localeconv_impl(void) {
+  linux_lconv_t  r = (linux_lconv_t)localeconv();
+  return r;
+}
+
 SHIM_WRAP(__newlocale);
 SHIM_WRAP(__duplocale);
 SHIM_WRAP(__uselocale);
 SHIM_WRAP(__freelocale);
+SHIM_WRAP(__localeconv);
 
 linux_locale_t shim_newlocale_impl(int mask, const char* locale, linux_locale_t base) {
   return shim___newlocale_impl(mask, locale, base);
@@ -82,7 +88,12 @@ void shim_freelocale_impl(linux_locale_t locale) {
   shim___freelocale_impl(locale);
 }
 
+linux_lconv_t shim_localeconv_impl(void) {
+  return shim___localeconv_impl();
+}
+
 SHIM_WRAP(newlocale);
 SHIM_WRAP(duplocale);
 SHIM_WRAP(uselocale);
 SHIM_WRAP(freelocale);
+SHIM_WRAP(localeconv);
