@@ -500,6 +500,7 @@ SHIM_WRAP(__recv_chk);
 
 static int linux_to_native_so_opt(int optname) {
   switch (optname) {
+    case LINUX_SO_REUSEADDR: return SO_REUSEADDR;
     case LINUX_SO_BROADCAST: return SO_BROADCAST;
     case LINUX_SO_SNDBUF:    return SO_SNDBUF;
     case LINUX_SO_RCVBUF:    return SO_RCVBUF;
