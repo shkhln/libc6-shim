@@ -39,11 +39,11 @@ GLIBC_2.26  {} SHIM;
 GLIBC_2.27  {} SHIM;
 GLIBC_2.28  {} SHIM;
 
-# 32-bit libnvidia-glvkspirv.so.460.27.04
+# libexecinfo.so.1 brings _Unwind_Find_FDE@@GCC_3.0 (through libgcc_s.so.1)
+# as required by 32-bit libnvidia-{glvkspirv.so,gpucomp.so} and lsteamclient.dll.so
+# we still need this line, though
 
-GCC_3.0 {
-  global: _Unwind_Find_FDE;
-};
+GCC_3.0 {};
 
 # we don't export any FBSD symbols, but due to a librt.so.1 name collision
 # we still must pass a dynamic linker's sanity check

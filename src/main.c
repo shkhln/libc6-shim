@@ -159,23 +159,3 @@ unsigned long shim_getauxval_impl(unsigned long type) {
 }
 
 SHIM_WRAP(getauxval);
-
-// 32-bit libnvidia-glvkspirv.so.460.27.04
-#ifdef __i386__
-
-void* (*libgcc_Unwind_Find_FDE)(void* pc, void* bases) = NULL;
-
-void* _Unwind_Find_FDE(void* pc, void* bases) {
-
-  if (!libgcc_Unwind_Find_FDE) {
-    void* libgcc = dlopen("libgcc_s.so.1", RTLD_LAZY);
-    assert(libgcc != NULL);
-
-    libgcc_Unwind_Find_FDE = dlvsym(libgcc, "_Unwind_Find_FDE", "GCC_3.0");
-    assert(libgcc_Unwind_Find_FDE != NULL);
-  }
-
-  return libgcc_Unwind_Find_FDE(pc, bases);
-}
-
-#endif
