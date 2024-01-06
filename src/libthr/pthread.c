@@ -67,7 +67,7 @@
 
 NATIVE_WHATEVER_ATTRS(barrier,  10);
 NATIVE_WHATEVER_ATTRS(cond,    100);
-NATIVE_WHATEVER_ATTRS(mutex,   200);
+NATIVE_WHATEVER_ATTRS(mutex,   300);
 
 int shim_pthread_join_impl(pthread_t thread, void** value_ptr) {
   int err = pthread_join(thread, value_ptr);
