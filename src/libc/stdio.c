@@ -28,6 +28,15 @@ FILE* shim_fopen_impl(const char* path, const char* mode) {
     return mem;
   }
 
+  // CUDA
+  if (strncmp(path, "/proc/self/task/", sizeof("/proc/self/task/") - 1) == 0) {
+    char* tail = strchr(path + sizeof("/proc/self/task/"), '/');
+    if (tail != NULL && strcmp(tail, "/comm") == 0) {
+      assert(strcmp(mode, "wb") == 0);
+      return fopen("/dev/null", mode);
+    }
+  }
+
   char* p = redirect(path);
   if (p == NULL) {
     errno = EACCES;
