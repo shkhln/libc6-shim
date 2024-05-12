@@ -1783,6 +1783,7 @@ define(["stdio.h", "stdarg.h"], [
 # STATVFS(3)
 define(["sys/statvfs.h"], [
   "int statvfs(const char* restrict path, struct statvfs* restrict buf)",
+  "int statvfs64(const char* restrict path, struct statvfs64* restrict buf)",
   "int fstatvfs(int fd, struct statvfs* buf)"
 ])
 
