@@ -551,11 +551,12 @@ struct wrapper_args {
 };
 
 // helps with stack alignment crashes in steamclient.so
-static void* start_routine_wrapper(void* arg) {
+static void* pthread_create_start_routine_wrapper(void* arg) {
   LOG_ENTRY("%p", arg);
   struct wrapper_args* wargs = (struct wrapper_args*)arg;
   LOG("start_routine = %p, arg = %p", wargs->start_routine, wargs->arg);
   void* ret = wargs->start_routine(wargs->arg);
+  free(wargs);
   LOG_EXIT("%p", ret);
   return ret;
 }
@@ -564,7 +565,7 @@ int shim_pthread_create_impl(pthread_t* thread, const pthread_attr_t* attr, void
   struct wrapper_args* wargs = malloc(sizeof(struct wrapper_args));
   wargs->start_routine = start_routine;
   wargs->arg = arg;
-  return pthread_create(thread, attr, start_routine_wrapper, wargs);
+  return pthread_create(thread, attr, pthread_create_start_routine_wrapper, wargs);
 }
 
 SHIM_WRAP(pthread_create);

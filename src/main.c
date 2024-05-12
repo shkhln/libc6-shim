@@ -84,9 +84,33 @@ static void shim_init(int argc, char** argv, char** env) {
 
 extern int __cxa_atexit(void (*)(void*), void*, void*);
 
+#ifdef __i386__
+struct wrapper_args {
+  void (*cb)(void*);
+  void* arg;
+};
+
+// helps with stack alignment crashes in steamclient.so
+static void __cxa_atexit_cb_wrapper(void* arg) {
+  LOG_ENTRY("%p", arg);
+  struct wrapper_args* wargs = (struct wrapper_args*)arg;
+  LOG("cb = %p, arg = %p", wargs->cb, wargs->arg);
+  wargs->cb(wargs->arg);
+  free(wargs);
+  LOG_EXIT();
+}
+
+int shim___cxa_atexit_impl(void (*cb)(void*), void* arg, void* dso) {
+  struct wrapper_args* wargs = malloc(sizeof(struct wrapper_args));
+  wargs->cb  = cb;
+  wargs->arg = arg;
+  return __cxa_atexit(__cxa_atexit_cb_wrapper, wargs, dso);
+}
+#else
 int shim___cxa_atexit_impl(void (*cb)(void*), void* arg, void* dso) {
   return __cxa_atexit(cb, arg, dso);
 }
+#endif
 
 extern void __cxa_finalize(void*);
 
