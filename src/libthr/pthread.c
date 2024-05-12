@@ -541,3 +541,31 @@ SHIM_WRAP(pthread_spin_init);
 SHIM_WRAP(pthread_spin_lock);
 SHIM_WRAP(pthread_spin_trylock);
 SHIM_WRAP(pthread_spin_unlock);
+
+#ifdef __i386__
+#include <stdlib.h>
+
+struct wrapper_args {
+  void* (*start_routine)(void*);
+  void* arg;
+};
+
+// helps with stack alignment crashes in steamclient.so
+static void* start_routine_wrapper(void* arg) {
+  LOG_ENTRY("%p", arg);
+  struct wrapper_args* wargs = (struct wrapper_args*)arg;
+  LOG("start_routine = %p, arg = %p", wargs->start_routine, wargs->arg);
+  void* ret = wargs->start_routine(wargs->arg);
+  LOG_EXIT("%p", ret);
+  return ret;
+}
+
+int shim_pthread_create_impl(pthread_t* thread, const pthread_attr_t* attr, void* (*start_routine)(void*), void* arg) {
+  struct wrapper_args* wargs = malloc(sizeof(struct wrapper_args));
+  wargs->start_routine = start_routine;
+  wargs->arg = arg;
+  return pthread_create(thread, attr, start_routine_wrapper, wargs);
+}
+
+SHIM_WRAP(pthread_create);
+#endif

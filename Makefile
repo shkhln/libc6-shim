@@ -14,7 +14,7 @@ CFLAGS    = -std=c99 -Wall -Wextra -Wno-unused-parameter -Wno-incompatible-point
 
 CCTYPE != $(CC) --version | grep -q clang && echo clang || true
 .if $(CCTYPE) == "clang"
-CFLAGS32  = -mstack-alignment=16 # helps with movaps (?) crashes in steamclient.so a bit
+CFLAGS32  = -mstack-alignment=16 -mstackrealign # helps with movaps (?) crashes in steamclient.so a bit
 .endif
 
 LDFLAGS64 = -lexecinfo -lm -pthread
