@@ -3,7 +3,7 @@
 def format_specifier(decl)
 
   return '...' if decl[:name] == '...'
-  return '%p'  if decl[:type] =~ /^.+?\(\*\)\s*\([^\)]+\)$/
+  return '%p [callback]' if decl[:type] =~ /^.+?\(\*\)\s*\([^\)]+\)$/
 
   case decl[:type]
     when /const char ?\*\*/
