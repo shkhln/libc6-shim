@@ -3517,6 +3517,7 @@ lsb_define([
   "void envz_remove(char** envz, size_t* envz_len, const char* name)",
   "void envz_strip(char** envz, size_t* envz_len)",
   "int epoll_create(int size)",
+  "int epoll_create1(int flags)",
   "int epoll_ctl(int epfd, int op, int fd, struct epoll_event* event)",
   "int epoll_wait(int epfd, struct epoll_event* events, int maxevents, int timeout)",
   "int erand48_r(unsigned short xsubi[3], struct drand48_data* buffer, double* result)",
