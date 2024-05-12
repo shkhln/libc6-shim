@@ -21,7 +21,7 @@ int shim_epoll_create_impl(int size) {
 }
 
 int shim_epoll_create1_impl(int flags) {
-  return fake_epoll_fd;
+  return -1;
 }
 
 typedef void linux_epoll_event;
