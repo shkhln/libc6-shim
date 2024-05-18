@@ -121,7 +121,7 @@ def generate_wrapper(out, function, shim_fun_impl)
 
   def to_decl(arg)
     case arg[:type]
-      when /^(.+?)(\[(\d*|restrict)\])$/
+      when /^(.+?)\s?(\[(\d*|restrict)\])$/
         "#{$1} #{arg[:name]}#{$2}"
       when FUNCTION_POINTER_TYPE
         "#{to_shim_type($1)}(#{$2}#{arg[:name]})#{to_shim_type($3)}"
