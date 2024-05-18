@@ -51,23 +51,25 @@ static void copy_linux_flock(struct flock* dst, struct linux_flock* src) {
   dst->l_pid    = src->l_pid;
 }
 
+extern int (*libepoll_epoll_shim_fcntl)(int, int, ...);
+
 int shim_fcntl_impl(int fd, int cmd, va_list args) {
 
   if (cmd == LINUX_F_GETFD) {
     LOG("%s: cmd = F_GETFD", __func__);
-    return fcntl(fd, F_GETFD);
+    return libepoll_epoll_shim_fcntl(fd, F_GETFD);
   }
 
   if (cmd == LINUX_F_SETFD) {
     int arg = va_arg(args, int);
     LOG("%s: cmd = F_SETFD, arg = 0x%x", __func__, arg);
     assert(arg == 1);
-    return fcntl(fd, F_SETFD, FD_CLOEXEC);
+    return libepoll_epoll_shim_fcntl(fd, F_SETFD, FD_CLOEXEC);
   }
 
   if (cmd == LINUX_F_GETFL) {
     LOG("%s: cmd = F_GETFL", __func__);
-    int flags       = fcntl(fd, F_GETFL);
+    int flags       = libepoll_epoll_shim_fcntl(fd, F_GETFL);
     int linux_flags =
       (flags & O_RDWR     ? LINUX_O_RDWR     : 0) |
       (flags & O_NONBLOCK ? LINUX_O_NONBLOCK : 0);
@@ -85,7 +87,7 @@ int shim_fcntl_impl(int fd, int cmd, va_list args) {
       (linux_flags & LINUX_O_RDWR     ? O_RDWR     : 0) |
       (linux_flags & LINUX_O_NONBLOCK ? O_NONBLOCK : 0);
 
-    return fcntl(fd, F_SETFL, flags);
+    return libepoll_epoll_shim_fcntl(fd, F_SETFL, flags);
   }
 
   if (cmd == LINUX_F_GETLK) {
@@ -104,7 +106,7 @@ int shim_fcntl_impl(int fd, int cmd, va_list args) {
     struct flock lock;
     copy_linux_flock(&lock, linux_lock);
 
-    return fcntl(fd, F_SETLK, &lock);
+    return libepoll_epoll_shim_fcntl(fd, F_SETLK, &lock);
   }
 
   if (cmd == LINUX_F_SETLKW) {
@@ -115,7 +117,7 @@ int shim_fcntl_impl(int fd, int cmd, va_list args) {
     struct flock lock;
     copy_linux_flock(&lock, linux_lock);
 
-    return fcntl(fd, F_SETLKW, &lock);
+    return libepoll_epoll_shim_fcntl(fd, F_SETLKW, &lock);
   }
 
   if (cmd == LINUX_F_SETOWN) {
@@ -135,7 +137,7 @@ int shim_fcntl_impl(int fd, int cmd, va_list args) {
 #if __FreeBSD_version >= 1300139
     int flags = va_arg(args, int);
     LOG("%s: cmd = LINUX_F_ADD_SEALS, arg = 0x%x", __func__, flags);
-    return fcntl(fd, F_ADD_SEALS, flags);
+    return libepoll_epoll_shim_fcntl(fd, F_ADD_SEALS, flags);
 #else
     return -1;
 #endif

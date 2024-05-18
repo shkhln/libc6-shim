@@ -3,11 +3,13 @@
 #include <libgen.h>
 #include <limits.h>
 #include <link.h>
+#include <poll.h>
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/elf.h>
+#include <sys/epoll.h>
 
 #include "shim.h"
 
@@ -21,10 +23,31 @@ static char** shim_env  = NULL;
 static int    shim_argc = 0;
 static char** shim_argv = NULL;
 
+int     (*libepoll_epoll_create)    (int);
+int     (*libepoll_epoll_create1)   (int);
+int     (*libepoll_epoll_ctl)       (int, int, int, struct epoll_event*);
+int     (*libepoll_epoll_wait)      (int, struct epoll_event*, int, int);
+int     (*libepoll_epoll_pwait)     (int, struct epoll_event*, int, int, const sigset_t*);
+ssize_t (*libepoll_epoll_shim_read) (int, void*, size_t);
+ssize_t (*libepoll_epoll_shim_write)(int, const void*, size_t);
+int     (*libepoll_epoll_shim_close)(int);
+int     (*libepoll_epoll_shim_poll) (struct pollfd[], nfds_t, int);
+int     (*libepoll_epoll_shim_ppoll)(struct pollfd[], nfds_t, const struct timespec* restrict, const sigset_t* restrict);
+int     (*libepoll_epoll_shim_fcntl)(int, int, ...);
+
+static int dummy() {
+  return -1;
+}
+
 __attribute__((constructor(101)))
 static void shim_init(int argc, char** argv, char** env) {
 
-  fprintf(stderr, "shim init\n");
+  Link_map* link_map = NULL;
+
+  int err = dlinfo(RTLD_SELF, RTLD_DI_LINKMAP, &link_map);
+  assert(err == 0);
+
+  fprintf(stderr, "%s: shim init\n", link_map->l_name);
 
   char* short_program_name = basename(argv[0]);
 
@@ -80,6 +103,36 @@ static void shim_init(int argc, char** argv, char** env) {
   shim_env  = env;
   shim_argc = argc;
   shim_argv = argv;
+
+  void* libepoll = dlopen("libepoll-shim.so.0", RTLD_LAZY);
+  if (libepoll != NULL) {
+#define E(sym) libepoll_##sym = dlsym(libepoll, #sym); assert(libepoll_##sym != NULL);
+    E(epoll_create);
+    E(epoll_create1);
+    E(epoll_ctl);
+    E(epoll_wait);
+    E(epoll_pwait);
+    E(epoll_shim_read);
+    E(epoll_shim_write);
+    E(epoll_shim_close);
+    E(epoll_shim_poll);
+    E(epoll_shim_ppoll);
+    E(epoll_shim_fcntl);
+#undef E
+  } else {
+    fprintf(stderr, "%s: unable to load libepoll-shim.so.0 (%s)\n", link_map->l_name, dlerror());
+    libepoll_epoll_create     = dummy;
+    libepoll_epoll_create1    = dummy;
+    libepoll_epoll_ctl        = dummy;
+    libepoll_epoll_wait       = dummy;
+    libepoll_epoll_pwait      = dummy;
+    libepoll_epoll_shim_read  = read;
+    libepoll_epoll_shim_write = write;
+    libepoll_epoll_shim_close = close;
+    libepoll_epoll_shim_poll  = poll;
+    libepoll_epoll_shim_ppoll = ppoll;
+    libepoll_epoll_shim_fcntl = fcntl;
+  }
 }
 
 extern int __cxa_atexit(void (*)(void*), void*, void*);

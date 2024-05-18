@@ -169,3 +169,23 @@ int shim_access_impl(const char* path, int mode) {
 }
 
 SHIM_WRAP(access);
+
+extern ssize_t (*libepoll_epoll_shim_read) (int, void*, size_t);
+extern ssize_t (*libepoll_epoll_shim_write)(int, const void*, size_t);
+extern int     (*libepoll_epoll_shim_close)(int);
+
+ssize_t shim_read_impl(int fd, void *buf, size_t nbytes) {
+  return libepoll_epoll_shim_read(fd, buf, nbytes);
+}
+
+ssize_t shim_write_impl(int fd, const void* buf, size_t nbytes) {
+  return libepoll_epoll_shim_write(fd, buf, nbytes);
+}
+
+int shim_close_impl(int fd) {
+  return libepoll_epoll_shim_close(fd);
+}
+
+SHIM_WRAP(read);
+SHIM_WRAP(write);
+SHIM_WRAP(close);
