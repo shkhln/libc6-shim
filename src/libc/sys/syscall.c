@@ -43,6 +43,10 @@
 #define LINUX_MEMFD_CREATE    319
 #endif
 
+#define LINUX_MFD_CLOEXEC       0x01
+#define LINUX_MFD_ALLOW_SEALING 0x02
+#define LINUX_MFD_EXEC          0x10
+
 void* shim_mmap_impl(void*, size_t, int, int, int, linux_off_t);
 int   shim_open_impl(const char*, int, va_list);
 
@@ -198,12 +202,16 @@ long shim_syscall_impl(long number, va_list args) {
 
   if (number == LINUX_MEMFD_CREATE) {
 #if __FreeBSD_version >= 1300139
-    char* name  = va_arg(args, char*);
-    int   flags = va_arg(args, int);
+    char* name        = va_arg(args, char*);
+    int   linux_flags = va_arg(args, int);
 
-    LOG("%s: memfd_create(\"%s\", 0x%x)", __func__, name, flags);
+    LOG("%s: memfd_create(\"%s\", 0x%x)", __func__, name, linux_flags);
 
-    assert((flags & (MFD_CLOEXEC | MFD_ALLOW_SEALING)) == flags);
+    assert((linux_flags & ~(LINUX_MFD_CLOEXEC | LINUX_MFD_ALLOW_SEALING | LINUX_MFD_EXEC)) == 0);
+
+    int flags = 0;
+    if (linux_flags & LINUX_MFD_CLOEXEC)       flags |= MFD_CLOEXEC;
+    if (linux_flags & LINUX_MFD_ALLOW_SEALING) flags |= MFD_ALLOW_SEALING;
 
     int err = memfd_create(name, flags);
 
