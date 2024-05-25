@@ -22,22 +22,21 @@ def libmap(target_dir)
   libglx_path = File.join(target_dir, "libGLX_nvidia.so.#{DRIVER_VERSION}")
 
   lmap = {
-    'libgl_nvidia' => libglx_path,
-    'libGL.so'     => libglx_path, # no glvnd
-    'libGL.so.1'   => libglx_path  # no glvnd
+    'libgl_nvidia' => libglx_path
   }
 
-  for path in Dir[File.join(target_dir, 'lib{cuda.so*,nvcuvid.so*,nvidia-*.so*,GLX_nvidia*.so*}')]
+  for path in Dir[File.join(target_dir, 'lib{cuda.so*,nvcuvid.so*,nvidia-*.so*,{EGL,GLX}_nvidia*.so*}')]
     lmap[File.basename(path)] = path
   end
 
   lmap.map{|k, v| '%-40s %s' % [k, v]}.sort.join("\n")
 end
 
-ENV['LD_LIBMAP']        = [libmap(NVIDIA_LIB64_DIR), ENV['LD_LIBMAP']   ].compact.join("\n")
-ENV['LD_32_LIBMAP']     = [libmap(NVIDIA_LIB32_DIR), ENV['LD_32_LIBMAP']].compact.join("\n")
+ENV['LD_LIBMAP']                 = [libmap(NVIDIA_LIB64_DIR), ENV['LD_LIBMAP']   ].compact.join("\n")
+ENV['LD_32_LIBMAP']              = [libmap(NVIDIA_LIB32_DIR), ENV['LD_32_LIBMAP']].compact.join("\n")
 
-ENV['OCL_ICD_VENDORS']  = File.join(__dir__, '../icds/ocl')
-ENV['VK_ICD_FILENAMES'] = File.join(__dir__, '../icds/vk/nv.json')
+ENV['__GLX_VENDOR_LIBRARY_NAME'] = 'nvidia'
+ENV['OCL_ICD_VENDORS']           = File.join(__dir__, '../icds/ocl')
+ENV['VK_ICD_FILENAMES']          = File.join(__dir__, '../icds/vk/nv.json')
 
 exec([File.join(__dir__, 'with-glibc-shim')] * 2, *ARGV)
