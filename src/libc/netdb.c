@@ -30,7 +30,18 @@ struct linux_addrinfo {
 #define LINUX_AI_ALL          0x10
 #define LINUX_AI_ADDRCONFIG   0x20
 
+#define KNOWN_LINUX_AI_FLAGS ( \
+  LINUX_AI_PASSIVE     |       \
+  LINUX_AI_CANONNAME   |       \
+  LINUX_AI_NUMERICHOST |       \
+  LINUX_AI_V4MAPPED    |       \
+  LINUX_AI_ALL         |       \
+  LINUX_AI_ADDRCONFIG          \
+)
+
 static int linux_to_native_ai_flags(int linux_flags) {
+
+  assert((linux_flags & ~KNOWN_LINUX_AI_FLAGS) == 0);
 
   int flags = 0;
 
@@ -101,17 +112,12 @@ int shim_getaddrinfo_impl(const char* hostname, const char* servname, const linu
   struct addrinfo* list_head;
   int err = getaddrinfo(hostname, servname, &hints, &list_head);
   if (err == 0) {
-    struct addrinfo* info       = list_head;
-    linux_addrinfo*  linux_info = copy_addrinfo(info);
-    *res = linux_info;
-    info = info->ai_next;
-
-    while (info != NULL) {
+    linux_addrinfo* linux_info = (*res = copy_addrinfo(list_head));
+    for (struct addrinfo* info = list_head->ai_next; info != NULL; info = info->ai_next) {
       linux_info->ai_next = copy_addrinfo(info);
       linux_info = linux_info->ai_next;
-      info = info->ai_next;
     }
-
+    linux_info->ai_next = NULL;
     freeaddrinfo(list_head);
   }
 
@@ -139,9 +145,17 @@ SHIM_WRAP(freeaddrinfo);
 #define LINUX_NI_NAMEREQD     8
 #define LINUX_NI_DGRAM       16
 
+#define KNOWN_LINUX_NI_FLAGS ( \
+  LINUX_NI_NUMERICHOST |       \
+  LINUX_NI_NUMERICSERV |       \
+  LINUX_NI_NOFQDN      |       \
+  LINUX_NI_NAMEREQD    |       \
+  LINUX_NI_DGRAM               \
+)
+
 static int linux_to_native_ni_flags(int linux_flags) {
 
-  assert((linux_flags & (LINUX_NI_NUMERICHOST | LINUX_NI_NUMERICSERV | LINUX_NI_NOFQDN | LINUX_NI_NAMEREQD | LINUX_NI_DGRAM)) == linux_flags);
+  assert((linux_flags & ~KNOWN_LINUX_NI_FLAGS) == 0);
 
   int flags = 0;
 
