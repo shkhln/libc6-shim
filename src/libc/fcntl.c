@@ -70,6 +70,9 @@ int shim_fcntl_impl(int fd, int cmd, va_list args) {
   if (cmd == LINUX_F_GETFL) {
     LOG("%s: cmd = F_GETFL", __func__);
     int flags       = libepoll_epoll_shim_fcntl(fd, F_GETFL);
+
+    assert((flags & ~(O_RDWR | O_NONBLOCK)) == 0);
+
     int linux_flags =
       (flags & O_RDWR     ? LINUX_O_RDWR     : 0) |
       (flags & O_NONBLOCK ? LINUX_O_NONBLOCK : 0);
@@ -81,7 +84,7 @@ int shim_fcntl_impl(int fd, int cmd, va_list args) {
     int linux_flags = va_arg(args, int);
     LOG("%s: cmd = F_SETFL, arg = 0x%x", __func__, linux_flags);
 
-    assert((linux_flags & (LINUX_O_RDWR | LINUX_O_NONBLOCK)) == linux_flags);
+    assert((linux_flags & ~(LINUX_O_RDWR | LINUX_O_NONBLOCK)) == 0);
 
     int flags =
       (linux_flags & LINUX_O_RDWR     ? O_RDWR     : 0) |
