@@ -60,7 +60,9 @@ long shim_syscall_impl(long number, va_list args) {
 
     LOG("%s: write(%d, %p, %zu)", __func__, fd, buf, nbytes);
 
-    int n = write(fd, buf, nbytes);
+    extern ssize_t (*libepoll_epoll_shim_write)(int, const void*, size_t);
+
+    int n = libepoll_epoll_shim_write(fd, buf, nbytes);
     LOG("%s: write -> %d", __func__, n);
 
     return n;

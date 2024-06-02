@@ -23,6 +23,7 @@ static char** shim_env  = NULL;
 static int    shim_argc = 0;
 static char** shim_argv = NULL;
 
+// we don't route fread/fwrite through libepoll-shim, should we?
 int     (*libepoll_epoll_create)    (int);
 int     (*libepoll_epoll_create1)   (int);
 int     (*libepoll_epoll_ctl)       (int, int, int, struct epoll_event*);

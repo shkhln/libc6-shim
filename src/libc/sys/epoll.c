@@ -1,3 +1,5 @@
+#define EPOLL_SHIM_DISABLE_WRAPPER_MACROS
+
 #include <unistd.h>
 #include <sys/epoll.h>
 #include "../../shim.h"
