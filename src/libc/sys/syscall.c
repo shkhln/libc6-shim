@@ -203,7 +203,6 @@ long shim_syscall_impl(long number, va_list args) {
   }
 
   if (number == LINUX_MEMFD_CREATE) {
-#if __FreeBSD_version >= 1300139
     char* name        = va_arg(args, char*);
     int   linux_flags = va_arg(args, int);
 
@@ -220,10 +219,6 @@ long shim_syscall_impl(long number, va_list args) {
     LOG("%s: memfd_create -> %d", __func__, err);
 
     return err;
-#else
-    errno = native_to_linux_errno(ENOSYS);
-    return -1;
-#endif
   }
 
   UNIMPLEMENTED_ARGS("%ld, ...", number);

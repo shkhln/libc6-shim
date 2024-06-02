@@ -137,13 +137,9 @@ int shim_fcntl_impl(int fd, int cmd, va_list args) {
   }
 
   if (cmd == LINUX_F_ADD_SEALS) {
-#if __FreeBSD_version >= 1300139
     int flags = va_arg(args, int);
     LOG("%s: cmd = LINUX_F_ADD_SEALS, arg = 0x%x", __func__, flags);
     return libepoll_epoll_shim_fcntl(fd, F_ADD_SEALS, flags);
-#else
-    return -1;
-#endif
   }
 
   UNIMPLEMENTED_ARGS("%d, %d, ...", fd, cmd);
