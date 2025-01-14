@@ -64,10 +64,13 @@
 #define LINUX_SO_ACCEPTCONN 30
 #define LINUX_SO_PROTOCOL   38
 
-#define LINUX_TCP_NODELAY       1
-#define LINUX_TCP_USER_TIMEOUT 18
+#define LINUX_IP_TOS            1
+#define LINUX_IP_RECVTOS       13
 
 #define LINUX_IPV6_V6ONLY      26
+
+#define LINUX_TCP_NODELAY       1
+#define LINUX_TCP_USER_TIMEOUT 18
 
 #define LINUX_MSG_OOB          0x00000001
 #define LINUX_MSG_PEEK         0x00000002

@@ -258,6 +258,21 @@ int shim_connect_impl(int s, const linux_sockaddr* linux_name, socklen_t namelen
   }
 }
 
+// we assume that CMSG_DATA is in the same place for both structs
+_Static_assert(_ALIGN(sizeof(struct linux_cmsghdr)) == _ALIGN(sizeof(struct cmsghdr)), "");
+
+#define LINUX_CMSG_DATA CMSG_DATA
+#define LINUX_CMSG_LEN  CMSG_LEN
+
+// on AMD64 cmsg_len on FreeBSD is smaller than cmsg_len on Linux,
+// but since this is a little-endian arch we don't really care
+#if defined(__x86_64__) || defined(__i386__)
+_Static_assert(offsetof(struct linux_msghdr, msg_control) == offsetof(struct msghdr, msg_control), "");
+#define LINUX_CMSG_FIRSTHDR(msg)     (struct linux_cmsghdr*)CMSG_FIRSTHDR(msg)
+#define LINUX_CMSG_NXTHDR(msg, cmsg) (struct linux_cmsghdr*)CMSG_NXTHDR(msg, cmsg)
+#endif
+
+// we also assume the payload itself has the same layout and size
 static void linux_to_native_msghdr(struct msghdr* msg, const struct linux_msghdr* linux_msg) {
 
   msg->msg_name    = linux_msg->msg_name;
@@ -271,11 +286,11 @@ static void linux_to_native_msghdr(struct msghdr* msg, const struct linux_msghdr
     assert(msg->msg_controllen >= linux_msg->msg_controllen);
     msg->msg_controllen = linux_msg->msg_controllen;
 
-    memset(msg->msg_control, 0, linux_msg->msg_controllen);
-
-    struct linux_cmsghdr* linux_cmsg = (struct linux_cmsghdr*)CMSG_FIRSTHDR(linux_msg);
-    while (linux_cmsg != NULL) {
-      struct cmsghdr* cmsg = (struct cmsghdr*)((uint8_t*)msg->msg_control + ((uint64_t)linux_cmsg - (uint64_t)linux_msg->msg_control));
+    for (struct linux_cmsghdr* linux_cmsg = LINUX_CMSG_FIRSTHDR(linux_msg);
+      linux_cmsg != NULL; linux_cmsg = LINUX_CMSG_NXTHDR(linux_msg, linux_cmsg))
+    {
+      struct cmsghdr* cmsg = (struct cmsghdr*)(
+        (uint8_t*)msg->msg_control + ((uintptr_t)linux_cmsg - (uintptr_t)linux_msg->msg_control));
 
       assert(linux_cmsg->cmsg_type == LINUX_SCM_RIGHTS);
 
@@ -283,22 +298,14 @@ static void linux_to_native_msghdr(struct msghdr* msg, const struct linux_msghdr
       cmsg->cmsg_level = linux_to_native_sock_level(linux_cmsg->cmsg_level);
       cmsg->cmsg_type  = SCM_RIGHTS;
 
-#ifdef __x86_64__
-      memcpy((uint8_t*)cmsg + 16, (uint8_t*)linux_cmsg + 16, linux_cmsg->cmsg_len - 16);
-#elif defined(__i386__)
-      memcpy((uint8_t*)cmsg + 12, (uint8_t*)linux_cmsg + 12, linux_cmsg->cmsg_len - 12);
-#else
-  #error
-#endif
-
-      linux_cmsg = (struct linux_cmsghdr*)CMSG_NXTHDR(linux_msg, linux_cmsg);
+      memcpy(CMSG_DATA(cmsg), LINUX_CMSG_DATA(linux_cmsg), linux_cmsg->cmsg_len - LINUX_CMSG_LEN(0));
     }
   } else {
-    msg->msg_control    = NULL;
     msg->msg_controllen = 0;
   }
 }
 
+// same assumptions as in linux_to_native_msghdr
 static void native_to_linux_msghdr(struct linux_msghdr* linux_msg, const struct msghdr* msg) {
 
   linux_msg->msg_name    = msg->msg_name;
@@ -312,31 +319,25 @@ static void native_to_linux_msghdr(struct linux_msghdr* linux_msg, const struct 
     assert(linux_msg->msg_controllen >= msg->msg_controllen);
     linux_msg->msg_controllen = msg->msg_controllen;
 
-    memset(linux_msg->msg_control, 0, msg->msg_controllen);
+    for (struct cmsghdr* cmsg = CMSG_FIRSTHDR(msg); cmsg != NULL; cmsg = CMSG_NXTHDR(msg, cmsg)) {
 
-    struct cmsghdr* cmsg = CMSG_FIRSTHDR(msg);
-    while (cmsg != NULL) {
-      struct linux_cmsghdr* linux_cmsg = (struct linux_cmsghdr*)((uint8_t*)linux_msg->msg_control + ((uint64_t)cmsg - (uint64_t)msg->msg_control));
-
-      assert(cmsg->cmsg_type == SCM_RIGHTS);
+      struct linux_cmsghdr* linux_cmsg = (struct linux_cmsghdr*)(
+        (uint8_t*)linux_msg->msg_control + ((uintptr_t)cmsg - (uintptr_t)CMSG_FIRSTHDR(msg)));
 
       linux_cmsg->cmsg_len   = cmsg->cmsg_len;
       linux_cmsg->cmsg_level = native_to_linux_sock_level(cmsg->cmsg_level);
-      linux_cmsg->cmsg_type  = LINUX_SCM_RIGHTS;
 
-#ifdef __x86_64__
-      memcpy((uint8_t*)linux_cmsg + 16, (uint8_t*)cmsg + 16, cmsg->cmsg_len - 16);
-#elif defined(__i386__)
-      memcpy((uint8_t*)linux_cmsg + 12, (uint8_t*)cmsg + 12, cmsg->cmsg_len - 12);
-#else
-  #error
-#endif
+      if (cmsg->cmsg_type == SCM_RIGHTS) {
+        linux_cmsg->cmsg_type = LINUX_SCM_RIGHTS;
+      } else if (cmsg->cmsg_level == IPPROTO_IP && cmsg->cmsg_type == IP_RECVTOS) {
+        linux_cmsg->cmsg_type = LINUX_IP_TOS;
+      } else {
+        assert(0);
+      }
 
-      cmsg = CMSG_NXTHDR(msg, cmsg);
+      memcpy(LINUX_CMSG_DATA(linux_cmsg), CMSG_DATA(cmsg), cmsg->cmsg_len - CMSG_LEN(0));
     }
-
   } else {
-    linux_msg->msg_control    = NULL;
     linux_msg->msg_controllen = 0;
   }
 }
@@ -510,10 +511,9 @@ static int linux_to_native_so_opt(int optname) {
   }
 }
 
-static int linux_to_native_tcp_opt(int optname) {
+static int linux_to_native_ip4_opt(int optname) {
   switch (optname) {
-    case LINUX_TCP_NODELAY:      return TCP_NODELAY;
-    case LINUX_TCP_USER_TIMEOUT: return -1; // ?
+    case LINUX_IP_RECVTOS: return IP_RECVTOS;
     default:
       assert(0);
   }
@@ -522,6 +522,15 @@ static int linux_to_native_tcp_opt(int optname) {
 static int linux_to_native_ip6_opt(int optname) {
   switch (optname) {
     case LINUX_IPV6_V6ONLY: return IPV6_V6ONLY;
+    default:
+      assert(0);
+  }
+}
+
+static int linux_to_native_tcp_opt(int optname) {
+  switch (optname) {
+    case LINUX_TCP_NODELAY:      return TCP_NODELAY;
+    case LINUX_TCP_USER_TIMEOUT: return -1; // ?
     default:
       assert(0);
   }
@@ -539,39 +548,34 @@ int shim_getsockopt_impl(int s, int linux_level, int linux_optname, void* restri
       } else {
         return getsockopt(s, SOL_SOCKET, linux_to_native_so_opt(linux_optname), optval, optlen);
       }
-    case LINUX_SOL_TCP:    return getsockopt(s, IPPROTO_TCP, linux_to_native_tcp_opt(linux_optname), optval, optlen);
-    case LINUX_SOL_IPV6:   return getsockopt(s, IPPROTO_TCP, linux_to_native_ip6_opt(linux_optname), optval, optlen);
+    case LINUX_SOL_IP:   return getsockopt(s, IPPROTO_IP,  linux_to_native_ip4_opt(linux_optname), optval, optlen);
+    case LINUX_SOL_IPV6: return getsockopt(s, IPPROTO_IP,  linux_to_native_ip6_opt(linux_optname), optval, optlen);
+    case LINUX_SOL_TCP:  return getsockopt(s, IPPROTO_TCP, linux_to_native_tcp_opt(linux_optname), optval, optlen);
     default:
       assert(0);
   }
 }
 
 int shim_setsockopt_impl(int s, int linux_level, int linux_optname, const void* optval, socklen_t optlen) {
-  int err;
   switch (linux_level) {
     case LINUX_SOL_SOCKET:
       if (linux_optname == LINUX_SO_SNDBUF && optval && *((int*)optval) == 0) {
-        err = 0; // ?
+        return 0; // ?
       } else if (linux_optname == LINUX_SO_PASSCRED) {
 #ifdef LOCAL_CREDS_PERSISTENT
-        err = setsockopt(s, SOL_LOCAL, LOCAL_CREDS_PERSISTENT, optval, optlen);
+        return setsockopt(s, SOL_LOCAL, LOCAL_CREDS_PERSISTENT, optval, optlen);
 #else
-        err = -1;
+        return -1;
 #endif
       } else {
-        err = setsockopt(s, SOL_SOCKET, linux_to_native_so_opt(linux_optname), optval, optlen);
+        return setsockopt(s, SOL_SOCKET, linux_to_native_so_opt(linux_optname), optval, optlen);
       }
-      break;
-    case LINUX_SOL_TCP:
-      err = setsockopt(s, IPPROTO_TCP, linux_to_native_tcp_opt(linux_optname), optval, optlen);
-      break;
-    case LINUX_SOL_IPV6:
-      err = setsockopt(s, IPPROTO_TCP, linux_to_native_ip6_opt(linux_optname), optval, optlen);
-      break;
+    case LINUX_SOL_IP:   return setsockopt(s, IPPROTO_IP,  linux_to_native_ip4_opt(linux_optname), optval, optlen);
+    case LINUX_SOL_IPV6: return setsockopt(s, IPPROTO_IP,  linux_to_native_ip6_opt(linux_optname), optval, optlen);
+    case LINUX_SOL_TCP:  return setsockopt(s, IPPROTO_TCP, linux_to_native_tcp_opt(linux_optname), optval, optlen);
     default:
       assert(0);
   }
-  return err;
 }
 
 SHIM_WRAP(getsockopt);
