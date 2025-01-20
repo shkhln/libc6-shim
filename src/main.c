@@ -37,10 +37,6 @@ int     (*libepoll_epoll_shim_poll) (struct pollfd[], nfds_t, int);
 int     (*libepoll_epoll_shim_ppoll)(struct pollfd[], nfds_t, const struct timespec* restrict, const sigset_t* restrict);
 int     (*libepoll_epoll_shim_fcntl)(int, int, ...);
 
-iconv_t (*libiconv_iconv_open) (const char*, const char*);
-int     (*libiconv_iconv_close)(iconv_t);
-size_t  (*libiconv_iconv)      (iconv_t, char** restrict, size_t* restrict, char** restrict, size_t* restrict);
-
 static int dummy() {
   return -1;
 }
@@ -138,18 +134,6 @@ static void shim_init(int argc, char** argv, char** env) {
     libepoll_epoll_shim_poll  = poll;
     libepoll_epoll_shim_ppoll = ppoll;
     libepoll_epoll_shim_fcntl = fcntl;
-  }
-
-  void* libiconv = dlopen("libiconv.so.2", RTLD_LAZY);
-  if (libiconv != NULL) {
-    libiconv_iconv_open  = dlsym(libiconv, "libiconv_open");  assert(libiconv_iconv_open  != NULL);
-    libiconv_iconv_close = dlsym(libiconv, "libiconv_close"); assert(libiconv_iconv_close != NULL);
-    libiconv_iconv       = dlsym(libiconv, "libiconv");       assert(libiconv_iconv       != NULL);
-  } else {
-    fprintf(stderr, "%s: unable to load libiconv.so.2 (%s)\n", link_map->l_name, dlerror());
-    libiconv_iconv_open  = iconv_open;
-    libiconv_iconv_close = iconv_close;
-    libiconv_iconv       = iconv;
   }
 }
 
