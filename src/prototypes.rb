@@ -1650,7 +1650,9 @@ define(["stdio.h", "sys/types.h"], [
   "int fgetpos(FILE* restrict stream, fpos_t* restrict pos)",
   "int fsetpos(FILE* stream, const fpos_t* pos)",
   "int fseeko(FILE* stream, off_t offset, int whence)",
-  "off_t ftello(FILE* stream)"
+  "int fseeko64(FILE* stream, off64_t offset, int whence)",
+  "off_t ftello(FILE* stream)",
+  "off64_t ftello64(FILE* stream)"
 ])
 
 # FGETS(3)

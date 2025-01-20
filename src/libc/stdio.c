@@ -103,3 +103,15 @@ int shim_fgetpos64_impl(FILE* stream, linux_fpos64_t* pos) {
 }
 
 SHIM_WRAP(fgetpos64);
+
+int shim_fseeko64_impl(FILE* stream, linux_off64_t offset, int whence) {
+  return fseeko(stream, offset, whence);
+}
+
+SHIM_WRAP(fseeko64);
+
+linux_off64_t shim_ftello64_impl(FILE* stream) {
+  return ftello(stream);
+}
+
+SHIM_WRAP(ftello64);
