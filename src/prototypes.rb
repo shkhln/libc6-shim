@@ -3545,6 +3545,7 @@ lsb_define([
   "int initstate_r(unsigned int seed, char* statebuf, size_t statelen, struct random_data* buffer)",
   "int inotify_add_watch(int fd, const char* path, uint32_t mask)",
   "int inotify_init(void)",
+  "int inotify_init1(int)",
   "int inotify_rm_watch(int fd, int wd)",
   "int jrand48_r(unsigned short xsubi[3], struct drand48_data* buffer, long int* result)",
   "int lcong48_r(unsigned short param[7], struct drand48_data* buffer)",
