@@ -50,20 +50,58 @@ int shim_sigaction_impl(int sig, const struct sigaction* act, const struct sigac
   return -1;
 }
 
-int shim_sigaddset_impl(sigset_t* set, int signo) {
-  UNIMPLEMENTED();
+#define LINUX_SIGBUS   7
+#define LINUX_SIGUSR1 10
+#define LINUX_SIGUSR2 12
+#define LINUX_SIGCHLD 17
+#define LINUX_SIGCONT 18
+#define LINUX_SIGSTOP 19
+#define LINUX_SIGTSTP 20
+#define LINUX_SIGURG  23
+#define LINUX_SIGIO   29
+#define LINUX_SIGSYS  31
+
+int linux_to_freebsd_signo(int linux_signal) {
+
+  if (linux_signal < 7 || linux_signal == 11
+    || (linux_signal >  7 && linux_signal < 10)
+    || (linux_signal > 12 && linux_signal < 17)
+    || (linux_signal > 20 && linux_signal < 23)
+    || (linux_signal > 23 && linux_signal < 29))
+  {
+    return linux_signal;
+  }
+
+  switch (linux_signal) {
+    case LINUX_SIGBUS:  return SIGBUS;
+    case LINUX_SIGUSR1: return SIGUSR1;
+    case LINUX_SIGUSR2: return SIGUSR2;
+    case LINUX_SIGCHLD: return SIGCHLD;
+    case LINUX_SIGCONT: return SIGCONT;
+    case LINUX_SIGSTOP: return SIGSTOP;
+    case LINUX_SIGTSTP: return SIGTSTP;
+    case LINUX_SIGURG:  return SIGURG;
+    case LINUX_SIGIO:   return SIGIO;
+    case LINUX_SIGSYS:  return SIGSYS;
+    default:
+      return -1;
+  }
 }
 
-int shim_sigdelset_impl(sigset_t* set, int signo) {
-  UNIMPLEMENTED();
+int shim_sigaddset_impl(sigset_t* set, int linux_signo) {
+  return sigaddset(set, linux_to_freebsd_signo(linux_signo));
+}
+
+int shim_sigdelset_impl(sigset_t* set, int linux_signo) {
+  return sigdelset(set, linux_to_freebsd_signo(linux_signo));
 }
 
 int shim_siginterrupt_impl(int sig, int flag) {
   UNIMPLEMENTED();
 }
 
-int shim_sigismember_impl(const sigset_t* set, int signo) {
-  UNIMPLEMENTED();
+int shim_sigismember_impl(const sigset_t* set, int linux_signo) {
+  return sigismember(set, linux_to_freebsd_signo(linux_signo));
 }
 
 int shim_sigqueue_impl(pid_t pid, int signo, const union sigval value) {
