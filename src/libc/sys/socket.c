@@ -267,7 +267,8 @@ _Static_assert(_ALIGN(sizeof(struct linux_cmsghdr)) == _ALIGN(sizeof(struct cmsg
 // on AMD64 cmsg_len on FreeBSD is smaller than cmsg_len on Linux,
 // but since this is a little-endian arch we don't really care
 #if defined(__x86_64__) || defined(__i386__)
-_Static_assert(offsetof(struct linux_msghdr, msg_control) == offsetof(struct msghdr, msg_control), "");
+_Static_assert(offsetof(struct linux_msghdr,  msg_control) == offsetof(struct msghdr,  msg_control), "");
+_Static_assert(offsetof(struct linux_cmsghdr, cmsg_len)    == offsetof(struct cmsghdr, cmsg_len),    "");
 #define LINUX_CMSG_FIRSTHDR(msg)     (struct linux_cmsghdr*)CMSG_FIRSTHDR(msg)
 #define LINUX_CMSG_NXTHDR(msg, cmsg) (struct linux_cmsghdr*)CMSG_NXTHDR(msg, cmsg)
 #endif
@@ -536,6 +537,7 @@ static int linux_to_native_tcp_opt(int optname) {
   }
 }
 
+//TODO: verify that SO_PASSCRED actually works
 int shim_getsockopt_impl(int s, int linux_level, int linux_optname, void* restrict optval, socklen_t* restrict optlen) {
   switch (linux_level) {
     case LINUX_SOL_SOCKET:
