@@ -22,7 +22,7 @@ struct NvUvmInitParams
 #define LINUX_FIONBIO        0x5421
 #define LINUX_SNDCTL_SYSINFO 0x84f85801
 
-int shim_ioctl_impl(int fd, unsigned long request, va_list args) {
+static int shim_ioctl_impl(int fd, unsigned long request, va_list args) {
 
   int m = request & 0xffff;
   if ((m >= 0x4600 && m <= 0x46ff) /* nvidia */ || m == 0x6d00 /* nvidia-modeset */) {

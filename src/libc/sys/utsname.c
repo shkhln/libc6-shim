@@ -3,7 +3,7 @@
 #include "../../shim.h"
 #include "utsname.h"
 
-int shim_uname_impl(struct linux_utsname* linux_name) {
+static int shim_uname_impl(struct linux_utsname* linux_name) {
 
   struct utsname name;
 

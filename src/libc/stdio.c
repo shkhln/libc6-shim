@@ -9,11 +9,11 @@
 #include <sys/sysctl.h>
 #include "../shim.h"
 
-int shim___isoc99_fscanf_impl(FILE* restrict stream, const char* restrict format, va_list args) {
+static int shim___isoc99_fscanf_impl(FILE* restrict stream, const char* restrict format, va_list args) {
   return vfscanf(stream, format, args);
 }
 
-FILE* shim_fopen_impl(const char* path, const char* mode) {
+static FILE* shim_fopen_impl(const char* path, const char* mode) {
 
   if (strcmp(path, "/proc/driver/nvidia/params") == 0) {
 
@@ -46,11 +46,11 @@ FILE* shim_fopen_impl(const char* path, const char* mode) {
   return fopen(p, mode);
 }
 
-FILE* shim_fopen64_impl(const char* path, const char* mode) {
+static FILE* shim_fopen64_impl(const char* path, const char* mode) {
   return shim_fopen_impl(path, mode);
 }
 
-int shim_remove_impl(const char* path) {
+static int shim_remove_impl(const char* path) {
   assert(str_starts_with(path, "/dev/char/195:") || !str_starts_with(path, "/dev/"));
   return remove(path);
 }
@@ -60,33 +60,33 @@ SHIM_WRAP(fopen);
 SHIM_WRAP(fopen64);
 SHIM_WRAP(remove);
 
-int shim___printf_chk_impl(int flag, const char* format, va_list args) {
+static int shim___printf_chk_impl(int flag, const char* format, va_list args) {
   return vprintf(format, args);
 }
 
-int shim___snprintf_chk_impl(char* str, size_t maxlen, int flag, size_t strlen, const char* format, va_list args) {
+static int shim___snprintf_chk_impl(char* str, size_t maxlen, int flag, size_t strlen, const char* format, va_list args) {
   assert(flag == 1 && strlen >= maxlen);
   return vsnprintf(str, maxlen, format, args);
 }
 
-int shim___vsnprintf_chk_impl(char* str, size_t maxlen, int flag, size_t strlen, const char* format, va_list args) {
+static int shim___vsnprintf_chk_impl(char* str, size_t maxlen, int flag, size_t strlen, const char* format, va_list args) {
   assert(flag == 1 && strlen >= maxlen);
   return vsnprintf(str, maxlen, format, args);
 }
 
-int shim___fprintf_chk_impl(FILE* stream, int flag, const char* format, va_list args) {
+static int shim___fprintf_chk_impl(FILE* stream, int flag, const char* format, va_list args) {
   return vfprintf(stream, format, args);
 }
 
-int shim___sprintf_chk_impl(char* str, int flag, size_t strlen, const char* format, va_list args) {
+static int shim___sprintf_chk_impl(char* str, int flag, size_t strlen, const char* format, va_list args) {
   return vsprintf(str, format, args);
 }
 
-int shim___vasprintf_chk_impl(char** ret, int flags, const char* format, va_list args) {
+static int shim___vasprintf_chk_impl(char** ret, int flags, const char* format, va_list args) {
   return vasprintf(ret, format, args);
 }
 
-int shim___vfprintf_chk_impl(FILE* stream, int flag, const char* format, va_list args) {
+static int shim___vfprintf_chk_impl(FILE* stream, int flag, const char* format, va_list args) {
   return vfprintf(stream, format, args);
 }
 
@@ -98,19 +98,19 @@ SHIM_WRAP(__sprintf_chk);
 SHIM_WRAP(__vasprintf_chk);
 SHIM_WRAP(__vfprintf_chk);
 
-int shim_fgetpos64_impl(FILE* stream, linux_fpos64_t* pos) {
+static int shim_fgetpos64_impl(FILE* stream, linux_fpos64_t* pos) {
   return fgetpos(stream, pos);
 }
 
 SHIM_WRAP(fgetpos64);
 
-int shim_fseeko64_impl(FILE* stream, linux_off64_t offset, int whence) {
+static int shim_fseeko64_impl(FILE* stream, linux_off64_t offset, int whence) {
   return fseeko(stream, offset, whence);
 }
 
 SHIM_WRAP(fseeko64);
 
-linux_off64_t shim_ftello64_impl(FILE* stream) {
+static linux_off64_t shim_ftello64_impl(FILE* stream) {
   return ftello(stream);
 }
 

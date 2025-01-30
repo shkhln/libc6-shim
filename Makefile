@@ -10,7 +10,7 @@ LIBS      = $(BUILD_DIR)/lib64/libc6.so \
             $(BUILD_DIR)/lib32/libc6-debug.so
 
 CFLAGS    = -std=c99 -Wall -Wextra -Wno-unused-parameter -Wno-incompatible-pointer-types-discards-qualifiers \
- -shared -fPIC -Wl,-soname,librt.so.1 -Wl,--version-script=src/shim.map -I/usr/local/include/libepoll-shim
+ -shared -fPIC -Wl,-soname,librt.so.1 -Wl,--version-script=src/shim.map -Wl,--no-undefined -I/usr/local/include/libepoll-shim
 
 CCTYPE != $(CC) --version | grep -q clang && echo clang || true
 .if $(CCTYPE) == "clang"

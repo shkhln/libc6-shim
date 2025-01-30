@@ -34,7 +34,7 @@ static void copy_statfs64_buf(linux_statfs64* dst, struct statfs* src) {
   dst->f_flags   = 0; // ?
 }
 
-int shim_fstatfs_impl(int fd, linux_statfs* linux_buf) {
+static int shim_fstatfs_impl(int fd, linux_statfs* linux_buf) {
 
   struct statfs buf;
 
@@ -46,7 +46,7 @@ int shim_fstatfs_impl(int fd, linux_statfs* linux_buf) {
   return err;
 }
 
-int shim_fstatfs64_impl(int fd, linux_statfs64* linux_buf) {
+static int shim_fstatfs64_impl(int fd, linux_statfs64* linux_buf) {
 
   struct statfs buf;
 
@@ -58,7 +58,7 @@ int shim_fstatfs64_impl(int fd, linux_statfs64* linux_buf) {
   return err;
 }
 
-int shim_statfs_impl(const char* path, linux_statfs* linux_buf) {
+static int shim_statfs_impl(const char* path, linux_statfs* linux_buf) {
 
   struct statfs buf;
 
@@ -70,7 +70,7 @@ int shim_statfs_impl(const char* path, linux_statfs* linux_buf) {
   return err;
 }
 
-int shim_statfs64_impl(const char* path, linux_statfs64* linux_buf) {
+static int shim_statfs64_impl(const char* path, linux_statfs64* linux_buf) {
 
   struct statfs buf;
 

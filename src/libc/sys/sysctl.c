@@ -5,7 +5,7 @@
 
 #include "../../shim.h"
 
-int shim_sysctl_impl(int* name, int namelen, void* oldp, size_t* oldlenp, void* newp, size_t newlen) {
+static int shim_sysctl_impl(int* name, int namelen, void* oldp, size_t* oldlenp, void* newp, size_t newlen) {
   UNIMPLEMENTED();
 }
 

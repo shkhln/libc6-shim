@@ -12,12 +12,12 @@
 #include "../shim.h"
 #include "fcntl.h"
 
-int shim_chown_impl(const char* path, uid_t owner, gid_t group) {
+static int shim_chown_impl(const char* path, uid_t owner, gid_t group) {
   assert(!str_starts_with(path, "/dev/"));
   return chown(path, owner, group);
 }
 
-ssize_t shim_readlink_impl(const char* path, char* buf, size_t bufsize) {
+static ssize_t shim_readlink_impl(const char* path, char* buf, size_t bufsize) {
 
   if (str_starts_with(path, "/proc/")) {
 
@@ -87,7 +87,7 @@ ssize_t shim_readlink_impl(const char* path, char* buf, size_t bufsize) {
 #define GLIBC_SC_PHYS_PAGES        85
 #define GLIBC_SC_MONOTONIC_CLOCK  149
 
-long shim_sysconf_impl(int name) {
+static long shim_sysconf_impl(int name) {
 
   if (name == GLIBC_SC_NPROCESSORS_CONF) {
     return sysconf(_SC_NPROCESSORS_CONF);
@@ -112,7 +112,7 @@ long shim_sysconf_impl(int name) {
   UNIMPLEMENTED_ARGS("%d", name);
 }
 
-int shim_ftruncate64_impl(int fd, linux_off64_t length) {
+static int shim_ftruncate64_impl(int fd, linux_off64_t length) {
   return ftruncate(fd, length);
 }
 
@@ -135,13 +135,13 @@ int shim_pipe2_impl(int fildes[2], int linux_flags) {
 
 SHIM_WRAP(pipe2);
 
-linux_off64_t shim_lseek64_impl(int fd, linux_off64_t offset, int whence) {
+static linux_off64_t shim_lseek64_impl(int fd, linux_off64_t offset, int whence) {
   return lseek(fd, offset, whence);
 }
 
 SHIM_WRAP(lseek64);
 
-int shim_getopt_impl(int argc, char* const argv[], const char* optstring) {
+static int shim_getopt_impl(int argc, char* const argv[], const char* optstring) {
 
   optind = *globals.optind;
   opterr = *globals.opterr;
@@ -157,7 +157,7 @@ int shim_getopt_impl(int argc, char* const argv[], const char* optstring) {
 
 SHIM_WRAP(getopt);
 
-int shim_access_impl(const char* path, int mode) {
+static int shim_access_impl(const char* path, int mode) {
 
   char* p = redirect(path);
   if (p == NULL) {
@@ -174,15 +174,15 @@ extern ssize_t (*libepoll_epoll_shim_read) (int, void*, size_t);
 extern ssize_t (*libepoll_epoll_shim_write)(int, const void*, size_t);
 extern int     (*libepoll_epoll_shim_close)(int);
 
-ssize_t shim_read_impl(int fd, void *buf, size_t nbytes) {
+static ssize_t shim_read_impl(int fd, void *buf, size_t nbytes) {
   return libepoll_epoll_shim_read(fd, buf, nbytes);
 }
 
-ssize_t shim_write_impl(int fd, const void* buf, size_t nbytes) {
+static ssize_t shim_write_impl(int fd, const void* buf, size_t nbytes) {
   return libepoll_epoll_shim_write(fd, buf, nbytes);
 }
 
-int shim_close_impl(int fd) {
+static int shim_close_impl(int fd) {
   return libepoll_epoll_shim_close(fd);
 }
 

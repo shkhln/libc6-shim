@@ -19,7 +19,7 @@ SHIM_EXPORT(tzname);
 extern char** shim___tzname __attribute__((alias("shim_tzname")));
 SHIM_EXPORT(__tzname);
 
-void shim_tzset_impl() {
+static void shim_tzset_impl() {
   tzset();
   strlcpy(shim_tzname_0, tzname[0], sizeof(shim_tzname_0));
   strlcpy(shim_tzname_1, tzname[1], sizeof(shim_tzname_1));
@@ -50,11 +50,11 @@ int shim_clock_gettime_impl(linux_clockid_t linux_clock_id, linux_timespec* tp) 
 
 SHIM_WRAP(clock_gettime);
 
-size_t shim_strftime_l_impl(char* restrict buf, size_t maxsize, const char* restrict format, const linux_tm* restrict timeptr, linux_locale_t loc) {
+static size_t shim_strftime_l_impl(char* restrict buf, size_t maxsize, const char* restrict format, const linux_tm* restrict timeptr, linux_locale_t loc) {
   return strftime_l(buf, maxsize, format, timeptr, loc->native_locale);
 }
 
-char* shim_strptime_l_impl(const char* restrict buf, const char* restrict format, linux_tm* restrict timeptr, linux_locale_t loc) {
+static char* shim_strptime_l_impl(const char* restrict buf, const char* restrict format, linux_tm* restrict timeptr, linux_locale_t loc) {
   return strptime_l(buf, format, timeptr, loc->native_locale);
 }
 

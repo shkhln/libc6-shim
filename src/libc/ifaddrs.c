@@ -122,7 +122,7 @@ static struct linux_ifaddrs* copy_ifaddrs(struct ifaddrs* ifa) {
   return linux_ifa;
 }
 
-int shim_getifaddrs_impl(linux_ifaddrs** res) {
+static int shim_getifaddrs_impl(linux_ifaddrs** res) {
 
   struct ifaddrs* list_head;
   int err = getifaddrs(&list_head);
@@ -144,7 +144,7 @@ int shim_getifaddrs_impl(linux_ifaddrs** res) {
   return err;
 }
 
-void shim_freeifaddrs_impl(linux_ifaddrs* ifa) {
+static void shim_freeifaddrs_impl(linux_ifaddrs* ifa) {
   while (ifa != NULL) {
     linux_ifaddrs* next = ifa->ifa_next;
 

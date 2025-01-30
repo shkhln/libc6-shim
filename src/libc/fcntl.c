@@ -53,7 +53,7 @@ static void copy_linux_flock(struct flock* dst, struct linux_flock* src) {
 
 extern int (*libepoll_epoll_shim_fcntl)(int, int, ...);
 
-int shim_fcntl_impl(int fd, int cmd, va_list args) {
+static int shim_fcntl_impl(int fd, int cmd, va_list args) {
 
   if (cmd == LINUX_F_GETFD) {
     LOG("%s: cmd = F_GETFD", __func__);
@@ -145,7 +145,7 @@ int shim_fcntl_impl(int fd, int cmd, va_list args) {
   UNIMPLEMENTED_ARGS("%d, %d, ...", fd, cmd);
 }
 
-int shim_fcntl64_impl(int fd, int cmd, va_list args) {
+static int shim_fcntl64_impl(int fd, int cmd, va_list args) {
   return shim_fcntl_impl(fd, cmd, args);
 }
 
@@ -186,11 +186,11 @@ int shim_open_impl(const char* path, int linux_flags, va_list args) {
   return open(p, flags, mode);
 }
 
-int shim_open64_impl(const char* path, int linux_flags, va_list args) {
+static int shim_open64_impl(const char* path, int linux_flags, va_list args) {
   return shim_open_impl(path, linux_flags, args);
 }
 
-int shim_posix_fallocate64_impl(int fd, linux_off64_t offset, linux_off64_t len) {
+static int shim_posix_fallocate64_impl(int fd, linux_off64_t offset, linux_off64_t len) {
   return posix_fallocate(fd, offset, len);
 }
 
@@ -200,7 +200,7 @@ SHIM_WRAP(open);
 SHIM_WRAP(open64);
 SHIM_WRAP(posix_fallocate64);
 
-int shim_shm_open_impl(const char* path, int linux_flags, linux_mode_t mode) {
+static int shim_shm_open_impl(const char* path, int linux_flags, linux_mode_t mode) {
 
   char buf[PATH_MAX];
   snprintf(buf, sizeof(buf), "/compat/linux/dev/shm%s", path);

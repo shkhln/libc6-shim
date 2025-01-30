@@ -119,57 +119,57 @@ static struct linux_dirent64* insert_entry64(struct shim_directory* shim_dir, st
   return linux_entry64;
 }
 
-struct shim_directory* shim_fdopendir_impl(int fd) {
+static struct shim_directory* shim_fdopendir_impl(int fd) {
   DIR* dir = fdopendir(fd);
   return dir != NULL ? create_shim_dir(dir) : NULL;
 }
 
-struct shim_directory* shim_opendir_impl(const char* filename) {
+static struct shim_directory* shim_opendir_impl(const char* filename) {
   DIR* dir = opendir(filename);
   return dir != NULL ? create_shim_dir(dir) : NULL;
 }
 
-struct linux_dirent* shim_readdir_impl(struct shim_directory* shim_dir) {
+static struct linux_dirent* shim_readdir_impl(struct shim_directory* shim_dir) {
   struct dirent* entry = readdir(shim_dir->dir);
   return entry != NULL ? insert_entry(shim_dir, entry) : NULL;
 }
 
-struct linux_dirent64* shim_readdir64_impl(struct shim_directory* shim_dir) {
+static struct linux_dirent64* shim_readdir64_impl(struct shim_directory* shim_dir) {
   struct dirent* entry = readdir(shim_dir->dir);
   return entry != NULL ? insert_entry64(shim_dir, entry) : NULL;
 }
 
-int shim_closedir_impl(struct shim_directory* shim_dir) {
+static int shim_closedir_impl(struct shim_directory* shim_dir) {
   int err = closedir(shim_dir->dir);
   destroy_shim_dir(shim_dir);
   return err;
 }
 
-int shim_dirfd_impl(struct shim_directory* shim_dir) {
+static int shim_dirfd_impl(struct shim_directory* shim_dir) {
   return dirfd(shim_dir->dir);
 }
 
-void shim_rewinddir_impl(struct shim_directory* shim_dir) {
+static void shim_rewinddir_impl(struct shim_directory* shim_dir) {
   rewinddir(shim_dir->dir);
 }
 
-void shim_seekdir_impl(struct shim_directory* shim_dir, long loc) {
+static void shim_seekdir_impl(struct shim_directory* shim_dir, long loc) {
   seekdir(shim_dir->dir, loc);
 }
 
-long shim_telldir_impl(struct shim_directory* shim_dir) {
+static long shim_telldir_impl(struct shim_directory* shim_dir) {
   return telldir(shim_dir->dir);
 }
 
-int shim_alphasort_impl(const struct linux_dirent** d1, const struct linux_dirent** d2) {
+static int shim_alphasort_impl(const struct linux_dirent** d1, const struct linux_dirent** d2) {
   return strcoll((*d1)->d_name, (*d2)->d_name);
 }
 
-int shim_alphasort64_impl(const struct linux_dirent64** d1, const struct linux_dirent64** d2) {
+static int shim_alphasort64_impl(const struct linux_dirent64** d1, const struct linux_dirent64** d2) {
   return strcoll((*d1)->d_name, (*d2)->d_name);
 }
 
-int shim_readdir_r_impl(struct shim_directory* shim_dir, struct linux_dirent* linux_entry, struct linux_dirent** result) {
+static int shim_readdir_r_impl(struct shim_directory* shim_dir, struct linux_dirent* linux_entry, struct linux_dirent** result) {
 
   struct dirent* e = readdir(shim_dir->dir);
   if (e != NULL) {
@@ -182,7 +182,7 @@ int shim_readdir_r_impl(struct shim_directory* shim_dir, struct linux_dirent* li
   return 0;
 }
 
-int shim_readdir64_r_impl(struct shim_directory* shim_dir, struct linux_dirent64* linux_entry, struct linux_dirent64** result) {
+static int shim_readdir64_r_impl(struct shim_directory* shim_dir, struct linux_dirent64* linux_entry, struct linux_dirent64** result) {
 
   struct dirent* e = readdir(shim_dir->dir);
   if (e != NULL) {
@@ -195,7 +195,7 @@ int shim_readdir64_r_impl(struct shim_directory* shim_dir, struct linux_dirent64
   return 0;
 }
 
-int shim_scandir_impl(
+static int shim_scandir_impl(
   const char* dirname,
   linux_dirent*** linux_namelist,
   int (*select)(const struct linux_dirent*),
@@ -247,7 +247,7 @@ int shim_scandir_impl(
 }
 
 //TODO: do something about code duplication?
-int shim_scandir64_impl(
+static int shim_scandir64_impl(
   const char* dirname,
   linux_dirent64*** linux_namelist,
   int (*select)(const struct linux_dirent64*),

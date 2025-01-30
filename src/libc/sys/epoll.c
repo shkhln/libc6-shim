@@ -15,11 +15,11 @@ extern int (*libepoll_epoll_ctl)    (int, int, int, struct epoll_event*);
 extern int (*libepoll_epoll_wait)   (int, struct epoll_event*, int, int);
 extern int (*libepoll_epoll_pwait)  (int, struct epoll_event*, int, int, const sigset_t*);
 
-int shim_epoll_create_impl(int size) {
+static int shim_epoll_create_impl(int size) {
   return libepoll_epoll_create(size);
 }
 
-int shim_epoll_create1_impl(int linux_flags) {
+static int shim_epoll_create1_impl(int linux_flags) {
 
   assert((linux_flags & ~LINUX_EPOLL_CLOEXEC) == 0);
 
@@ -32,16 +32,16 @@ int shim_epoll_create1_impl(int linux_flags) {
   return libepoll_epoll_create1(flags);
 }
 
-int shim_epoll_ctl_impl(int epfd, int linux_op, int fd, linux_epoll_event* linux_event) {
+static int shim_epoll_ctl_impl(int epfd, int linux_op, int fd, linux_epoll_event* linux_event) {
   return libepoll_epoll_ctl(epfd, linux_op /* same encoding */, fd, linux_event /* same encoding */);
 }
 
-int shim_epoll_wait_impl(int epfd, linux_epoll_event* events, int maxevents, int timeout) {
+static int shim_epoll_wait_impl(int epfd, linux_epoll_event* events, int maxevents, int timeout) {
   return libepoll_epoll_wait(epfd, events /* same encoding */, maxevents, timeout);
 }
 
 //TODO: sigset_t compat?
-int shim_epoll_pwait_impl(int epfd, struct epoll_event* events, int maxevents, int timeout, const sigset_t* sigmask) {
+static int shim_epoll_pwait_impl(int epfd, struct epoll_event* events, int maxevents, int timeout, const sigset_t* sigmask) {
   return libepoll_epoll_pwait(epfd, events /* same encoding */, maxevents, timeout, sigmask /* ? */);
 }
 

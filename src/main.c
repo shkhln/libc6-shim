@@ -155,25 +155,25 @@ static void __cxa_atexit_cb_wrapper(void* arg) {
   LOG_EXIT();
 }
 
-int shim___cxa_atexit_impl(void (*cb)(void*), void* arg, void* dso) {
+static int shim___cxa_atexit_impl(void (*cb)(void*), void* arg, void* dso) {
   struct wrapper_args* wargs = malloc(sizeof(struct wrapper_args));
   wargs->cb  = cb;
   wargs->arg = arg;
   return __cxa_atexit(__cxa_atexit_cb_wrapper, wargs, dso);
 }
 #else
-int shim___cxa_atexit_impl(void (*cb)(void*), void* arg, void* dso) {
+static int shim___cxa_atexit_impl(void (*cb)(void*), void* arg, void* dso) {
   return __cxa_atexit(cb, arg, dso);
 }
 #endif
 
 extern void __cxa_finalize(void*);
 
-void shim___cxa_finalize_impl(void* dso) {
+static void shim___cxa_finalize_impl(void* dso) {
   __cxa_finalize(dso);
 }
 
-int shim___libc_start_main_impl(
+static int shim___libc_start_main_impl(
   int (*main)(int, char**, char**),
   int argc,
   char** ubp_av,
@@ -199,15 +199,15 @@ int shim___libc_start_main_impl(
   exit(main(shim_argc, shim_argv, shim_env));
 }
 
-void shim___stack_chk_fail_impl() {
+static void shim___stack_chk_fail_impl() {
   assert(0);
 }
 
-int shim___register_atfork_impl(void (*prepare)(void), void (*parent)(void), void (*child)(void), void* dso_handle) {
+static int shim___register_atfork_impl(void (*prepare)(void), void (*parent)(void), void (*child)(void), void* dso_handle) {
   return pthread_atfork(prepare, parent, child);
 }
 
-char* shim_gnu_get_libc_version_impl() {
+static char* shim_gnu_get_libc_version_impl() {
   return "2.17";
 }
 
@@ -232,7 +232,7 @@ __asm__(".symver shim____tls_get_addr,___tls_get_addr@GLIBC_2.3");
 
 #define LINUX_AT_SYSINFO_EHDR 33
 
-unsigned long shim_getauxval_impl(unsigned long type) {
+static unsigned long shim_getauxval_impl(unsigned long type) {
   assert(type == LINUX_AT_SYSINFO_EHDR);
   return 0;
 }

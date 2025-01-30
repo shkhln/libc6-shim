@@ -5,12 +5,12 @@
 #include "../shim.h"
 
 #define STRTONUM_INTERNAL_I(ret_type, name) \
-  ret_type shim_ ## __ ## name ## _internal_impl(char* nptr, char** endptr, int base, int group) {\
+  static ret_type shim_ ## __ ## name ## _internal_impl(char* nptr, char** endptr, int base, int group) {\
     return name(nptr, endptr, base);\
   }
 
 #define STRTONUM_INTERNAL_F(ret_type, name) \
-  ret_type shim_ ## __ ## name ## _internal_impl(char* nptr, char** endptr, int group) {\
+  static ret_type shim_ ## __ ## name ## _internal_impl(char* nptr, char** endptr, int group) {\
     return name(nptr, endptr);\
   }
 
@@ -30,7 +30,7 @@ SHIM_WRAP(__strtof_internal);
 SHIM_WRAP(__strtod_internal);
 SHIM_WRAP(__strtold_internal);
 
-void* shim_memalign_impl(size_t alignment, size_t size) {
+static void* shim_memalign_impl(size_t alignment, size_t size) {
   void* p = NULL;
   posix_memalign(&p, alignment, size);
   return p;
@@ -38,14 +38,14 @@ void* shim_memalign_impl(size_t alignment, size_t size) {
 
 SHIM_WRAP(memalign);
 
-char* shim___realpath_chk_impl(const char* path, char* resolved_path, size_t resolved_len) {
+static char* shim___realpath_chk_impl(const char* path, char* resolved_path, size_t resolved_len) {
   assert(resolved_len >= PATH_MAX);
   return realpath(path, resolved_path);
 }
 
 SHIM_WRAP(__realpath_chk);
 
-char* shim_secure_getenv_impl(const char* name) {
+static char* shim_secure_getenv_impl(const char* name) {
   return issetugid() == 0 ? getenv(name) : NULL;
 }
 

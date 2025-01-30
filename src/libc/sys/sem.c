@@ -36,7 +36,7 @@ static int linux_to_native_sem_cmd(int cmd) {
   }
 }
 
-int shim_semctl_impl(int semid, int semnum, int cmd, va_list args) {
+static int shim_semctl_impl(int semid, int semnum, int cmd, va_list args) {
 
   if (cmd == LINUX_SETVAL) {
     return semctl(semid, semnum, SETVAL, va_arg(args, int));
@@ -50,7 +50,7 @@ SHIM_WRAP(semctl);
 typedef struct sembuf linux_sembuf;
 
 // IPC_NOWAIT and SEM_UNDO have same values on Linux and FreeBSD
-int shim_semop_impl(int semid, linux_sembuf* array, size_t nops) {
+static int shim_semop_impl(int semid, linux_sembuf* array, size_t nops) {
   int err = semop(semid, array, nops);
   if (err == -1) {
     errno = native_to_linux_errno(errno);

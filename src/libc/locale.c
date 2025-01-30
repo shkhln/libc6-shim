@@ -8,7 +8,7 @@ extern const unsigned short** shim___ctype_b_loc();
 extern int32_t** shim___ctype_tolower_loc();
 extern int32_t** shim___ctype_toupper_loc();
 
-linux_locale_t shim___newlocale_impl(int category_mask, const char* locale, linux_locale_t base) {
+static linux_locale_t shim___newlocale_impl(int category_mask, const char* locale, linux_locale_t base) {
 
   assert(category_mask == 64 || category_mask == 8127); // LC_ALL_MASK
   assert(strcmp(locale, "C") == 0);
@@ -29,7 +29,7 @@ linux_locale_t shim___newlocale_impl(int category_mask, const char* locale, linu
   return linux_locale;
 }
 
-linux_locale_t shim___duplocale_impl(linux_locale_t locale) {
+static linux_locale_t shim___duplocale_impl(linux_locale_t locale) {
   linux_locale_t duplicate = malloc(sizeof(struct linux_locale));
   memcpy(duplicate, locale, sizeof(struct linux_locale));
   duplicate->native_locale = duplocale(locale->native_locale);
@@ -38,7 +38,7 @@ linux_locale_t shim___duplocale_impl(linux_locale_t locale) {
 
 __thread linux_locale_t thread_locale = LINUX_LC_GLOBAL_LOCALE;
 
-linux_locale_t shim___uselocale_impl(linux_locale_t locale) {
+static linux_locale_t shim___uselocale_impl(linux_locale_t locale) {
 
   linux_locale_t prev = thread_locale;
 
@@ -56,7 +56,7 @@ linux_locale_t shim___uselocale_impl(linux_locale_t locale) {
   return prev;
 }
 
-void shim___freelocale_impl(linux_locale_t locale) {
+static void shim___freelocale_impl(linux_locale_t locale) {
   freelocale(locale->native_locale);
   free(locale);
 }
@@ -66,19 +66,19 @@ SHIM_WRAP(__duplocale);
 SHIM_WRAP(__uselocale);
 SHIM_WRAP(__freelocale);
 
-linux_locale_t shim_newlocale_impl(int mask, const char* locale, linux_locale_t base) {
+static linux_locale_t shim_newlocale_impl(int mask, const char* locale, linux_locale_t base) {
   return shim___newlocale_impl(mask, locale, base);
 }
 
-linux_locale_t shim_duplocale_impl(linux_locale_t locale) {
+static linux_locale_t shim_duplocale_impl(linux_locale_t locale) {
   return shim___duplocale_impl(locale);
 }
 
-linux_locale_t shim_uselocale_impl(linux_locale_t locale) {
+static linux_locale_t shim_uselocale_impl(linux_locale_t locale) {
   return shim___uselocale_impl(locale);
 }
 
-void shim_freelocale_impl(linux_locale_t locale) {
+static void shim_freelocale_impl(linux_locale_t locale) {
   shim___freelocale_impl(locale);
 }
 
@@ -152,7 +152,7 @@ static void init() {
   set_process_lconv();
 }
 
-linux_lconv* shim_localeconv_impl() {
+static linux_lconv* shim_localeconv_impl() {
   return &process_lconv;
 }
 
@@ -178,7 +178,7 @@ static int linux_to_native_category(int linux_category) {
   }
 }
 
-char* shim_setlocale_impl(int linux_category, const char* locale) {
+static char* shim_setlocale_impl(int linux_category, const char* locale) {
   char* ret = setlocale(linux_to_native_category(linux_category), locale);
   if (ret != NULL) {
     set_process_lconv();

@@ -24,7 +24,7 @@
 
 #define LINUX_RTLD_DI_LINKMAP 2
 
-int shim_dladdr1_impl(void* address, Dl_info* info, void** extra_info, int extra_info_type) {
+static int shim_dladdr1_impl(void* address, Dl_info* info, void** extra_info, int extra_info_type) {
 
   int dladdr_err = dladdr(address, info);
   if (dladdr_err != 0) {
@@ -57,7 +57,7 @@ int shim_dladdr1_impl(void* address, Dl_info* info, void** extra_info, int extra
   return dladdr_err;
 }
 
-void* shim_dlopen_impl(const char* path, int linux_mode) {
+static void* shim_dlopen_impl(const char* path, int linux_mode) {
 
   assert((linux_mode & KNOWN_LINUX_DLOPEN_MODE_FLAGS) == linux_mode);
 
@@ -80,7 +80,7 @@ void* shim_dlopen_impl(const char* path, int linux_mode) {
 
 typedef long int Lmid_t;
 
-void* shim_dlmopen_impl(Lmid_t lmid, const char* path, int mode) {
+static void* shim_dlmopen_impl(Lmid_t lmid, const char* path, int mode) {
   return shim_dlopen_impl(path, mode);
 }
 
@@ -121,11 +121,11 @@ static void* _shim_dlvsym(void* linux_handle, const char* symbol, const char* ve
   }
 }
 
-void* shim_dlsym_impl(void* handle, const char* symbol) {
+static void* shim_dlsym_impl(void* handle, const char* symbol) {
   return _shim_dlvsym(handle, symbol, NULL);
 }
 
-void* shim_dlvsym_impl(void* handle, const char* symbol, const char* version) {
+static void* shim_dlvsym_impl(void* handle, const char* symbol, const char* version) {
   return _shim_dlvsym(handle, symbol, version);
 }
 
@@ -135,7 +135,7 @@ SHIM_WRAP(dlmopen);
 SHIM_WRAP(dlsym);
 SHIM_WRAP(dlvsym);
 
-int shim_dlinfo_impl(void* restrict handle, int request, void* restrict p) {
+static int shim_dlinfo_impl(void* restrict handle, int request, void* restrict p) {
   UNIMPLEMENTED();
 }
 

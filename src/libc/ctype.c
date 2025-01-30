@@ -38,11 +38,11 @@ const uint16_t* shim___ctype_b = &shim_ctype_b_table[128];
 
 SHIM_EXPORT(__ctype_b);
 
-const unsigned short** shim___ctype_b_loc_impl() {
+static const unsigned short** shim___ctype_b_loc_impl() {
   return &shim___ctype_b;
 }
 
-size_t shim___ctype_get_mb_cur_max_impl() {
+static size_t shim___ctype_get_mb_cur_max_impl() {
   return MB_CUR_MAX;
 }
 
@@ -64,11 +64,11 @@ int32_t* shim___ctype_toupper = &shim_ctype_toupper_table[128];
 SHIM_EXPORT(__ctype_tolower);
 SHIM_EXPORT(__ctype_toupper);
 
-int32_t** shim___ctype_tolower_loc_impl() {
+static int32_t** shim___ctype_tolower_loc_impl() {
   return &shim___ctype_tolower;
 }
 
-int32_t** shim___ctype_toupper_loc_impl() {
+static int32_t** shim___ctype_toupper_loc_impl() {
   return &shim___ctype_toupper;
 }
 
@@ -77,51 +77,51 @@ SHIM_WRAP(__ctype_get_mb_cur_max);
 SHIM_WRAP(__ctype_tolower_loc);
 SHIM_WRAP(__ctype_toupper_loc);
 
-int shim_isalnum_l_impl(int c, linux_locale_t loc) {
+static int shim_isalnum_l_impl(int c, linux_locale_t loc) {
   return isalnum_l(c, loc->native_locale);
 }
 
-int shim_isalpha_l_impl(int c, linux_locale_t loc) {
+static int shim_isalpha_l_impl(int c, linux_locale_t loc) {
   return isalpha_l(c, loc->native_locale);
 }
 
-int shim_isblank_l_impl(int c, linux_locale_t loc) {
+static int shim_isblank_l_impl(int c, linux_locale_t loc) {
   return isblank_l(c, loc->native_locale);
 }
 
-int shim_iscntrl_l_impl(int c, linux_locale_t loc) {
+static int shim_iscntrl_l_impl(int c, linux_locale_t loc) {
   return iscntrl_l(c, loc->native_locale);
 }
 
-int shim_isdigit_l_impl(int c, linux_locale_t loc) {
+static int shim_isdigit_l_impl(int c, linux_locale_t loc) {
   return isdigit_l(c, loc->native_locale);
 }
 
-int shim_isgraph_l_impl(int c, linux_locale_t loc) {
+static int shim_isgraph_l_impl(int c, linux_locale_t loc) {
   return isgraph_l(c, loc->native_locale);
 }
 
-int shim_islower_l_impl(int c, linux_locale_t loc) {
+static int shim_islower_l_impl(int c, linux_locale_t loc) {
   return islower_l(c, loc->native_locale);
 }
 
-int shim_isprint_l_impl(int c, linux_locale_t loc) {
+static int shim_isprint_l_impl(int c, linux_locale_t loc) {
   return isprint_l(c, loc->native_locale);
 }
 
-int shim_ispunct_l_impl(int c, linux_locale_t loc) {
+static int shim_ispunct_l_impl(int c, linux_locale_t loc) {
   return ispunct_l(c, loc->native_locale);
 }
 
-int shim_isspace_l_impl(int c, linux_locale_t loc) {
+static int shim_isspace_l_impl(int c, linux_locale_t loc) {
   return isspace_l(c, loc->native_locale);
 }
 
-int shim_isupper_l_impl(int c, linux_locale_t loc) {
+static int shim_isupper_l_impl(int c, linux_locale_t loc) {
   return isupper_l(c, loc->native_locale);
 }
 
-int shim_isxdigit_l_impl(int c, linux_locale_t loc) {
+static int shim_isxdigit_l_impl(int c, linux_locale_t loc) {
   return isxdigit_l(c, loc->native_locale);
 }
 
@@ -138,11 +138,11 @@ SHIM_WRAP(isspace_l);
 SHIM_WRAP(isupper_l);
 SHIM_WRAP(isxdigit_l);
 
-int shim_tolower_l_impl(int c, linux_locale_t loc) {
+static int shim_tolower_l_impl(int c, linux_locale_t loc) {
   return tolower_l(c, loc->native_locale);
 }
 
-int shim_toupper_l_impl(int c, linux_locale_t loc) {
+static int shim_toupper_l_impl(int c, linux_locale_t loc) {
   return toupper_l(c, loc->native_locale);
 }
 

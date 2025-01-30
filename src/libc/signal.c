@@ -4,13 +4,13 @@
 #include <signal.h>
 #include "../shim.h"
 
-int shim___libc_current_sigrtmin_impl() {
+static int shim___libc_current_sigrtmin_impl() {
   UNIMPLEMENTED();
 }
 
 SHIM_WRAP(__libc_current_sigrtmin);
 
-int shim_kill_impl(pid_t pid, int sig) {
+static int shim_kill_impl(pid_t pid, int sig) {
   if (sig == 0) {
     return kill(pid, sig);
   } else {
@@ -18,23 +18,23 @@ int shim_kill_impl(pid_t pid, int sig) {
   }
 }
 
-int shim_killpg_impl(pid_t pgrp, int sig) {
+static int shim_killpg_impl(pid_t pgrp, int sig) {
   UNIMPLEMENTED();
 }
 
-void shim_psignal_impl(int sig, const char* s) {
+static void shim_psignal_impl(int sig, const char* s) {
   UNIMPLEMENTED();
 }
 
-int shim_raise_impl(int sig) {
+static int shim_raise_impl(int sig) {
   UNIMPLEMENTED();
 }
 
-sig_t shim_signal_impl(int sig, sig_t func) {
+static sig_t shim_signal_impl(int sig, sig_t func) {
   return NULL;
 }
 
-char* shim_strsignal_impl(int sig) {
+static char* shim_strsignal_impl(int sig) {
   UNIMPLEMENTED()
 }
 
@@ -45,7 +45,7 @@ SHIM_WRAP(raise);
 SHIM_WRAP(signal);
 SHIM_WRAP(strsignal);
 
-int shim_sigaction_impl(int sig, const struct sigaction* act, const struct sigaction* oact) {
+static int shim_sigaction_impl(int sig, const struct sigaction* act, const struct sigaction* oact) {
   errno = EINVAL;
   return -1;
 }
@@ -88,27 +88,27 @@ int linux_to_freebsd_signo(int linux_signal) {
   }
 }
 
-int shim_sigaddset_impl(sigset_t* set, int linux_signo) {
+static int shim_sigaddset_impl(sigset_t* set, int linux_signo) {
   return sigaddset(set, linux_to_freebsd_signo(linux_signo));
 }
 
-int shim_sigdelset_impl(sigset_t* set, int linux_signo) {
+static int shim_sigdelset_impl(sigset_t* set, int linux_signo) {
   return sigdelset(set, linux_to_freebsd_signo(linux_signo));
 }
 
-int shim_siginterrupt_impl(int sig, int flag) {
+static int shim_siginterrupt_impl(int sig, int flag) {
   UNIMPLEMENTED();
 }
 
-int shim_sigismember_impl(const sigset_t* set, int linux_signo) {
+static int shim_sigismember_impl(const sigset_t* set, int linux_signo) {
   return sigismember(set, linux_to_freebsd_signo(linux_signo));
 }
 
-int shim_sigqueue_impl(pid_t pid, int signo, const union sigval value) {
+static int shim_sigqueue_impl(pid_t pid, int signo, const union sigval value) {
   UNIMPLEMENTED();
 }
 
-int shim_sigwait_impl(const sigset_t* restrict set, int* restrict sig) {
+static int shim_sigwait_impl(const sigset_t* restrict set, int* restrict sig) {
   UNIMPLEMENTED();
 }
 

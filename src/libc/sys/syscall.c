@@ -50,7 +50,7 @@
 void* shim_mmap_impl(void*, size_t, int, int, int, linux_off_t);
 int   shim_open_impl(const char*, int, va_list);
 
-long shim_syscall_impl(long number, va_list args) {
+static long shim_syscall_impl(long number, va_list args) {
 
   if (number == LINUX_WRITE) {
 

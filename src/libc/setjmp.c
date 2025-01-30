@@ -29,17 +29,17 @@ SHIM_EXPORT(setjmp);
 SHIM_EXPORT(_setjmp);
 SHIM_EXPORT(__sigsetjmp);
 
-void shim_longjmp_impl(jmp_buf env, int val) {
+static void shim_longjmp_impl(jmp_buf env, int val) {
   //~ fprintf(stderr, "[[%s]]\n", __func__);
   _longjmp(env, val);
 }
 
-void shim__longjmp_impl(jmp_buf env, int val) {
+static void shim__longjmp_impl(jmp_buf env, int val) {
   //~ fprintf(stderr, "[[%s]]\n", __func__);
   _longjmp(env, val);
 }
 
-void shim_siglongjmp_impl(sigjmp_buf env, int val) {
+static void shim_siglongjmp_impl(sigjmp_buf env, int val) {
   //~ fprintf(stderr, "[[%s]]\n", __func__);
   siglongjmp(env, val);
 }

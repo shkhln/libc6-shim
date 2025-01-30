@@ -41,7 +41,7 @@ typedef struct linux_statvfs64 linux_statvfs64;
 #define LINUX_ST_RDONLY 1
 #define LINUX_ST_NOSUID 2
 
-int shim_statvfs64_impl(const char* restrict path, linux_statvfs64* restrict linux_buf) {
+static int shim_statvfs64_impl(const char* restrict path, linux_statvfs64* restrict linux_buf) {
 
   struct statvfs buf;
   int err = statvfs(path, &buf);

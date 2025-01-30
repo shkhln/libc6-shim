@@ -4,11 +4,11 @@
 
 typedef void linux_cpu_set_t;
 
-int shim_sched_getaffinity_impl(pid_t pid, size_t cpusetsize, linux_cpu_set_t* mask) {
+static int shim_sched_getaffinity_impl(pid_t pid, size_t cpusetsize, linux_cpu_set_t* mask) {
   return -1;
 }
 
-int shim_sched_setaffinity_impl(pid_t pid, size_t cpusetsize, linux_cpu_set_t* mask) {
+static int shim_sched_setaffinity_impl(pid_t pid, size_t cpusetsize, linux_cpu_set_t* mask) {
   return 0;
 }
 
@@ -35,29 +35,29 @@ int native_to_linux_sched_policy(int linux_policy) {
   }
 }
 
-int shim_sched_get_priority_max_impl(int linux_policy) {
+static int shim_sched_get_priority_max_impl(int linux_policy) {
   return sched_get_priority_max(linux_to_native_sched_policy(linux_policy));
 }
 
-int shim_sched_get_priority_min_impl(int linux_policy) {
+static int shim_sched_get_priority_min_impl(int linux_policy) {
   return sched_get_priority_min(linux_to_native_sched_policy(linux_policy));
 }
 
 SHIM_WRAP(sched_get_priority_max);
 SHIM_WRAP(sched_get_priority_min);
 
-int shim_sched_getscheduler_impl(pid_t pid) {
+static int shim_sched_getscheduler_impl(pid_t pid) {
   return native_to_linux_sched_policy(sched_getscheduler(pid));
 }
 
-int shim_sched_setscheduler_impl(pid_t pid, int policy, const linux_sched_param* param) {
+static int shim_sched_setscheduler_impl(pid_t pid, int policy, const linux_sched_param* param) {
   return sched_setscheduler(pid, linux_to_native_sched_policy(policy), param);
 }
 
 SHIM_WRAP(sched_getscheduler);
 SHIM_WRAP(sched_setscheduler);
 
-int shim_posix_spawnattr_getschedpolicy_impl(const posix_spawnattr_t* restrict attr, int* restrict linux_policy) {
+static int shim_posix_spawnattr_getschedpolicy_impl(const posix_spawnattr_t* restrict attr, int* restrict linux_policy) {
   int policy;
   int err = posix_spawnattr_getschedpolicy(attr, &policy);
   if (err == 0) {
@@ -66,7 +66,7 @@ int shim_posix_spawnattr_getschedpolicy_impl(const posix_spawnattr_t* restrict a
   return err;
 }
 
-int shim_posix_spawnattr_setschedpolicy_impl(posix_spawnattr_t* attr, int linux_policy) {
+static int shim_posix_spawnattr_setschedpolicy_impl(posix_spawnattr_t* attr, int linux_policy) {
   return posix_spawnattr_setschedpolicy(attr, linux_to_native_sched_policy(linux_policy));
 }
 

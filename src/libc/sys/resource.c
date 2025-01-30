@@ -7,17 +7,17 @@
 typedef void linux_rlimit;
 typedef void linux_rlimit64;
 
-int shim_getrlimit_impl(int resource, linux_rlimit* rlp) {
+static int shim_getrlimit_impl(int resource, linux_rlimit* rlp) {
   errno = native_to_linux_errno(EPERM);
   return -1;
 }
 
-int shim_getrlimit64_impl(int resource, linux_rlimit64* rlp) {
+static int shim_getrlimit64_impl(int resource, linux_rlimit64* rlp) {
   errno = native_to_linux_errno(EPERM);
   return -1;
 }
 
-int shim_setrlimit_impl(int resource, const linux_rlimit* rlp) {
+static int shim_setrlimit_impl(int resource, const linux_rlimit* rlp) {
   UNIMPLEMENTED();
 }
 

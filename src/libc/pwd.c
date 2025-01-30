@@ -17,7 +17,7 @@ typedef struct linux_passwd linux_passwd;
 
 static linux_passwd lp;
 
-linux_passwd* shim_getpwuid_impl(uid_t uid) {
+static linux_passwd* shim_getpwuid_impl(uid_t uid) {
 
   struct passwd* p = getpwuid(uid);
   if (p == NULL) {

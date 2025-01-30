@@ -1,7 +1,7 @@
 #include <libgen.h>
 #include "../shim.h"
 
-char* shim___xpg_basename_impl(const char* path) {
+static char* shim___xpg_basename_impl(const char* path) {
   return basename(path);
 }
 

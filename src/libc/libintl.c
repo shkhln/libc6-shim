@@ -1,6 +1,6 @@
 #include "../shim.h"
 
-char* shim_gettext_impl(const char* msgid) {
+static char* shim_gettext_impl(const char* msgid) {
   return msgid;
 }
 

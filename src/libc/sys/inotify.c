@@ -38,25 +38,25 @@ static void init() {
   }
 }
 
-int shim_inotify_init_impl() {
+static int shim_inotify_init_impl() {
   return libinotify_inotify_init();
 }
 
 SHIM_WRAP(inotify_init);
 
-int shim_inotify_init1_impl(int flags) {
+static int shim_inotify_init1_impl(int flags) {
   return libinotify_inotify_init1(flags);
 }
 
 SHIM_WRAP(inotify_init1);
 
-int shim_inotify_add_watch_impl(int fd, const char* path, uint32_t mask) {
+static int shim_inotify_add_watch_impl(int fd, const char* path, uint32_t mask) {
   return libinotify_inotify_add_watch(fd, path, mask);
 }
 
 SHIM_WRAP(inotify_add_watch);
 
-int shim_inotify_rm_watch_impl(int fd, int wd) {
+static int shim_inotify_rm_watch_impl(int fd, int wd) {
   return libinotify_inotify_rm_watch(fd, wd);
 }
 

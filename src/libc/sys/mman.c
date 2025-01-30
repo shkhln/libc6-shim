@@ -23,7 +23,7 @@
  LINUX_MAP_NORESERVE             \
 )
 
-void* shim_mmap64_impl(void *addr, size_t len, int prot, int linux_flags, int fd, linux_off64_t offset) {
+static void* shim_mmap64_impl(void *addr, size_t len, int prot, int linux_flags, int fd, linux_off64_t offset) {
 
   assert((linux_flags & KNOWN_LINUX_MMAP_FLAGS) == linux_flags);
 
@@ -72,7 +72,7 @@ void* shim_mmap_impl(void *addr, size_t len, int prot, int linux_flags, int fd, 
 SHIM_WRAP(mmap);
 SHIM_WRAP(mmap64);
 
-void* shim_mremap_impl(void* old_address, size_t old_size, size_t new_size, int flags, va_list args) {
+static void* shim_mremap_impl(void* old_address, size_t old_size, size_t new_size, int flags, va_list args) {
   return (void*)-1;
 }
 

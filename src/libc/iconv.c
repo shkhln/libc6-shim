@@ -28,19 +28,19 @@ static void init() {
   }
 }
 
-iconv_t shim_iconv_open_impl(const char* dstname, const char* srcname) {
+static iconv_t shim_iconv_open_impl(const char* dstname, const char* srcname) {
   return libiconv_iconv_open(dstname, srcname);
 }
 
 SHIM_WRAP(iconv_open);
 
-int shim_iconv_close_impl(iconv_t cd) {
+static int shim_iconv_close_impl(iconv_t cd) {
   return libiconv_iconv_close(cd);
 }
 
 SHIM_WRAP(iconv_close);
 
-size_t shim_iconv_impl(iconv_t cd, char** restrict src, size_t* restrict srcleft, char** restrict dst, size_t* restrict dstleft) {
+static size_t shim_iconv_impl(iconv_t cd, char** restrict src, size_t* restrict srcleft, char** restrict dst, size_t* restrict dstleft) {
   return libiconv_iconv(cd, src, srcleft, dst, dstleft);
 }
 

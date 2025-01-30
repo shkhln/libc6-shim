@@ -4,7 +4,7 @@
 #include "sys/socket.h"
 #include "netdb.h"
 
-int* shim___h_errno_location_impl() {
+static int* shim___h_errno_location_impl() {
   return &h_errno;
 }
 
@@ -84,7 +84,7 @@ static linux_addrinfo* copy_addrinfo(struct addrinfo* info) {
   return linux_info;
 }
 
-int shim_getaddrinfo_impl(const char* hostname, const char* servname, const linux_addrinfo* linux_hints, linux_addrinfo** res) {
+static int shim_getaddrinfo_impl(const char* hostname, const char* servname, const linux_addrinfo* linux_hints, linux_addrinfo** res) {
 
   struct addrinfo hints;
   if (linux_hints != NULL) {
@@ -124,7 +124,7 @@ int shim_getaddrinfo_impl(const char* hostname, const char* servname, const linu
   return err;
 }
 
-void shim_freeaddrinfo_impl(linux_addrinfo* ai) {
+static void shim_freeaddrinfo_impl(linux_addrinfo* ai) {
   while (ai != NULL) {
     linux_addrinfo* next = ai->ai_next;
     if (ai->ai_canonname != NULL) {
@@ -168,7 +168,7 @@ static int linux_to_native_ni_flags(int linux_flags) {
   return flags;
 }
 
-int shim_getnameinfo_impl(const linux_sockaddr* linux_addr, socklen_t linux_addrlen, char* host, size_t hostlen, char* serv, size_t servlen, int linux_flags) {
+static int shim_getnameinfo_impl(const linux_sockaddr* linux_addr, socklen_t linux_addrlen, char* host, size_t hostlen, char* serv, size_t servlen, int linux_flags) {
 
   switch (linux_addr->sa_family) {
     case LINUX_AF_UNIX:

@@ -6,7 +6,7 @@
 #define LINUX_EFD_NONBLOCK 0x00800
 #define LINUX_EFD_CLOEXEC  0x80000
 
-int shim_eventfd_impl(unsigned int initval, int linux_flags) {
+static int shim_eventfd_impl(unsigned int initval, int linux_flags) {
 
   assert((linux_flags & ~(LINUX_EFD_CLOEXEC | LINUX_EFD_NONBLOCK)) == 0);
 

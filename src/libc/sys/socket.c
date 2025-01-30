@@ -177,15 +177,15 @@ static int linux_to_native_domain(int domain) {
   }
 }
 
-int shim_socket_impl(int domain, int type, int protocol) {
+static int shim_socket_impl(int domain, int type, int protocol) {
   return socket(linux_to_native_domain(domain), linux_to_native_sock_type(type), protocol);
 }
 
-int shim_socketpair_impl(int domain, int type, int protocol, int* sv) {
+static int shim_socketpair_impl(int domain, int type, int protocol, int* sv) {
   return socketpair(linux_to_native_domain(domain), linux_to_native_sock_type(type), protocol, sv);
 }
 
-int shim_bind_impl(int s, const linux_sockaddr* linux_addr, socklen_t addrlen) {
+static int shim_bind_impl(int s, const linux_sockaddr* linux_addr, socklen_t addrlen) {
 
   switch (linux_addr->sa_family) {
 
@@ -224,7 +224,7 @@ int shim_bind_impl(int s, const linux_sockaddr* linux_addr, socklen_t addrlen) {
   }
 }
 
-int shim_connect_impl(int s, const linux_sockaddr* linux_name, socklen_t namelen) {
+static int shim_connect_impl(int s, const linux_sockaddr* linux_name, socklen_t namelen) {
 
   switch (linux_name->sa_family) {
 
@@ -343,7 +343,7 @@ static void native_to_linux_msghdr(struct linux_msghdr* linux_msg, const struct 
   }
 }
 
-ssize_t shim_recv_impl(int s, void* buf, size_t len, int linux_flags) {
+static ssize_t shim_recv_impl(int s, void* buf, size_t len, int linux_flags) {
   ssize_t nbytes = recv(s, buf, len, linux_to_native_msg_flags(linux_flags));
   if (nbytes == -1) {
     errno = native_to_linux_errno(errno);
@@ -351,7 +351,7 @@ ssize_t shim_recv_impl(int s, void* buf, size_t len, int linux_flags) {
   return nbytes;
 }
 
-ssize_t shim_send_impl(int s, const void* msg, size_t len, int linux_flags) {
+static ssize_t shim_send_impl(int s, const void* msg, size_t len, int linux_flags) {
   ssize_t nbytes = send(s, msg, len, linux_to_native_msg_flags(linux_flags));
   if (nbytes == -1) {
     errno = native_to_linux_errno(errno);
@@ -359,7 +359,7 @@ ssize_t shim_send_impl(int s, const void* msg, size_t len, int linux_flags) {
   return nbytes;
 }
 
-ssize_t shim_recvmsg_impl(int s, struct linux_msghdr* linux_msg, int linux_flags) {
+static ssize_t shim_recvmsg_impl(int s, struct linux_msghdr* linux_msg, int linux_flags) {
 
   struct msghdr msg;
   uint8_t buf[linux_msg->msg_controllen];
@@ -382,7 +382,7 @@ ssize_t shim_recvmsg_impl(int s, struct linux_msghdr* linux_msg, int linux_flags
   return nbytes;
 }
 
-ssize_t shim_sendmsg_impl(int s, const struct linux_msghdr* linux_msg, int linux_flags) {
+static ssize_t shim_sendmsg_impl(int s, const struct linux_msghdr* linux_msg, int linux_flags) {
 
   struct msghdr msg;
   uint8_t buf[linux_msg->msg_controllen];
@@ -400,7 +400,7 @@ ssize_t shim_sendmsg_impl(int s, const struct linux_msghdr* linux_msg, int linux
   return nbytes;
 }
 
-ssize_t shim_recvfrom_impl(int s, void* buf, size_t len, int linux_flags, linux_sockaddr* restrict linux_from, socklen_t* restrict linux_fromlen) {
+static ssize_t shim_recvfrom_impl(int s, void* buf, size_t len, int linux_flags, linux_sockaddr* restrict linux_from, socklen_t* restrict linux_fromlen) {
 
   ssize_t nbytes;
   if (linux_from != NULL) {
@@ -439,7 +439,7 @@ ssize_t shim_recvfrom_impl(int s, void* buf, size_t len, int linux_flags, linux_
   return nbytes;
 }
 
-ssize_t shim_sendto_impl(int s, const void* msg, size_t len, int linux_flags, const linux_sockaddr* linux_to, socklen_t tolen) {
+static ssize_t shim_sendto_impl(int s, const void* msg, size_t len, int linux_flags, const linux_sockaddr* linux_to, socklen_t tolen) {
 
   ssize_t nbytes;
   switch (linux_to->sa_family) {
@@ -493,7 +493,7 @@ SHIM_WRAP(sendto);
 SHIM_WRAP(socket);
 SHIM_WRAP(socketpair);
 
-ssize_t shim___recv_chk_impl(int fd, void* buf, size_t len, size_t buflen, int flags) {
+static ssize_t shim___recv_chk_impl(int fd, void* buf, size_t len, size_t buflen, int flags) {
   assert(len <= buflen);
   return recv(fd, buf, len, flags);
 }
@@ -538,7 +538,7 @@ static int linux_to_native_tcp_opt(int optname) {
 }
 
 //TODO: verify that SO_PASSCRED actually works
-int shim_getsockopt_impl(int s, int linux_level, int linux_optname, void* restrict optval, socklen_t* restrict optlen) {
+static int shim_getsockopt_impl(int s, int linux_level, int linux_optname, void* restrict optval, socklen_t* restrict optlen) {
   switch (linux_level) {
     case LINUX_SOL_SOCKET:
       if (linux_optname == LINUX_SO_PASSCRED) {
@@ -558,7 +558,7 @@ int shim_getsockopt_impl(int s, int linux_level, int linux_optname, void* restri
   }
 }
 
-int shim_setsockopt_impl(int s, int linux_level, int linux_optname, const void* optval, socklen_t optlen) {
+static int shim_setsockopt_impl(int s, int linux_level, int linux_optname, const void* optval, socklen_t optlen) {
   switch (linux_level) {
     case LINUX_SOL_SOCKET:
       if (linux_optname == LINUX_SO_SNDBUF && optval && *((int*)optval) == 0) {
@@ -583,7 +583,7 @@ int shim_setsockopt_impl(int s, int linux_level, int linux_optname, const void* 
 SHIM_WRAP(getsockopt);
 SHIM_WRAP(setsockopt);
 
-int shim_getsockname_impl(int s, linux_sockaddr* restrict linux_name, socklen_t* restrict linux_namelen) {
+static int shim_getsockname_impl(int s, linux_sockaddr* restrict linux_name, socklen_t* restrict linux_namelen) {
 
   uint8_t   name[110] __attribute__((aligned(8))); // ?
   socklen_t namelen = sizeof(name);
@@ -613,12 +613,12 @@ int shim_getsockname_impl(int s, linux_sockaddr* restrict linux_name, socklen_t*
 
 SHIM_WRAP(getsockname);
 
-const char* shim_inet_ntop_impl(int af, const void* restrict src, char* restrict dst, socklen_t size) {
+static const char* shim_inet_ntop_impl(int af, const void* restrict src, char* restrict dst, socklen_t size) {
   assert(af == LINUX_PF_INET || af == LINUX_PF_INET6);
   return inet_ntop(linux_to_native_domain(af), src, dst, size);
 }
 
-int shim_inet_pton_impl(int af, const char* restrict src, void* restrict dst) {
+static int shim_inet_pton_impl(int af, const char* restrict src, void* restrict dst) {
   assert(af == LINUX_PF_INET || af == LINUX_PF_INET6);
   return inet_pton(linux_to_native_domain(af), src, dst);
 }
