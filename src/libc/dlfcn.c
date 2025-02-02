@@ -12,6 +12,7 @@
 #define LINUX_RTLD_NOLOAD   0x4
 #define LINUX_RTLD_GLOBAL   RTLD_GLOBAL
 #define LINUX_RTLD_NODELETE RTLD_NODELETE
+#define LINUX_RTLD_DEEPBIND 0x00008
 
 #define KNOWN_LINUX_DLOPEN_MODE_FLAGS ( \
  LINUX_RTLD_LOCAL    |                  \
@@ -19,7 +20,8 @@
  LINUX_RTLD_NOW      |                  \
  LINUX_RTLD_NOLOAD   |                  \
  LINUX_RTLD_GLOBAL   |                  \
- LINUX_RTLD_NODELETE                    \
+ LINUX_RTLD_NODELETE |                  \
+ LINUX_RTLD_DEEPBIND                    \
 )
 
 #define LINUX_RTLD_DI_LINKMAP 2
@@ -61,10 +63,14 @@ static void* shim_dlopen_impl(const char* path, int linux_mode) {
 
   assert((linux_mode & KNOWN_LINUX_DLOPEN_MODE_FLAGS) == linux_mode);
 
-  int mode = linux_mode & ~LINUX_RTLD_NOLOAD;
+  int mode = linux_mode & ~(LINUX_RTLD_NOLOAD | LINUX_RTLD_DEEPBIND);
 
   if (linux_mode & LINUX_RTLD_NOLOAD) {
     mode |= RTLD_NOLOAD;
+  }
+
+  if (linux_mode & LINUX_RTLD_DEEPBIND) {
+    mode |= RTLD_DEEPBIND;
   }
 
   void* p = dlopen(path, mode);
