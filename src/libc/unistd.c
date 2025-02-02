@@ -17,6 +17,13 @@ static int shim_chown_impl(const char* path, uid_t owner, gid_t group) {
   return chown(path, owner, group);
 }
 
+static char* proc_self_exe_override = NULL;
+
+__attribute__((constructor))
+static void init() {
+  proc_self_exe_override = getenv("SHIM_PROC_SELF_EXE");
+}
+
 static ssize_t shim_readlink_impl(const char* path, char* buf, size_t bufsize) {
 
   if (str_starts_with(path, "/proc/")) {
@@ -38,31 +45,41 @@ static ssize_t shim_readlink_impl(const char* path, char* buf, size_t bufsize) {
         assert(pid > 0);
       }
 
-      int name[] = {
-        CTL_KERN,
-        KERN_PROC,
-        KERN_PROC_PATHNAME,
-        pid
-      };
-
-      int err = sysctl(name, nitems(name), buf, &bufsize, NULL, 0);
-      assert(err == 0);
-
       free(p);
 
-      return bufsize;
+      if (proc_self_exe_override != NULL) {
+        size_t nchars = strlen(proc_self_exe_override);
+        strncpy(buf, proc_self_exe_override, nchars <= bufsize ? nchars : bufsize);
+        return nchars <= bufsize ? nchars : bufsize;
+      } else {
+        int name[] = {
+          CTL_KERN,
+          KERN_PROC,
+          KERN_PROC_PATHNAME,
+          pid
+        };
+
+        int err = sysctl(name, nitems(name), buf, &bufsize, NULL, 0);
+        if (err == -1) {
+          // we don't care about emulating silent truncation here
+          errno = native_to_linux_errno(errno);
+          return -1;
+        }
+
+        return bufsize - 1; // length without a nul char
+      }
 
     } else {
 
       free(p);
 
-      errno = EACCES;
+      errno = native_to_linux_errno(EACCES);
       return -1;
     }
   }
 
   if (str_starts_with(path, "/sys/")) {
-    errno = EACCES;
+    errno = native_to_linux_errno(EACCES);
     return -1;
   }
 
