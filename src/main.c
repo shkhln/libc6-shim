@@ -173,7 +173,13 @@ static void shim___cxa_finalize_impl(void* dso) {
   __cxa_finalize(dso);
 }
 
-static int shim___libc_start_main_impl(
+extern void __libc_start1(int, char*[], char*[], void (*)(void), int (*)(int, char*[], char*[]));
+
+static void dummy_cleanup() {
+  // do nothing
+}
+
+void shim___libc_start_main(
   int (*main)(int, char**, char**),
   int argc,
   char** ubp_av,
@@ -182,21 +188,15 @@ static int shim___libc_start_main_impl(
   void (*rtld_fini)(void),
   void* stack_end
 ) {
+  LOG_ENTRY("main: %p, argc: %#x, upb_av: %p, init: %p, fini: %p, rtld_fini: %p, stack_end: %p", main, argc, ubp_av, init, fini, rtld_fini, stack_end);
 
-  // _init_tls?
+  assert(init != NULL);
+  assert(fini != NULL);
 
-  if (fini != NULL) {
-    //shim___cxa_atexit_impl(fini, NULL, NULL);
-    atexit(fini);
-  }
+  init(shim_argc, shim_argv, shim_env);
+  atexit(fini);
 
-  if (init != NULL) {
-    LOG("%s: init", __func__);
-    init(shim_argc, shim_argv, shim_env);
-  }
-
-  LOG("%s: main", __func__);
-  exit(main(shim_argc, shim_argv, shim_env));
+  __libc_start1(shim_argc, shim_argv, shim_env, dummy_cleanup, main);
 }
 
 static void shim___stack_chk_fail_impl() {
@@ -213,7 +213,7 @@ static char* shim_gnu_get_libc_version_impl() {
 
 SHIM_WRAP(__cxa_atexit);
 SHIM_WRAP(__cxa_finalize);
-SHIM_WRAP(__libc_start_main);
+SHIM_EXPORT(__libc_start_main);
 SHIM_WRAP(__stack_chk_fail);
 SHIM_WRAP(__register_atfork);
 SHIM_WRAP(gnu_get_libc_version);

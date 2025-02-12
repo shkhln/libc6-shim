@@ -116,7 +116,7 @@ for sym in symbols.keys
 
   puts "// #{sym}"
 
-  if symbols[sym][:type] == 'fun' && !(SUBSTITUTIONS[sym.to_sym] || sym.to_sym =~ /setjmp/)
+  if symbols[sym][:type] == 'fun' && !(SUBSTITUTIONS[sym.to_sym] || sym.to_sym =~ /setjmp|__libc_start_main/)
 
     puts "#ifndef SHIM_WRAPPER_#{sym}"
     puts
