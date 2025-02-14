@@ -26,6 +26,14 @@ static int shim_finite_impl(double x) {
   return isfinite(x);
 }
 
+static int shim___signbitf_impl(float x) {
+  return signbit(x);
+}
+
+static int shim___signbit_impl(double x) {
+  return signbit(x);
+}
+
 #ifdef __i386__
 
 static int64_t shim___divdi3_impl(int64_t a, int64_t b) {
@@ -49,7 +57,7 @@ SHIM_WRAP(__udivdi3);
 SHIM_WRAP(__moddi3);
 SHIM_WRAP(__umoddi3);
 
-#endif
+#endif // __i386__
 
 SHIM_WRAP(__isinf);
 SHIM_WRAP(__isinff);
@@ -66,3 +74,5 @@ SHIM_WRAPPER___isnanf
 
 SHIM_WRAP(__finitef);
 SHIM_WRAP(finite);
+SHIM_WRAP(__signbitf);
+SHIM_WRAP(__signbit);
