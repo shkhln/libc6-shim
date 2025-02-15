@@ -18,15 +18,17 @@ if !(`file '#{target}'` =~ /ELF 64-bit LSB executable, x86-64, [^,]+, dynamicall
   exit(1)
 end
 
-dependencies = `ldd -f '%o\n' '#{target}'`.split("\n")
+#~ dependencies = `ldd -f '%o\n' '#{target}'`.split("\n")
 
 LIB64_DIR = ENV['SHIM_LINUX_LIB64_DIR'] || '/compat/linux/usr/lib64'
 
-libmap = ''
-libmap += "libstdc++.so.6=#{LIB64_DIR}/libstdc++.so.6\n" if dependencies.include?('libstdc++.so.6')
-libmap += "libGLU.so.1=#{LIB64_DIR}/libGLU.so.1\n"       if dependencies.include?('libGLU.so.1')
+libmap = <<~LIBMAP
+  [#{target}]
+  libstdc++.so.6=#{LIB64_DIR}/libstdc++.so.6
+  libGLU.so.1=#{LIB64_DIR}/libGLU.so.1
+LIBMAP
 
 ENV['SHIM_PROC_SELF_EXE'] = target
-ENV['LD_LIBMAP']          = [libmap].compact.join("\n")
+ENV['LD_LIBMAP']          = [libmap, ENV['LD_LIBMAP']].compact.join("\n")
 
 exec(File.join(__dir__, 'c6-env'), '/libexec/ld-elf.so.1', *ARGV)
