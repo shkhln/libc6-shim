@@ -2,7 +2,7 @@
 # encoding: UTF-8
 
 if ARGV.length == 0
-  STDERR.puts "run application with glibc shim:\n\s\s[env SHIM_DEBUG=1] #{File.basename($PROGRAM_NAME)} <application> [application args]"
+  STDERR.puts "Run application with glibc shim:\n\s\s[env SHIM_DEBUG=1] #{File.basename($PROGRAM_NAME)} <application> [application args]"
   exit(0)
 end
 

@@ -1,11 +1,8 @@
 #!/usr/bin/env ruby
 # encoding: UTF-8
 
-require 'digest'
-require 'fileutils'
-
 if ARGV.length == 0
-  STDERR.puts "substitute Nvidia's Linux OpenGL/Vulkan libraries:\n\s\s[env SHIM_DEBUG=1] #{File.basename($PROGRAM_NAME)} <application> [application args]"
+  STDERR.puts "Substitute Nvidia's Linux OpenGL/Vulkan libraries:\n\s\s[env SHIM_DEBUG=1] #{File.basename($PROGRAM_NAME)} <application> [application args]"
   exit(1)
 end
 
@@ -39,4 +36,4 @@ ENV['__GLX_VENDOR_LIBRARY_NAME'] = 'nvidia'
 ENV['OCL_ICD_VENDORS']           = File.join(__dir__, '../icds/ocl')
 ENV['VK_ICD_FILENAMES']          = File.join(__dir__, '../icds/vk/nv.json')
 
-exec([File.join(__dir__, 'with-glibc-shim')] * 2, *ARGV)
+exec(File.join(__dir__, 'with-glibc-shim'), *ARGV)

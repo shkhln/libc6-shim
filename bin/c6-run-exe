@@ -1,0 +1,32 @@
+#!/usr/bin/env ruby
+# encoding: UTF-8
+
+if ARGV.length == 0
+  STDERR.puts "Launch a Linux executable through libc6-shim:\n\s\s[env SHIM_LINUX_LIB64_DIR=<path>] #{File.basename($PROGRAM_NAME)} <application> [application args]"
+  exit(1)
+end
+
+target = begin
+  File.realpath(ARGV[0])
+rescue Errno::ENOENT
+  STDERR.puts "#{File.expand_path(ARGV[0])} doesn't exist"
+  exit(1)
+end
+
+if !(`file '#{target}'` =~ /ELF 64-bit LSB executable, x86-64, [^,]+, dynamically linked, interpreter \/lib64\/ld-linux-x86-64\.so\.2/)
+  STDERR.puts "#{target} is not an executable of expected type"
+  exit(1)
+end
+
+dependencies = `ldd -f '%o\n' '#{target}'`.split("\n")
+
+LIB64_DIR = ENV['SHIM_LINUX_LIB64_DIR'] || '/compat/linux/usr/lib64'
+
+libmap = ''
+libmap += "libstdc++.so.6=#{LIB64_DIR}/libstdc++.so.6\n" if dependencies.include?('libstdc++.so.6')
+libmap += "libGLU.so.1=#{LIB64_DIR}/libGLU.so.1\n"       if dependencies.include?('libGLU.so.1')
+
+ENV['SHIM_PROC_SELF_EXE'] = target
+ENV['LD_LIBMAP']          = [libmap].compact.join("\n")
+
+exec(File.join(__dir__, 'with-glibc-shim'), '/libexec/ld-elf.so.1', *ARGV)
