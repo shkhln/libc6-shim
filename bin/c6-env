@@ -1,0 +1,39 @@
+#!/usr/bin/env ruby
+# encoding: UTF-8
+
+if ARGV.length == 0
+  STDERR.puts "Run application with libc6-shim:\n\s\s[env SHIM_DEBUG=1] #{File.basename($PROGRAM_NAME)} <application> [application args]"
+  exit(0)
+end
+
+SHIM_LIB64_DIR = File.join(__dir__, '../lib64')
+SHIM_LIB32_DIR = File.join(__dir__, '../lib32')
+
+def libmap(target_dir, libdir_suffix)
+
+  shim_path = File.expand_path(ENV['SHIM_DEBUG'] == '1' ? 'libc6-debug.so' : 'libc6.so', target_dir)
+
+  lmap = {
+    'ld-linux.so.2'        => shim_path,
+    'ld-linux-x86-64.so.2' => shim_path,
+    'libc.so.6'            => shim_path,
+    'libdl.so.2'           => shim_path,
+    'libm.so.6 '           => shim_path,
+    'libpthread.so.0'      => shim_path,
+    'librt.so.1'           => shim_path,
+    'libcxxrt.so.1'        => (File.expand_path('fakecxxrt.so', target_dir) if ENV['SHIM_FAKECXXRT'] == '1')
+  }
+
+  if libdir_suffix == '' && File.exist?("/lib/librt.so.1")
+    lmap['bsd-librt.so.1'] = "/lib/librt.so.1"
+  else
+    lmap['bsd-librt.so.1'] = "/usr/lib#{libdir_suffix}/librt.so.1"
+  end
+
+  lmap.compact.map{|k, v| '%-40s %s' % [k, v]}.join("\n")
+end
+
+ENV['LD_LIBMAP']    = [libmap(SHIM_LIB64_DIR, ''),   ENV['LD_LIBMAP']   ].compact.join("\n")
+ENV['LD_32_LIBMAP'] = [libmap(SHIM_LIB32_DIR, '32'), ENV['LD_32_LIBMAP']].compact.join("\n")
+
+exec([ARGV[0]] * 2, *ARGV[1..-1])
