@@ -141,8 +141,14 @@ SHIM_WRAP(dlmopen);
 SHIM_WRAP(dlsym);
 SHIM_WRAP(dlvsym);
 
+#define LINUX_RTLD_DI_ORIGIN 6
+
 static int shim_dlinfo_impl(void* restrict handle, int request, void* restrict p) {
-  UNIMPLEMENTED();
+  switch (request) {
+    case LINUX_RTLD_DI_ORIGIN: return dlinfo(handle, RTLD_DI_ORIGIN, p);
+    default:
+      UNIMPLEMENTED_ARGS("%p, %d, %p", handle, request, p);
+  }
 }
 
 SHIM_WRAP(dlinfo);
