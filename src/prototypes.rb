@@ -3044,6 +3044,7 @@ define(["stdlib.h", "limits.h", "inttypes.h", "sys/types.h"], [
 # STRXFRM(3)
 define(["string.h"], [
   "size_t strxfrm(char* restrict dst, const char* restrict src, size_t n)",
+  "size_t __strxfrm_l(char* restrict dst, const char* restrict src, size_t n, locale_t loc)",
   "size_t strxfrm_l(char* restrict dst, const char* restrict src, size_t n, locale_t loc)"
 ])
 

@@ -85,6 +85,10 @@ static int shim_strncasecmp_l_impl(const char* s1, const char* s2, size_t len, l
   return strncasecmp_l(s1, s2, len, loc->native_locale);
 }
 
+static size_t shim___strxfrm_l_impl(char* restrict dst, const char* restrict src, size_t n, linux_locale_t loc) {
+  return strxfrm_l(dst, src, n, loc->native_locale);
+}
+
 static size_t shim_strxfrm_l_impl(char* restrict dst, const char* restrict src, size_t n, linux_locale_t loc) {
   return strxfrm_l(dst, src, n, loc->native_locale);
 }
@@ -92,6 +96,7 @@ static size_t shim_strxfrm_l_impl(char* restrict dst, const char* restrict src, 
 SHIM_WRAP(strcasecmp_l);
 SHIM_WRAP(strcoll_l);
 SHIM_WRAP(strncasecmp_l);
+SHIM_WRAP(__strxfrm_l);
 SHIM_WRAP(strxfrm_l);
 
 static int shim___xpg_strerror_r_impl(int errnum, char* buf, size_t buflen) {
