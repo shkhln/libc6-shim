@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <errno.h>
+#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -68,6 +69,35 @@ static int shim___fxstat64_impl(int ver, int fd, linux_stat64* stat_buf) {
   struct stat sb;
 
   int err = fstat(fd, &sb);
+  if (err == 0) {
+    copy_stat_buf64(stat_buf, &sb);
+  }
+
+  return err;
+}
+
+#define LINUX_AT_SYMLINK_NOFOLLOW 0x0100
+#define LINUX_AT_EMPTY_PATH       0x1000
+
+#define KNOWN_LINUX_AT_FLAGS (LINUX_AT_SYMLINK_NOFOLLOW | LINUX_AT_EMPTY_PATH)
+
+static int linux_to_native_fstatat_flags(int linux_flags) {
+
+  assert((linux_flags & ~KNOWN_LINUX_AT_FLAGS) == 0);
+
+  int flags = 0;
+
+  if (linux_flags & LINUX_AT_SYMLINK_NOFOLLOW) flags |= AT_SYMLINK_NOFOLLOW;
+  if (linux_flags & LINUX_AT_EMPTY_PATH)       flags |= AT_EMPTY_PATH;
+
+  return flags;
+}
+
+static int shim___fxstatat64_impl(int ver, int dirfd, const char* path, linux_stat64* stat_buf, int linux_flags) {
+
+  struct stat sb;
+
+  int err = fstatat(dirfd, path, &sb, linux_to_native_fstatat_flags(linux_flags));
   if (err == 0) {
     copy_stat_buf64(stat_buf, &sb);
   }
@@ -159,6 +189,7 @@ static int shim_chmod_impl(const char* path, linux_mode_t mode) {
 
 SHIM_WRAP(__fxstat);
 SHIM_WRAP(__fxstat64);
+SHIM_WRAP(__fxstatat64);
 SHIM_WRAP(__lxstat);
 SHIM_WRAP(__lxstat64);
 SHIM_WRAP(__xmknod);
