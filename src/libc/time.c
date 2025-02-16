@@ -50,6 +50,10 @@ int shim_clock_gettime_impl(linux_clockid_t linux_clock_id, linux_timespec* tp) 
 
 SHIM_WRAP(clock_gettime);
 
+static size_t shim___strftime_l_impl(char* restrict buf, size_t maxsize, const char* restrict format, const linux_tm* restrict timeptr, linux_locale_t loc) {
+  return strftime_l(buf, maxsize, format, timeptr, loc->native_locale);
+}
+
 static size_t shim_strftime_l_impl(char* restrict buf, size_t maxsize, const char* restrict format, const linux_tm* restrict timeptr, linux_locale_t loc) {
   return strftime_l(buf, maxsize, format, timeptr, loc->native_locale);
 }
@@ -58,5 +62,6 @@ static char* shim_strptime_l_impl(const char* restrict buf, const char* restrict
   return strptime_l(buf, format, timeptr, loc->native_locale);
 }
 
+SHIM_WRAP(__strftime_l);
 SHIM_WRAP(strftime_l);
 SHIM_WRAP(strptime_l);

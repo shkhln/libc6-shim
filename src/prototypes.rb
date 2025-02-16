@@ -2987,6 +2987,7 @@ define(["monetary.h"], [
 # STRFTIME(3)
 define(["time.h"], [
   "size_t strftime(char* restrict buf, size_t maxsize, const char* restrict format, const struct tm* restrict timeptr)",
+  "size_t __strftime_l(char* restrict buf, size_t maxsize, const char* restrict format, const struct tm* restrict timeptr, locale_t loc)",
   "size_t strftime_l(char* restrict buf, size_t maxsize, const char* restrict format, const struct tm* restrict timeptr, locale_t loc)"
 ])
 
