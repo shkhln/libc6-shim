@@ -99,3 +99,10 @@ static int shim___xpg_strerror_r_impl(int errnum, char* buf, size_t buflen) {
 }
 
 SHIM_WRAP(__xpg_strerror_r);
+
+static void* shim___memmove_chk_impl(void* dest, const void* src, size_t len, size_t destlen) {
+  assert(len <= destlen);
+  return memmove(dest, src, len);
+}
+
+SHIM_WRAP(__memmove_chk);
