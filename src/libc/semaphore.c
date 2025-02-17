@@ -23,7 +23,7 @@ SHIM_WRAP(sem_trywait);
 SHIM_WRAP(sem_timedwait);
 
 static int shim_sem_getvalue_impl(sem_t* restrict sem, int* restrict sval) {
-  UNIMPLEMENTED();
+  return sem_getvalue(sem, sval);
 }
 
 SHIM_WRAP(sem_getvalue);
