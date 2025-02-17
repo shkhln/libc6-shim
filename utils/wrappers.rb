@@ -109,6 +109,8 @@ def to_shim_type(type)
       'linux_pthread_mutex_t*'
     when /^(const |)pthread_(barrier|cond|mutex|rwlock)attr_t\*/
       $1 + 'linux_pthread_' + $2 + 'attr_t*'
+    when /(^|\s)(stack_t|sigset_t)($|[^\w_])/
+      type.gsub(/(^|\s)(stack_t|sigset_t)($|[^\w_])/) { "#{$1}linux_#{$2}#{$3}" }
     else
       type.gsub(/struct\s+/, 'linux_')
   end

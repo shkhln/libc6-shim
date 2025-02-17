@@ -3,8 +3,10 @@
 #include <pthread.h>
 #include <pthread_np.h>
 #include <signal.h>
+#include <spawn.h>
 #include "../shim.h"
 #include "../libc/sched.h"
+#include "../libc/signal.h"
 #include "../libc/time.h"
 #include "pthread.h"
 
@@ -110,12 +112,10 @@ static int shim_pthread_setname_np_impl(pthread_t tid, const char* name) {
   return 0;
 }
 
-static int shim_pthread_kill_impl(pthread_t thread, int sig) {
-  if (sig == 0 || sig == 9) {
-    return pthread_kill(thread, sig);
-  } else {
-    UNIMPLEMENTED_ARGS("%p, %d", thread, sig);
-  }
+static int shim_pthread_kill_impl(pthread_t thread, int linux_sig) {
+  int sig = linux_to_freebsd_signo(linux_sig);
+  assert(sig != -1);
+  return pthread_kill(thread, sig);
 }
 
 SHIM_WRAP(pthread_getaffinity_np);
@@ -571,13 +571,40 @@ static int shim_pthread_create_impl(pthread_t* thread, const pthread_attr_t* att
 SHIM_WRAP(pthread_create);
 #endif
 
-void shim___pthread_register_cancel_impl(void* buf) {
+static void shim___pthread_register_cancel_impl(void* buf) {
   // do nothing
 }
 
-void shim___pthread_unregister_cancel_impl(void* buf) {
+static void shim___pthread_unregister_cancel_impl(void* buf) {
   // do nothing
 }
 
 SHIM_WRAP(__pthread_register_cancel);
 SHIM_WRAP(__pthread_unregister_cancel);
+
+static int shim_pthread_sigmask_impl(int how, const linux_sigset_t* restrict set, linux_sigset_t* restrict oset) {
+  return pthread_sigmask(how, (sigset_t*)set, (sigset_t*)oset);
+}
+
+SHIM_WRAP(pthread_sigmask);
+
+static int shim_posix_spawnattr_getsigdefault_impl(const posix_spawnattr_t* restrict attr, linux_sigset_t* restrict sigdefault) {
+  return posix_spawnattr_getsigdefault(attr, (sigset_t*)sigdefault);
+}
+
+static int shim_posix_spawnattr_getsigmask_impl(const posix_spawnattr_t* restrict attr, linux_sigset_t* restrict sigmask) {
+  return posix_spawnattr_getsigmask(attr, (sigset_t*)sigmask);
+}
+
+static int shim_posix_spawnattr_setsigdefault_impl(posix_spawnattr_t* attr, const linux_sigset_t* restrict sigdefault) {
+  return posix_spawnattr_setsigdefault(attr, (sigset_t*)sigdefault);
+}
+
+static int shim_posix_spawnattr_setsigmask_impl(posix_spawnattr_t* attr, const linux_sigset_t* restrict sigmask) {
+  return posix_spawnattr_setsigmask(attr, (sigset_t*)sigmask);
+}
+
+SHIM_WRAP(posix_spawnattr_getsigdefault);
+SHIM_WRAP(posix_spawnattr_getsigmask);
+SHIM_WRAP(posix_spawnattr_setsigdefault);
+SHIM_WRAP(posix_spawnattr_setsigmask);

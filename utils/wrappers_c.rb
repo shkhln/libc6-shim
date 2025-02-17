@@ -32,6 +32,7 @@ STRUCT_COMPATIBILITY = {
   sembuf:       true,
   sched_param:  true,
   shmid_ds:     false,
+  sigaction:    false,
   sockaddr:     false,
   stat:         false,
   statfs:       false,
@@ -60,6 +61,7 @@ puts <<E
 #include "../src/libc/dirent.h"
 #include "../src/libc/locale.h"
 #include "../src/libc/netdb.h"
+#include "../src/libc/signal.h"
 #include "../src/libc/sched.h"
 #include "../src/libc/time.h"
 #include "../src/libc/sys/mount.h"

@@ -3,7 +3,7 @@
 #include <unistd.h>
 #include <sys/epoll.h>
 #include "../../shim.h"
-#include "fcntl.h"
+#include "../signal.h"
 
 #define LINUX_EPOLL_CLOEXEC 0x80000
 
@@ -40,9 +40,8 @@ static int shim_epoll_wait_impl(int epfd, linux_epoll_event* events, int maxeven
   return libepoll_epoll_wait(epfd, events /* same encoding */, maxevents, timeout);
 }
 
-//TODO: sigset_t compat?
-static int shim_epoll_pwait_impl(int epfd, struct epoll_event* events, int maxevents, int timeout, const sigset_t* sigmask) {
-  return libepoll_epoll_pwait(epfd, events /* same encoding */, maxevents, timeout, sigmask /* ? */);
+static int shim_epoll_pwait_impl(int epfd, struct epoll_event* events, int maxevents, int timeout, const linux_sigset_t* sigmask) {
+  return libepoll_epoll_pwait(epfd, events /* same encoding */, maxevents, timeout, (sigset_t*)sigmask);
 }
 
 SHIM_WRAP(epoll_create);
