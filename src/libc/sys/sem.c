@@ -25,12 +25,10 @@ static int linux_to_native_sem_cmd(int cmd) {
     //~ case LINUX_IPC_SET:  return IPC_SET;
     //~ case LINUX_IPC_STAT: return IPC_STAT;
     case LINUX_GETPID:   return GETPID;
-    //~ case LINUX_GETVAL:   return GETVAL;
+    case LINUX_GETVAL:   return GETVAL;
     //~ case LINUX_GETALL:   return GETALL;
     case LINUX_GETNCNT:  return GETNCNT;
     case LINUX_GETZCNT:  return GETZCNT;
-    //~ case LINUX_SETVAL:   return SETVAL;
-    //~ case LINUX_SETALL:   return SETALL;
     default:
       assert(0);
   }
@@ -40,6 +38,10 @@ static int shim_semctl_impl(int semid, int semnum, int cmd, va_list args) {
 
   if (cmd == LINUX_SETVAL) {
     return semctl(semid, semnum, SETVAL, va_arg(args, int));
+  }
+
+  if (cmd == LINUX_SETALL) {
+    return semctl(semid, semnum, SETALL, va_arg(args, unsigned short*));
   }
 
   return semctl(semid, semnum, linux_to_native_sem_cmd(cmd));
