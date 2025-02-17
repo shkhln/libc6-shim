@@ -11,6 +11,7 @@ SUBSTITUTIONS = {
   _exit:           '_Exit',
   _IO_getc:        'getc',
   _IO_putc:        'putc',
+  creat64:         'creat',
   mkstemp64:       'mkstemp'
 }
 
@@ -152,7 +153,7 @@ puts
 
 for sym, subst in SUBSTITUTIONS
   puts "extern __typeof(shim_#{subst}) shim_#{sym} __attribute__((alias(\"shim_#{subst}\")));"
-  puts "SHIM_EXPORT(#{sym})";
+  puts "SHIM_EXPORT(#{sym});"
 end
 
 puts
