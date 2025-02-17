@@ -53,6 +53,8 @@ static void copy_linux_flock(struct flock* dst, struct linux_flock* src) {
 
 extern int (*libepoll_epoll_shim_fcntl)(int, int, ...);
 
+#define LINUX_FD_CLOEXEC 1
+
 static int shim_fcntl_impl(int fd, int cmd, va_list args) {
 
   if (cmd == LINUX_F_GETFD) {
@@ -63,17 +65,18 @@ static int shim_fcntl_impl(int fd, int cmd, va_list args) {
   if (cmd == LINUX_F_SETFD) {
     int arg = va_arg(args, int);
     LOG("%s: cmd = F_SETFD, arg = 0x%x", __func__, arg);
-    assert(arg == 1);
-    return libepoll_epoll_shim_fcntl(fd, F_SETFD, FD_CLOEXEC);
+    return libepoll_epoll_shim_fcntl(fd, F_SETFD, arg & LINUX_FD_CLOEXEC ? FD_CLOEXEC : 0);
   }
 
   if (cmd == LINUX_F_GETFL) {
     LOG("%s: cmd = F_GETFL", __func__);
     int flags       = libepoll_epoll_shim_fcntl(fd, F_GETFL);
+    LOG("%s: flags -> %#x", __func__, flags);
 
-    assert((flags & ~(O_RDWR | O_NONBLOCK)) == 0);
+    assert((flags & ~(LINUX_O_WRONLY | O_RDWR | O_NONBLOCK)) == 0);
 
     int linux_flags =
+      (flags & O_WRONLY   ? LINUX_O_WRONLY   : 0) |
       (flags & O_RDWR     ? LINUX_O_RDWR     : 0) |
       (flags & O_NONBLOCK ? LINUX_O_NONBLOCK : 0);
 
