@@ -570,3 +570,14 @@ static int shim_pthread_create_impl(pthread_t* thread, const pthread_attr_t* att
 
 SHIM_WRAP(pthread_create);
 #endif
+
+void shim___pthread_register_cancel_impl(void* buf) {
+  // do nothing
+}
+
+void shim___pthread_unregister_cancel_impl(void* buf) {
+  // do nothing
+}
+
+SHIM_WRAP(__pthread_register_cancel);
+SHIM_WRAP(__pthread_unregister_cancel);
