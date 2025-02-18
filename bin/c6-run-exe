@@ -6,6 +6,11 @@ if ARGV.length == 0
   exit(1)
 end
 
+launcher_args = []
+while ARGV[0].start_with?('-')
+  launcher_args << ARGV.shift
+end
+
 target = begin
   File.realpath(ARGV[0])
 rescue Errno::ENOENT
@@ -13,12 +18,12 @@ rescue Errno::ENOENT
   exit(1)
 end
 
+target_args = ARGV[1..-1]
+
 if !(`file '#{target}'` =~ /ELF 64-bit LSB (pie |)executable, x86-64, [^,]+, dynamically linked, interpreter \/lib64\/ld-linux-x86-64\.so\.2/)
   STDERR.puts "#{target} is not an executable of expected type"
   exit(1)
 end
-
-#~ dependencies = `ldd -f '%o\n' '#{target}'`.split("\n")
 
 LIB64_DIR = ENV['SHIM_LINUX_LIB64_DIR'] || '/compat/linux/usr/lib64'
 
@@ -34,4 +39,40 @@ LIBMAP
 ENV['SHIM_PROC_SELF_EXE'] = target
 ENV['LD_LIBMAP']          = [libmap, ENV['LD_LIBMAP']].compact.join("\n")
 
-exec(File.join(__dir__, 'c6-env'), '/libexec/ld-elf.so.1', target, *ARGV[1..-1])
+if launcher_args.include?('-d')
+
+  checksum = `sha256 -q "#{target}"`.chomp
+
+  debug_target = File.join(File.dirname(target), checksum)
+  if !File.exist?(debug_target)
+    headers = `readelf --sections --wide "#{target}"`
+
+    obj = IO.binread(target)
+    headers.each_line do |line|
+      if line =~ /(?:.interp|.note.(?:ABI-tag|gnu.build-id))\s+(?:PROGBITS|NOTE)\s+[0-9a-f]+\s+([0-9a-f]+)\s([0-9a-f]+)/
+        offset = $1.to_i(16)
+        size   = $2.to_i(16)
+        str = obj[offset..(offset + size)]
+        str.gsub!('/lib64/ld-linux-x86-6'.b, "/libexec/ld-elf.so.1\x00".b)
+        str.gsub!('GNU'.b, "xxx".b)
+        obj[offset..(offset + size)] = str
+      end
+    end
+
+    IO.binwrite("#{debug_target}.temp", obj)
+    File.chmod(0700, "#{debug_target}.temp")
+    system('brandelf', '-t', 'FreeBSD', "#{debug_target}.temp") || raise
+    system('mv', "#{debug_target}.temp", debug_target) || raise
+  end
+
+  lldb_args = [
+    '--one-line', "pro hand -p true -s false SIGUSR1",
+    '--one-line', "pro hand -p true -s false SIGXCPU",
+  ]
+
+  system('mount', '-t', 'nullfs', '-o', 'nocover', debug_target, target) || raise
+  system(File.join(__dir__, 'c6-env'), 'lldb', *lldb_args, target, '--', *target_args)
+  system('umount', target)
+else
+  exec(File.join(__dir__, 'c6-env'), '/libexec/ld-elf.so.1', target, *target_args)
+end
