@@ -20,7 +20,7 @@ static int linux_to_native_sock_level(int level) {
     case LINUX_SOL_TCP:    return IPPROTO_TCP;
     case LINUX_SOL_UDP:    return IPPROTO_UDP;
     default:
-      assert(0);
+      UNIMPLEMENTED_PATH("Unknown linux sock level: %d", level);
   }
 }
 
@@ -31,7 +31,7 @@ static int native_to_linux_sock_level(int level) {
     case IPPROTO_TCP: return LINUX_SOL_TCP;
     case IPPROTO_UDP: return LINUX_SOL_UDP;
     default:
-      assert(0);
+      UNIMPLEMENTED_PATH("Unknown native sock level: %d", level);
   }
 }
 
@@ -70,7 +70,7 @@ int native_to_linux_sock_type(int type) {
 
 static int linux_to_native_msg_flags(int linux_flags) {
 
-  assert((linux_flags & KNOWN_LINUX_MSG_FLAGS) == linux_flags);
+  assert((linux_flags & ~KNOWN_LINUX_MSG_FLAGS) == 0);
 
   int flags = 0;
 
@@ -91,7 +91,7 @@ static int linux_to_native_msg_flags(int linux_flags) {
 
 static int native_to_linux_msg_flags(int flags) {
 
-  assert((flags & KNOWN_NATIVE_MSG_FLAGS) == flags);
+  assert((flags & ~KNOWN_NATIVE_MSG_FLAGS) == 0);
 
   int linux_flags = 0;
 
@@ -146,11 +146,38 @@ void linux_to_native_sockaddr_un(struct sockaddr_un* dest, const linux_sockaddr_
   }
 }
 
+static void linux_to_native_sockaddr(struct sockaddr* addr, socklen_t* len, const struct linux_sockaddr* linux_addr) {
+  switch (linux_addr->sa_family) {
+    case LINUX_PF_UNIX:
+      assert(*len >= sizeof(struct sockaddr_un));
+      linux_to_native_sockaddr_un((struct sockaddr_un*)addr, (linux_sockaddr_un*)linux_addr);
+      *len = sizeof(struct sockaddr_un);
+      break;
+    case LINUX_PF_INET:
+      assert(*len >= sizeof(struct sockaddr_in));
+      linux_to_native_sockaddr_in((struct sockaddr_in*)addr, (linux_sockaddr_in*)linux_addr);
+      *len = sizeof(struct sockaddr_in);
+#ifdef DEBUG
+      char buffer[INET_ADDRSTRLEN];
+      inet_ntop(AF_INET, &((struct sockaddr_in*)addr)->sin_addr, buffer, sizeof(buffer));
+      LOG("%s: address: %s:%d", __func__, buffer, ntohs(((struct sockaddr_in*)addr)->sin_port));
+#endif
+      break;
+    case LINUX_PF_INET6:
+      assert(*len >= sizeof(struct sockaddr_in6));
+      linux_to_native_sockaddr_in6((struct sockaddr_in6*)addr, (linux_sockaddr_in6*)linux_addr);
+      *len = sizeof(struct sockaddr_in6);
+      break;
+    default:
+      UNIMPLEMENTED_PATH("Unknown linux family: %d", linux_addr->sa_family);
+  }
+}
+
 void native_to_linux_sockaddr_in(linux_sockaddr_in* dest, const struct sockaddr_in* src) {
   dest->sin_family = LINUX_PF_INET;
   dest->sin_port   = src->sin_port;
   dest->sin_addr   = src->sin_addr;
-  memcpy(dest->sin_zero, src->sin_zero, sizeof(dest->sin_zero));
+  memcpy(dest->sin_zero, src->sin_zero, sizeof(dest->sin_zero)); // ?
 }
 
 void native_to_linux_sockaddr_in6(linux_sockaddr_in6* dest, const struct sockaddr_in6* src) {
@@ -167,13 +194,40 @@ void native_to_linux_sockaddr_un(linux_sockaddr_un* dest, const struct sockaddr_
   assert(nbytes < sizeof(dest->sun_path));
 }
 
-static int linux_to_native_domain(int domain) {
-  switch (domain) {
+static void native_to_linux_sockaddr(struct linux_sockaddr* linux_addr, socklen_t* linux_len, const struct sockaddr* addr) {
+  switch (addr->sa_family) {
+    case PF_UNIX:
+      assert(*linux_len >= sizeof(struct linux_sockaddr_un));
+      native_to_linux_sockaddr_un((linux_sockaddr_un*)linux_addr, (struct sockaddr_un*)addr);
+      *linux_len = sizeof(struct linux_sockaddr_un);
+      break;
+    case PF_INET:
+      assert(*linux_len >= sizeof(struct linux_sockaddr_in));
+      native_to_linux_sockaddr_in((linux_sockaddr_in*)linux_addr, (struct sockaddr_in*)addr);
+      *linux_len = sizeof(struct linux_sockaddr_in);
+#ifdef DEBUG
+      char buffer[INET_ADDRSTRLEN];
+      inet_ntop(AF_INET, &((struct sockaddr_in*)addr)->sin_addr, buffer, sizeof(buffer));
+      LOG("%s: address: %s:%d", __func__, buffer, ntohs(((struct sockaddr_in*)addr)->sin_port));
+#endif
+      break;
+    case PF_INET6:
+      assert(*linux_len >= sizeof(struct linux_sockaddr_in6));
+      native_to_linux_sockaddr_in6((linux_sockaddr_in6*)linux_addr, (struct sockaddr_in6*)addr);
+      *linux_len = sizeof(struct linux_sockaddr_in6);
+      break;
+    default:
+      UNIMPLEMENTED_PATH("Unknown native family: %d", addr->sa_family);
+  }
+}
+
+static int linux_to_native_domain(int linux_domain) {
+  switch (linux_domain) {
     case LINUX_PF_UNIX:  return PF_UNIX;
     case LINUX_PF_INET:  return PF_INET;
     case LINUX_PF_INET6: return PF_INET6;
     default:
-      assert(0);
+      UNIMPLEMENTED_PATH("Unknown linux domain: %d", linux_domain);
   }
 }
 
@@ -220,7 +274,7 @@ static int shim_bind_impl(int s, const linux_sockaddr* linux_addr, socklen_t add
       }
 
     default:
-      assert(0);
+      UNIMPLEMENTED_PATH("Unknown linux family: %d", linux_addr->sa_family);
   }
 }
 
@@ -254,7 +308,7 @@ static int shim_connect_impl(int s, const linux_sockaddr* linux_name, socklen_t 
       }
 
     default:
-      assert(0);
+      UNIMPLEMENTED_PATH("Unknown linux family: %d", linux_name->sa_family);
   }
 }
 
@@ -274,13 +328,7 @@ _Static_assert(offsetof(struct linux_cmsghdr, cmsg_len)    == offsetof(struct cm
 #endif
 
 // we also assume the payload itself has the same layout and size
-static void linux_to_native_msghdr(struct msghdr* msg, const struct linux_msghdr* linux_msg) {
-
-  msg->msg_name    = linux_msg->msg_name;
-  msg->msg_namelen = linux_msg->msg_namelen;
-  msg->msg_iov     = linux_msg->msg_iov;
-  msg->msg_iovlen  = linux_msg->msg_iovlen;
-  msg->msg_flags   = linux_to_native_msg_flags(linux_msg->msg_flags);
+static void linux_to_native_msg_control(struct msghdr* msg, const struct linux_msghdr* linux_msg) {
 
   if (linux_msg->msg_controllen > 0) {
 
@@ -302,18 +350,13 @@ static void linux_to_native_msghdr(struct msghdr* msg, const struct linux_msghdr
       memcpy(CMSG_DATA(cmsg), LINUX_CMSG_DATA(linux_cmsg), linux_cmsg->cmsg_len - LINUX_CMSG_LEN(0));
     }
   } else {
+    msg->msg_control    = NULL;
     msg->msg_controllen = 0;
   }
 }
 
-// same assumptions as in linux_to_native_msghdr
-static void native_to_linux_msghdr(struct linux_msghdr* linux_msg, const struct msghdr* msg) {
-
-  linux_msg->msg_name    = msg->msg_name;
-  linux_msg->msg_namelen = msg->msg_namelen;
-  linux_msg->msg_iov     = msg->msg_iov;
-  linux_msg->msg_iovlen  = msg->msg_iovlen;
-  linux_msg->msg_flags   = native_to_linux_msg_flags(msg->msg_flags);
+// same assumptions as in linux_to_native_msg_control
+static void native_to_linux_msg_control(struct linux_msghdr* linux_msg, const struct msghdr* msg) {
 
   if (msg->msg_controllen > 0) {
 
@@ -333,12 +376,13 @@ static void native_to_linux_msghdr(struct linux_msghdr* linux_msg, const struct 
       } else if (cmsg->cmsg_level == IPPROTO_IP && cmsg->cmsg_type == IP_RECVTOS) {
         linux_cmsg->cmsg_type = LINUX_IP_TOS;
       } else {
-        assert(0);
+        UNIMPLEMENTED_PATH("Unknown native cmsg level %d or type %d", cmsg->cmsg_level, cmsg->cmsg_type);
       }
 
       memcpy(LINUX_CMSG_DATA(linux_cmsg), CMSG_DATA(cmsg), cmsg->cmsg_len - CMSG_LEN(0));
     }
   } else {
+    linux_msg->msg_control    = NULL;
     linux_msg->msg_controllen = 0;
   }
 }
@@ -361,21 +405,52 @@ static ssize_t shim_send_impl(int s, const void* msg, size_t len, int linux_flag
 
 static ssize_t shim_recvmsg_impl(int s, struct linux_msghdr* linux_msg, int linux_flags) {
 
-  struct msghdr msg;
-  uint8_t buf[linux_msg->msg_controllen];
+  ssize_t nbytes;
+  if (linux_msg->msg_name != NULL) {
 
-  msg.msg_name       = linux_msg->msg_name;
-  msg.msg_namelen    = linux_msg->msg_namelen;
-  msg.msg_iov        = linux_msg->msg_iov;
-  msg.msg_iovlen     = linux_msg->msg_iovlen;
-  msg.msg_control    = &buf;
-  msg.msg_controllen = sizeof(buf);
-  msg.msg_flags      = linux_to_native_msg_flags(linux_msg->msg_flags);
+    struct sockaddr_storage name;
+    uint8_t control[linux_msg->msg_controllen];
 
-  ssize_t nbytes = recvmsg(s, &msg, linux_to_native_msg_flags(linux_flags));
-  if (nbytes != -1) {
-    native_to_linux_msghdr(linux_msg, &msg);
+    struct msghdr msg = {
+      .msg_name       = &name,
+      .msg_namelen    = sizeof(name),
+      .msg_iov        = linux_msg->msg_iov,
+      .msg_iovlen     = linux_msg->msg_iovlen,
+      .msg_control    = &control,
+      .msg_controllen = sizeof(control),
+      .msg_flags      = 0
+    };
+
+    nbytes = recvmsg(s, &msg, linux_to_native_msg_flags(linux_flags));
+    if (nbytes != -1) {
+      linux_msg->msg_iovlen = msg.msg_iovlen;
+      linux_msg->msg_flags  = native_to_linux_msg_flags(msg.msg_flags);
+      native_to_linux_sockaddr(linux_msg->msg_name, &linux_msg->msg_namelen, (struct sockaddr*)&name);
+      native_to_linux_msg_control(linux_msg, &msg);
+    }
+
   } else {
+    uint8_t control[linux_msg->msg_controllen];
+
+    struct msghdr msg = {
+      .msg_name       = NULL,
+      .msg_namelen    = 0,
+      .msg_iov        = linux_msg->msg_iov,
+      .msg_iovlen     = linux_msg->msg_iovlen,
+      .msg_control    = &control,
+      .msg_controllen = sizeof(control),
+      .msg_flags      = 0
+    };
+
+    nbytes = recvmsg(s, &msg, linux_to_native_msg_flags(linux_flags));
+    if (nbytes != -1) {
+      linux_msg->msg_iovlen = msg.msg_iovlen;
+      linux_msg->msg_flags  = native_to_linux_msg_flags(msg.msg_flags);
+      native_to_linux_msg_control(linux_msg, &msg);
+    }
+  }
+
+  if (nbytes == -1) {
     errno = native_to_linux_errno(errno);
   }
 
@@ -384,15 +459,44 @@ static ssize_t shim_recvmsg_impl(int s, struct linux_msghdr* linux_msg, int linu
 
 static ssize_t shim_sendmsg_impl(int s, const struct linux_msghdr* linux_msg, int linux_flags) {
 
-  struct msghdr msg;
-  uint8_t buf[linux_msg->msg_controllen];
+  ssize_t nbytes;
+  if (linux_msg->msg_name != NULL) {
 
-  msg.msg_control    = &buf;
-  msg.msg_controllen = sizeof(buf);
+    struct sockaddr_storage name;
+    uint8_t control[linux_msg->msg_controllen];
 
-  linux_to_native_msghdr(&msg, linux_msg);
+    struct msghdr msg = {
+      .msg_name       = &name,
+      .msg_namelen    = sizeof(name),
+      .msg_iov        = linux_msg->msg_iov,
+      .msg_iovlen     = linux_msg->msg_iovlen,
+      .msg_control    = &control,
+      .msg_controllen = sizeof(control),
+      .msg_flags      = 0
+    };
 
-  ssize_t nbytes = sendmsg(s, &msg, linux_to_native_msg_flags(linux_flags));
+    linux_to_native_sockaddr(msg.msg_name, &msg.msg_namelen, linux_msg->msg_name);
+    linux_to_native_msg_control(&msg, linux_msg);
+
+    nbytes = sendmsg(s, &msg, linux_to_native_msg_flags(linux_flags));
+  } else {
+    uint8_t control[linux_msg->msg_controllen];
+
+    struct msghdr msg = {
+      .msg_name       = NULL,
+      .msg_namelen    = 0,
+      .msg_iov        = linux_msg->msg_iov,
+      .msg_iovlen     = linux_msg->msg_iovlen,
+      .msg_control    = &control,
+      .msg_controllen = sizeof(control),
+      .msg_flags      = 0
+    };
+
+    linux_to_native_msg_control(&msg, linux_msg);
+
+    nbytes = sendmsg(s, &msg, linux_to_native_msg_flags(linux_flags));
+  }
+
   if (nbytes == -1) {
     errno = native_to_linux_errno(errno);
   }
@@ -405,31 +509,16 @@ static ssize_t shim_recvfrom_impl(int s, void* buf, size_t len, int linux_flags,
   ssize_t nbytes;
   if (linux_from != NULL) {
 
-    uint8_t   from[110] __attribute__((aligned(8))); // ?
+    struct sockaddr_storage from;
     socklen_t fromlen = sizeof(from);
 
     nbytes = recvfrom(s, buf, len, linux_to_native_msg_flags(linux_flags), (struct sockaddr*)&from, &fromlen);
     if (nbytes != -1) {
-      switch (((struct sockaddr*)&from)->sa_family) {
-        case PF_UNIX:
-          assert(*linux_fromlen >= sizeof(struct linux_sockaddr_un));
-          native_to_linux_sockaddr_un((linux_sockaddr_un*)linux_from, (struct sockaddr_un*)&from);
-          break;
-        case PF_INET:
-          assert(*linux_fromlen >= sizeof(struct linux_sockaddr_in));
-          native_to_linux_sockaddr_in((linux_sockaddr_in*)linux_from, (struct sockaddr_in*)&from);
-          break;
-        case PF_INET6:
-          assert(*linux_fromlen >= sizeof(struct linux_sockaddr_in6));
-          native_to_linux_sockaddr_in6((linux_sockaddr_in6*)linux_from, (struct sockaddr_in6*)&from);
-          break;
-        default:
-          assert(0);
-      }
+      native_to_linux_sockaddr(linux_from, linux_fromlen, (struct sockaddr*)&from);
     }
 
   } else {
-    nbytes = recvfrom(s, buf, len, linux_to_native_msg_flags(linux_flags), NULL, linux_fromlen);
+    nbytes = recvfrom(s, buf, len, linux_to_native_msg_flags(linux_flags), NULL, 0);
   }
 
   if (nbytes == -1) {
@@ -472,7 +561,7 @@ static ssize_t shim_sendto_impl(int s, const void* msg, size_t len, int linux_fl
     break;
 
     default:
-      assert(0);
+      UNIMPLEMENTED_PATH("Unknown linux family: %d", linux_to->sa_family);
   }
 
   if (nbytes == -1) {
@@ -508,7 +597,7 @@ static int linux_to_native_so_opt(int optname) {
     case LINUX_SO_RCVBUF:    return SO_RCVBUF;
     case LINUX_SO_KEEPALIVE: return SO_KEEPALIVE;
     default:
-      assert(0);
+      UNIMPLEMENTED_PATH("Unknown native so option: %d", optname);
   }
 }
 
@@ -516,7 +605,7 @@ static int linux_to_native_ip4_opt(int optname) {
   switch (optname) {
     case LINUX_IP_RECVTOS: return IP_RECVTOS;
     default:
-      assert(0);
+      UNIMPLEMENTED_PATH("Unknown native ip4 option: %d", optname);
   }
 }
 
@@ -524,7 +613,7 @@ static int linux_to_native_ip6_opt(int optname) {
   switch (optname) {
     case LINUX_IPV6_V6ONLY: return IPV6_V6ONLY;
     default:
-      assert(0);
+      UNIMPLEMENTED_PATH("Unknown native ip6 option: %d", optname);
   }
 }
 
@@ -533,7 +622,7 @@ static int linux_to_native_tcp_opt(int optname) {
     case LINUX_TCP_NODELAY:      return TCP_NODELAY;
     case LINUX_TCP_USER_TIMEOUT: return -1; // ?
     default:
-      assert(0);
+      UNIMPLEMENTED_PATH("Unknown native tcp option: %d", optname);
   }
 }
 
@@ -554,7 +643,7 @@ static int shim_getsockopt_impl(int s, int linux_level, int linux_optname, void*
     case LINUX_SOL_IPV6: return getsockopt(s, IPPROTO_IP,  linux_to_native_ip6_opt(linux_optname), optval, optlen);
     case LINUX_SOL_TCP:  return getsockopt(s, IPPROTO_TCP, linux_to_native_tcp_opt(linux_optname), optval, optlen);
     default:
-      assert(0);
+      UNIMPLEMENTED_PATH("Unknown linux level: %d", linux_level);
   }
 }
 
@@ -576,7 +665,7 @@ static int shim_setsockopt_impl(int s, int linux_level, int linux_optname, const
     case LINUX_SOL_IPV6: return setsockopt(s, IPPROTO_IP,  linux_to_native_ip6_opt(linux_optname), optval, optlen);
     case LINUX_SOL_TCP:  return setsockopt(s, IPPROTO_TCP, linux_to_native_tcp_opt(linux_optname), optval, optlen);
     default:
-      assert(0);
+      UNIMPLEMENTED_PATH("Unknown linux level: %d", linux_level);
   }
 }
 
@@ -585,27 +674,12 @@ SHIM_WRAP(setsockopt);
 
 static int shim_getsockname_impl(int s, linux_sockaddr* restrict linux_name, socklen_t* restrict linux_namelen) {
 
-  uint8_t   name[110] __attribute__((aligned(8))); // ?
+  struct sockaddr_storage name;
   socklen_t namelen = sizeof(name);
 
   int err = getsockname(s, (struct sockaddr*)&name, &namelen);
   if (err != -1) {
-    switch (((struct sockaddr*)&name)->sa_family) {
-      case PF_UNIX:
-        assert(*linux_namelen >= sizeof(struct linux_sockaddr_un));
-        native_to_linux_sockaddr_un((linux_sockaddr_un*)linux_name, (struct sockaddr_un*)&name);
-        break;
-      case PF_INET:
-        assert(*linux_namelen >= sizeof(struct linux_sockaddr_in));
-        native_to_linux_sockaddr_in((linux_sockaddr_in*)linux_name, (struct sockaddr_in*)&name);
-        break;
-      case PF_INET6:
-        assert(*linux_namelen >= sizeof(struct linux_sockaddr_in6));
-        native_to_linux_sockaddr_in6((linux_sockaddr_in6*)linux_name, (struct sockaddr_in6*)&name);
-        break;
-      default:
-        assert(0);
-    }
+    native_to_linux_sockaddr(linux_name, linux_namelen, (struct sockaddr*)&name);
   }
 
   return err;

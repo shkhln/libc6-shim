@@ -5,6 +5,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <unistd.h>
 
 #define __HEAD(head, ...) head
@@ -39,7 +40,7 @@ extern __thread int what_was_that_error;
   void* buffer[100];\
   int nframes = backtrace(buffer, 100);\
   backtrace_symbols_fd(buffer, nframes, STDERR_FILENO);\
-  assert(0);\
+  abort();\
 }
 
 #define UNIMPLEMENTED_ARGS(...) {\
@@ -47,7 +48,15 @@ extern __thread int what_was_that_error;
   void* buffer[100];\
   int nframes = backtrace(buffer, 100);\
   backtrace_symbols_fd(buffer, nframes, STDERR_FILENO);\
-  assert(0);\
+  abort();\
+}
+
+#define UNIMPLEMENTED_PATH(...) {\
+  fprintf(stderr, "%s: " __HEAD(__VA_ARGS__) "\n", __func__, __TAIL(__VA_ARGS__));\
+  void* buffer[100];\
+  int nframes = backtrace(buffer, 100);\
+  backtrace_symbols_fd(buffer, nframes, STDERR_FILENO);\
+  abort();\
 }
 
 #ifndef SHIM_EXPORT
