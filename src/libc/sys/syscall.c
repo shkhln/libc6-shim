@@ -14,6 +14,7 @@
 #include "../../shim.h"
 
 #ifdef __i386__
+#define LINUX_FORK              2
 #define LINUX_WRITE             4
 #define LINUX_OPEN              5
 #define LINUX_GETPID           20
@@ -33,6 +34,7 @@
 #define LINUX_OPEN              2
 #define LINUX_MMAP              9
 #define LINUX_GETPID           39
+#define LINUX_FORK             57
 #define LINUX_CAPGET          125
 #define LINUX_GETTID          186
 #define LINUX_FUTEX           202
@@ -106,6 +108,16 @@ static long shim_syscall_impl(long number, va_list args) {
 
     pid_t pid = getpid();
     LOG("%s: getpid -> %d", __func__, pid);
+
+    return pid;
+  }
+
+  if (number == LINUX_FORK) {
+
+    LOG("%s: fork()", __func__);
+
+    pid_t pid = fork();
+    LOG("%s: fork -> %d", __func__, pid);
 
     return pid;
   }
