@@ -253,3 +253,33 @@ SHIM_WRAP(sigsuspend);
 SHIM_WRAP(sigtimedwait);
 SHIM_WRAP(sigwait);
 SHIM_WRAP(sigwaitinfo);
+
+static int linux_to_freebsd_sigstack_flags(int linux_flags) {
+
+  assert((linux_flags & ~KNOWN_LINUX_SIGSTACK_FLAGS) == 0);
+
+  int flags = 0;
+
+  if (linux_flags & LINUX_SS_ONSTACK) flags |= SS_ONSTACK;
+  if (linux_flags & LINUX_SS_DISABLE) flags |= SS_DISABLE;
+
+  return flags;
+}
+
+static int shim_sigaltstack_impl(const linux_stack_t* restrict linux_ss, linux_stack_t* restrict linux_oss) {
+
+  assert(linux_ss  != NULL);
+  assert(linux_oss == NULL);
+
+  LOG("%s: ss_sp = %p, ss_flags = %#x, ss_size = %#zx", __func__, linux_ss->ss_sp, linux_ss->ss_flags, linux_ss->ss_size);
+
+  stack_t ss = {
+    .ss_sp    = linux_ss->ss_sp,
+    .ss_flags = linux_to_freebsd_sigstack_flags(linux_ss->ss_flags),
+    .ss_size  = linux_ss->ss_size
+  };
+
+  return sigaltstack(&ss, NULL);
+}
+
+SHIM_WRAP(sigaltstack);

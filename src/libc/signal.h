@@ -58,4 +58,10 @@ int linux_to_freebsd_signo(int linux_signal);
 
 #define KNOWN_LINUX_SIGSTACK_FLAGS (LINUX_SS_ONSTACK | LINUX_SS_DISABLE)
 
-typedef void linux_stack_t;
+struct linux_stack {
+  void*  ss_sp;
+  int    ss_flags;
+  size_t ss_size;
+};
+
+typedef struct linux_stack linux_stack_t;
