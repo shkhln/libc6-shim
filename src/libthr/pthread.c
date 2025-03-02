@@ -582,8 +582,14 @@ static void shim___pthread_unregister_cancel_impl(void* buf) {
 SHIM_WRAP(__pthread_register_cancel);
 SHIM_WRAP(__pthread_unregister_cancel);
 
-static int shim_pthread_sigmask_impl(int how, const linux_sigset_t* restrict set, linux_sigset_t* restrict oset) {
-  return pthread_sigmask(how, (sigset_t*)set, (sigset_t*)oset);
+static int shim_pthread_sigmask_impl(int linux_how, const linux_sigset_t* restrict set, linux_sigset_t* restrict oset) {
+  switch (linux_how) {
+    case LINUX_SIG_BLOCK:   return pthread_sigmask(SIG_BLOCK,   (sigset_t*)set, (sigset_t*)oset);
+    case LINUX_SIG_UNBLOCK: return pthread_sigmask(SIG_UNBLOCK, (sigset_t*)set, (sigset_t*)oset);
+    case LINUX_SIG_SETMASK: return pthread_sigmask(SIG_SETMASK, (sigset_t*)set, (sigset_t*)oset);
+    default:
+      UNIMPLEMENTED_ARGS("%d", linux_how);
+  }
 }
 
 SHIM_WRAP(pthread_sigmask);
