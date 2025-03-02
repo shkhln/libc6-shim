@@ -6,6 +6,7 @@
 #include <time.h>
 #include <unistd.h>
 #include <sys/types.h>
+#include <sys/random.h>
 #include <sys/mman.h>
 #include <sys/thr.h>
 
@@ -198,8 +199,17 @@ static long shim_syscall_impl(long number, va_list args) {
   }
 
   if (number == LINUX_GETRANDOM) {
-    errno = native_to_linux_errno(ENOSYS);
-    return -1;
+
+    void*  buf    = va_arg(args, void*);
+    size_t buflen = va_arg(args, size_t);
+    int    flags  = va_arg(args, unsigned int);
+
+    LOG("%s: getrandom(%p, %zd, %#x)", __func__, buf, buflen, flags);
+
+    int err = getrandom(buf, buflen, flags /* same values */);
+    LOG("%s: getrandom -> %d", __func__, err);
+
+    return err;
   }
 
   if (number == LINUX_MEMFD_CREATE) {
