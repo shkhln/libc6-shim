@@ -1,5 +1,6 @@
 #include <signal.h>
 
+#define LINUX_SIGABRT  6
 #define LINUX_SIGBUS   7
 #define LINUX_SIGUSR1 10
 #define LINUX_SIGSEGV 11

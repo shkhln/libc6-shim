@@ -102,18 +102,25 @@ static int linux_to_freebsd_sigaction_flags(int linux_flags) {
   return flags;
 }
 
+static int freebsd_to_linux_sigaction_flags(int flags) {
+
+  assert((flags & ~(SA_NOCLDSTOP | SA_NOCLDWAIT | SA_SIGINFO | SA_ONSTACK | SA_RESTART | SA_NODEFER | SA_RESETHAND)) == 0);
+
+  int linux_flags = 0;
+
+  if (flags & SA_NOCLDSTOP) linux_flags |= LINUX_SA_NOCLDSTOP;
+  if (flags & SA_NOCLDWAIT) linux_flags |= LINUX_SA_NOCLDWAIT;
+  if (flags & SA_SIGINFO)   linux_flags |= LINUX_SA_SIGINFO;
+  if (flags & SA_ONSTACK)   linux_flags |= LINUX_SA_ONSTACK;
+  if (flags & SA_RESTART)   linux_flags |= LINUX_SA_RESTART;
+  if (flags & SA_NODEFER)   linux_flags |= LINUX_SA_NODEFER;
+  if (flags & SA_RESETHAND) linux_flags |= LINUX_SA_RESETHAND;
+
+  return linux_flags;
+}
+
+// note that LINUX_SIG_DFL == SIG_DFL and LINUX_SIG_IGN == SIG_IGN
 static void linux_to_native_sigaction(struct sigaction* dst, const linux_sigaction* src) {
-
-  if (src->linux_sa_handler == LINUX_SIG_DFL) {
-    dst->sa_handler = SIG_DFL;
-    return;
-  }
-
-  if (src->linux_sa_handler == LINUX_SIG_IGN) {
-    dst->sa_handler = SIG_IGN;
-    return;
-  }
-
   dst->sa_handler = src->linux_sa_handler;
   memcpy(&dst->sa_mask, &src->sa_mask, sizeof(sigset_t));
   dst->sa_flags = linux_to_freebsd_sigaction_flags(src->sa_flags);
@@ -122,14 +129,24 @@ static void linux_to_native_sigaction(struct sigaction* dst, const linux_sigacti
 static void native_to_linux_sigaction(linux_sigaction* dst, const struct sigaction* src) {
   dst->linux_sa_handler = src->sa_handler;
   memcpy(&dst->sa_mask, &src->sa_mask, sizeof(sigset_t));
-  dst->sa_flags = 0; //TODO: convert flags
+  dst->sa_flags = freebsd_to_linux_sigaction_flags(src->sa_flags);
 }
 
 static int shim_sigaction_impl(int linux_sig, const linux_sigaction* linux_act, linux_sigaction* linux_oact) {
 
   // we are not interested in letting things like Unity to register its own segfault handlers
-  if (linux_sig == LINUX_SIGSEGV || linux_sig == LINUX_SIGBUS) {
+  if (linux_sig == LINUX_SIGABRT || linux_sig == LINUX_SIGSEGV || linux_sig == LINUX_SIGBUS || linux_sig == LINUX_SIGSYS) {
+    if (linux_oact != NULL) {
+      linux_oact->linux_sa_handler = LINUX_SIG_DFL;
+      sigemptyset((sigset_t*)&linux_oact->sa_mask);
+      linux_oact->sa_flags = 0;
+    }
     return 0;
+  }
+
+  int sig = linux_to_freebsd_signo(linux_sig);
+  if (sig == -1) {
+    return -1;
   }
 
   if (linux_act != NULL) {
@@ -138,19 +155,19 @@ static int shim_sigaction_impl(int linux_sig, const linux_sigaction* linux_act, 
 
     if (linux_oact != NULL) {
       struct sigaction oact;
-      int err = sigaction(linux_to_freebsd_signo(linux_sig), &act, &oact);
+      int err = sigaction(sig, &act, &oact);
       if (err != -1) {
         native_to_linux_sigaction(linux_oact, &oact);
       }
       return err;
     } else {
-      return sigaction(linux_to_freebsd_signo(linux_sig), &act, NULL);
+      return sigaction(sig, &act, NULL);
     }
   } else {
 
     if (linux_oact != NULL) {
       struct sigaction oact;
-      int err = sigaction(linux_to_freebsd_signo(linux_sig), NULL, &oact);
+      int err = sigaction(sig, NULL, &oact);
       if (err != -1) {
         native_to_linux_sigaction(linux_oact, &oact);
       }
