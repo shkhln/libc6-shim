@@ -9,6 +9,7 @@
 #include <sys/random.h>
 #include <sys/mman.h>
 #include <sys/thr.h>
+#include <sys/umtx.h>
 
 #include "../time.h"
 #include "../../shim.h"
@@ -139,8 +140,39 @@ static long shim_syscall_impl(long number, va_list args) {
   }
 
   if (number == LINUX_FUTEX) {
-    errno = native_to_linux_errno(ENOSYS);
-    return -1;
+
+#define FUTEX_WAIT_PRIVATE 0x80
+#define FUTEX_WAKE_PRIVATE 0x81
+
+    uint32_t*       uaddr    = va_arg(args, uint32_t*);
+    int             futex_op = va_arg(args, int);
+    uint32_t        val      = va_arg(args, uint32_t);
+    linux_timespec* timeout  = va_arg(args, linux_timespec*);
+#ifdef DEBUG
+    uint32_t*       uaddr2   = va_arg(args, uint32_t*);
+    uint32_t        val3     = va_arg(args, uint32_t);
+#endif
+
+    LOG("%s: futex(%p, op = %#x, val = %d, timeout = %p, uaddr2 = %p, val3 = %d)", __func__, uaddr, futex_op, val, timeout, uaddr2, val3);
+
+    int err;
+    switch (futex_op) {
+      case FUTEX_WAIT_PRIVATE:
+        err = _umtx_op(uaddr, UMTX_OP_WAIT, val, (void*)sizeof(struct timespec), timeout);
+        break;
+      case FUTEX_WAKE_PRIVATE:
+        err = _umtx_op(uaddr, UMTX_OP_WAKE, val, NULL, NULL);
+        break;
+      default:
+        err   = -1;
+        errno = ENOSYS;
+    }
+
+    if (err == -1) {
+      errno = native_to_linux_errno(errno);
+    }
+
+    return err;
   }
 
   if (number == LINUX_CLOCK_GETTIME) {
