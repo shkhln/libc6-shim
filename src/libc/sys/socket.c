@@ -13,14 +13,14 @@
 #include "../../shim.h"
 #include "socket.h"
 
-static int linux_to_native_sock_level(int level) {
-  switch (level) {
+static int linux_to_native_sock_level(int linux_level) {
+  switch (linux_level) {
     case LINUX_SOL_SOCKET: return SOL_SOCKET;
     case LINUX_SOL_IP:     return IPPROTO_IP;
     case LINUX_SOL_TCP:    return IPPROTO_TCP;
     case LINUX_SOL_UDP:    return IPPROTO_UDP;
     default:
-      UNIMPLEMENTED_PATH("Unknown linux sock level: %d", level);
+      UNIMPLEMENTED_PATH("Unknown linux sock level: %d", linux_level);
   }
 }
 
@@ -589,40 +589,43 @@ static ssize_t shim___recv_chk_impl(int fd, void* buf, size_t len, size_t buflen
 
 SHIM_WRAP(__recv_chk);
 
-static int linux_to_native_so_opt(int optname) {
-  switch (optname) {
+static int linux_to_native_so_opt(int linux_optname) {
+  switch (linux_optname) {
     case LINUX_SO_REUSEADDR: return SO_REUSEADDR;
     case LINUX_SO_BROADCAST: return SO_BROADCAST;
     case LINUX_SO_SNDBUF:    return SO_SNDBUF;
     case LINUX_SO_RCVBUF:    return SO_RCVBUF;
     case LINUX_SO_KEEPALIVE: return SO_KEEPALIVE;
     default:
-      UNIMPLEMENTED_PATH("Unknown native so option: %d", optname);
+      UNIMPLEMENTED_PATH("Unknown native so option: %d", linux_optname);
   }
 }
 
-static int linux_to_native_ip4_opt(int optname) {
-  switch (optname) {
-    case LINUX_IP_RECVTOS: return IP_RECVTOS;
+static int linux_to_native_ip4_opt(int linux_optname) {
+  switch (linux_optname) {
+    case LINUX_IP_RECVTOS:      return IP_RECVTOS;
+    case LINUX_IP_MTU_DISCOVER: return IP_DONTFRAG; // good enough for Mono (probably)
     default:
-      UNIMPLEMENTED_PATH("Unknown native ip4 option: %d", optname);
+      UNIMPLEMENTED_PATH("Unknown native ip4 option: %d", linux_optname);
   }
 }
 
-static int linux_to_native_ip6_opt(int optname) {
-  switch (optname) {
+static int linux_to_native_ip6_opt(int linux_optname) {
+  switch (linux_optname) {
     case LINUX_IPV6_V6ONLY: return IPV6_V6ONLY;
     default:
-      UNIMPLEMENTED_PATH("Unknown native ip6 option: %d", optname);
+      UNIMPLEMENTED_PATH("Unknown native ip6 option: %d", linux_optname);
   }
 }
 
-static int linux_to_native_tcp_opt(int optname) {
-  switch (optname) {
+static int linux_to_native_tcp_opt(int linux_optname) {
+  switch (linux_optname) {
     case LINUX_TCP_NODELAY:      return TCP_NODELAY;
+    case LINUX_TCP_KEEPIDLE:     return TCP_KEEPIDLE;
+    case LINUX_TCP_KEEPINTVL:    return TCP_KEEPINTVL;
     case LINUX_TCP_USER_TIMEOUT: return -1; // ?
     default:
-      UNIMPLEMENTED_PATH("Unknown native tcp option: %d", optname);
+      UNIMPLEMENTED_PATH("Unknown native tcp option: %d", linux_optname);
   }
 }
 
