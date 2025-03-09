@@ -106,3 +106,10 @@ const char* redirect(const char* path) {
 
   return path;
 }
+
+char* proc_self_exe_override = NULL;
+
+__attribute__((constructor))
+static void init_proc_self_exe_override() {
+  proc_self_exe_override = getenv("SHIM_PROC_SELF_EXE");
+}

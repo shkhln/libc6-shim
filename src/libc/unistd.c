@@ -17,13 +17,6 @@ static int shim_chown_impl(const char* path, uid_t owner, gid_t group) {
   return chown(path, owner, group);
 }
 
-static char* proc_self_exe_override = NULL;
-
-__attribute__((constructor))
-static void init() {
-  proc_self_exe_override = getenv("SHIM_PROC_SELF_EXE");
-}
-
 static ssize_t shim_readlink_impl(const char* path, char* buf, size_t bufsize) {
 
   if (str_starts_with(path, "/proc/")) {
@@ -47,10 +40,10 @@ static ssize_t shim_readlink_impl(const char* path, char* buf, size_t bufsize) {
 
       free(p);
 
-      if (proc_self_exe_override != NULL) {
+      if ((pid == -1 || pid == getpid()) && proc_self_exe_override != NULL) {
         size_t nchars = strlen(proc_self_exe_override);
-        strncpy(buf, proc_self_exe_override, nchars <= bufsize ? nchars : bufsize);
-        return nchars <= bufsize ? nchars : bufsize;
+        strncpy(buf, proc_self_exe_override, nchars < bufsize ? nchars : bufsize);
+        return nchars < bufsize ? nchars : bufsize;
       } else {
         int name[] = {
           CTL_KERN,

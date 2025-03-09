@@ -74,6 +74,8 @@ int linux_to_native_errno(int error);
 
 const char* redirect(const char* path);
 
+extern char* proc_self_exe_override;
+
 struct globals {
 #ifdef __i386__
   FILE**  _IO_stderr_;
