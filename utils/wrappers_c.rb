@@ -28,6 +28,7 @@ STRUCT_COMPATIBILITY = {
   option:       true,
   passwd:       false,
   pollfd:       true,
+  protoent:     true,
   rlimit:       false, # compatible on x86_64
   rusage:       true,
   sembuf:       true,
@@ -70,6 +71,8 @@ puts <<E
 #include "../src/libc/sys/stat.h"
 #include "../src/libc/sys/utsname.h"
 #include "../src/libthr/pthread.h"
+
+typedef struct protoent linux_protoent;
 
 E
 
