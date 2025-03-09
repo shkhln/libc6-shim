@@ -39,6 +39,10 @@ static void shim__longjmp_impl(jmp_buf env, int val) {
   _longjmp(env, val);
 }
 
+static void shim___longjmp_chk_impl(jmp_buf env, int val) {
+  _longjmp(env, val);
+}
+
 static void shim_siglongjmp_impl(sigjmp_buf env, int val) {
   //~ fprintf(stderr, "[[%s]]\n", __func__);
   siglongjmp(env, val);
@@ -46,4 +50,5 @@ static void shim_siglongjmp_impl(sigjmp_buf env, int val) {
 
 SHIM_WRAP(longjmp);
 SHIM_WRAP(_longjmp);
+SHIM_WRAP(__longjmp_chk);
 SHIM_WRAP(siglongjmp);

@@ -873,7 +873,8 @@ define(["setjmp.h"], [
   "int setjmp(jmp_buf env)",
   "void longjmp(jmp_buf env, int val)",
   "int _setjmp(jmp_buf env)",
-  "void _longjmp(jmp_buf env, int val)"
+  "void _longjmp(jmp_buf env, int val)",
+  "void __longjmp_chk(jmp_buf env, int val)"
 ])
 
 # RAND48(3)
