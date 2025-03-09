@@ -45,7 +45,8 @@ STRUCT_COMPATIBILITY = {
   tm:           true,
   utsname:      false,
   stat64:       false,
-  statfs64:     false
+  statfs64:     false,
+  utimbuf:      true
 }
 
 symbols = {}
@@ -71,9 +72,6 @@ puts <<E
 #include "../src/libc/sys/stat.h"
 #include "../src/libc/sys/utsname.h"
 #include "../src/libthr/pthread.h"
-
-typedef struct protoent linux_protoent;
-
 E
 
 LINUX = false

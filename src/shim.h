@@ -141,3 +141,7 @@ _Static_assert(sizeof(fpos_t) <= 12 /* sizeof(fpos_t) on glibc/Linux with i386 *
 
 typedef fpos_t linux_fpos_t;
 typedef fpos_t linux_fpos64_t;
+
+#include <utime.h>
+
+typedef struct utimbuf linux_utimbuf;
