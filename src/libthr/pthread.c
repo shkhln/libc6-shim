@@ -614,3 +614,10 @@ SHIM_WRAP(posix_spawnattr_getsigdefault);
 SHIM_WRAP(posix_spawnattr_getsigmask);
 SHIM_WRAP(posix_spawnattr_setsigdefault);
 SHIM_WRAP(posix_spawnattr_setsigmask);
+
+// FMOD init workaround (https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=240043#c26)
+static int shim_pthread_attr_setschedparam_impl(pthread_attr_t* attr, const linux_sched_param* param) {
+  return 0;
+}
+
+SHIM_WRAP(pthread_attr_setschedparam);
