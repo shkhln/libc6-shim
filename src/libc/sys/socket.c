@@ -592,12 +592,13 @@ SHIM_WRAP(__recv_chk);
 static int linux_to_native_so_opt(int linux_optname) {
   switch (linux_optname) {
     case LINUX_SO_REUSEADDR: return SO_REUSEADDR;
+    case LINUX_SO_ERROR:     return SO_ERROR;
     case LINUX_SO_BROADCAST: return SO_BROADCAST;
     case LINUX_SO_SNDBUF:    return SO_SNDBUF;
     case LINUX_SO_RCVBUF:    return SO_RCVBUF;
     case LINUX_SO_KEEPALIVE: return SO_KEEPALIVE;
     default:
-      UNIMPLEMENTED_PATH("Unknown native so option: %d", linux_optname);
+      UNIMPLEMENTED_PATH("Unknown linux so option: %d", linux_optname);
   }
 }
 
