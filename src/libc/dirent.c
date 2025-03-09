@@ -125,6 +125,12 @@ static struct shim_directory* shim_fdopendir_impl(int fd) {
 }
 
 static struct shim_directory* shim_opendir_impl(const char* filename) {
+
+  // some code in Unity (?) assumes this dir always exists
+  if (strcmp(filename, "/sys/devices/") == 0) {
+    return create_shim_dir(opendir("/libexec"));
+  }
+
   DIR* dir = opendir(filename);
   return dir != NULL ? create_shim_dir(dir) : NULL;
 }
