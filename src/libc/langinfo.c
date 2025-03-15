@@ -116,7 +116,7 @@ static nl_item linux_to_native_nl_item(nl_item linux_item) {
     case LINUX_NOEXPR:      return NOEXPR;
     case LINUX_CRNCYSTR:    return CRNCYSTR;
     default:
-      UNIMPLEMENTED_PATH("Unknown linux nl_item: %d", linux_item);
+      PANIC("Unknown linux nl_item: %d", linux_item);
   }
 }
 

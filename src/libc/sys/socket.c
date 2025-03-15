@@ -20,7 +20,7 @@ static int linux_to_native_sock_level(int linux_level) {
     case LINUX_SOL_TCP:    return IPPROTO_TCP;
     case LINUX_SOL_UDP:    return IPPROTO_UDP;
     default:
-      UNIMPLEMENTED_PATH("Unknown linux sock level: %d", linux_level);
+      PANIC("Unknown linux sock level: %d", linux_level);
   }
 }
 
@@ -31,7 +31,7 @@ static int native_to_linux_sock_level(int level) {
     case IPPROTO_TCP: return LINUX_SOL_TCP;
     case IPPROTO_UDP: return LINUX_SOL_UDP;
     default:
-      UNIMPLEMENTED_PATH("Unknown native sock level: %d", level);
+      PANIC("Unknown native sock level: %d", level);
   }
 }
 
@@ -169,7 +169,7 @@ static void linux_to_native_sockaddr(struct sockaddr* addr, socklen_t* len, cons
       *len = sizeof(struct sockaddr_in6);
       break;
     default:
-      UNIMPLEMENTED_PATH("Unknown linux family: %d", linux_addr->sa_family);
+      PANIC("Unknown linux family: %d", linux_addr->sa_family);
   }
 }
 
@@ -217,7 +217,7 @@ static void native_to_linux_sockaddr(struct linux_sockaddr* linux_addr, socklen_
       *linux_len = sizeof(struct linux_sockaddr_in6);
       break;
     default:
-      UNIMPLEMENTED_PATH("Unknown native family: %d", addr->sa_family);
+      PANIC("Unknown native family: %d", addr->sa_family);
   }
 }
 
@@ -227,7 +227,7 @@ static int linux_to_native_domain(int linux_domain) {
     case LINUX_PF_INET:  return PF_INET;
     case LINUX_PF_INET6: return PF_INET6;
     default:
-      UNIMPLEMENTED_PATH("Unknown linux domain: %d", linux_domain);
+      PANIC("Unknown linux domain: %d", linux_domain);
   }
 }
 
@@ -274,7 +274,7 @@ static int shim_bind_impl(int s, const linux_sockaddr* linux_addr, socklen_t add
       }
 
     default:
-      UNIMPLEMENTED_PATH("Unknown linux family: %d", linux_addr->sa_family);
+      PANIC("Unknown linux family: %d", linux_addr->sa_family);
   }
 }
 
@@ -308,7 +308,7 @@ static int shim_connect_impl(int s, const linux_sockaddr* linux_name, socklen_t 
       }
 
     default:
-      UNIMPLEMENTED_PATH("Unknown linux family: %d", linux_name->sa_family);
+      PANIC("Unknown linux family: %d", linux_name->sa_family);
   }
 }
 
@@ -376,7 +376,7 @@ static void native_to_linux_msg_control(struct linux_msghdr* linux_msg, const st
       } else if (cmsg->cmsg_level == IPPROTO_IP && cmsg->cmsg_type == IP_RECVTOS) {
         linux_cmsg->cmsg_type = LINUX_IP_TOS;
       } else {
-        UNIMPLEMENTED_PATH("Unknown native cmsg level %d or type %d", cmsg->cmsg_level, cmsg->cmsg_type);
+        PANIC("Unknown native cmsg level %d or type %d", cmsg->cmsg_level, cmsg->cmsg_type);
       }
 
       memcpy(LINUX_CMSG_DATA(linux_cmsg), CMSG_DATA(cmsg), cmsg->cmsg_len - CMSG_LEN(0));
@@ -561,7 +561,7 @@ static ssize_t shim_sendto_impl(int s, const void* msg, size_t len, int linux_fl
     break;
 
     default:
-      UNIMPLEMENTED_PATH("Unknown linux family: %d", linux_to->sa_family);
+      PANIC("Unknown linux family: %d", linux_to->sa_family);
   }
 
   if (nbytes == -1) {
@@ -598,7 +598,7 @@ static int linux_to_native_so_opt(int linux_optname) {
     case LINUX_SO_RCVBUF:    return SO_RCVBUF;
     case LINUX_SO_KEEPALIVE: return SO_KEEPALIVE;
     default:
-      UNIMPLEMENTED_PATH("Unknown linux so option: %d", linux_optname);
+      PANIC("Unknown linux so option: %d", linux_optname);
   }
 }
 
@@ -607,7 +607,7 @@ static int linux_to_native_ip4_opt(int linux_optname) {
     case LINUX_IP_RECVTOS:      return IP_RECVTOS;
     case LINUX_IP_MTU_DISCOVER: return IP_DONTFRAG; // good enough for Mono (probably)
     default:
-      UNIMPLEMENTED_PATH("Unknown native ip4 option: %d", linux_optname);
+      PANIC("Unknown native ip4 option: %d", linux_optname);
   }
 }
 
@@ -615,7 +615,7 @@ static int linux_to_native_ip6_opt(int linux_optname) {
   switch (linux_optname) {
     case LINUX_IPV6_V6ONLY: return IPV6_V6ONLY;
     default:
-      UNIMPLEMENTED_PATH("Unknown native ip6 option: %d", linux_optname);
+      PANIC("Unknown native ip6 option: %d", linux_optname);
   }
 }
 
@@ -626,7 +626,7 @@ static int linux_to_native_tcp_opt(int linux_optname) {
     case LINUX_TCP_KEEPINTVL:    return TCP_KEEPINTVL;
     case LINUX_TCP_USER_TIMEOUT: return -1; // ?
     default:
-      UNIMPLEMENTED_PATH("Unknown native tcp option: %d", linux_optname);
+      PANIC("Unknown native tcp option: %d", linux_optname);
   }
 }
 
@@ -647,7 +647,7 @@ static int shim_getsockopt_impl(int s, int linux_level, int linux_optname, void*
     case LINUX_SOL_IPV6: return getsockopt(s, IPPROTO_IP,  linux_to_native_ip6_opt(linux_optname), optval, optlen);
     case LINUX_SOL_TCP:  return getsockopt(s, IPPROTO_TCP, linux_to_native_tcp_opt(linux_optname), optval, optlen);
     default:
-      UNIMPLEMENTED_PATH("Unknown linux level: %d", linux_level);
+      PANIC("Unknown linux level: %d", linux_level);
   }
 }
 
@@ -669,7 +669,7 @@ static int shim_setsockopt_impl(int s, int linux_level, int linux_optname, const
     case LINUX_SOL_IPV6: return setsockopt(s, IPPROTO_IP,  linux_to_native_ip6_opt(linux_optname), optval, optlen);
     case LINUX_SOL_TCP:  return setsockopt(s, IPPROTO_TCP, linux_to_native_tcp_opt(linux_optname), optval, optlen);
     default:
-      UNIMPLEMENTED_PATH("Unknown linux level: %d", linux_level);
+      PANIC("Unknown linux level: %d", linux_level);
   }
 }
 

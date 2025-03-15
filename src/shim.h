@@ -51,7 +51,7 @@ extern __thread int what_was_that_error;
   abort();\
 }
 
-#define UNIMPLEMENTED_PATH(...) {\
+#define PANIC(...) {\
   fprintf(stderr, "%s: " __HEAD(__VA_ARGS__) "\n", __func__, __TAIL(__VA_ARGS__));\
   void* buffer[100];\
   int nframes = backtrace(buffer, 100);\
