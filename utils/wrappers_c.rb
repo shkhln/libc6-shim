@@ -86,7 +86,7 @@ def check_compat(function)
 
   for type in args.map{|arg| arg[:type]} + [function[:type]]
     case type
-      when /^(const |)pthread_(barrier|cond|mutex)attr_t\*/
+      when /^(const |)(pthread_(barrier|cond|mutex)attr_t|pthread_mutex_t)\*/
         return false
       when /ucontext_t/
         return false
