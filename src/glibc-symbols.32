@@ -1,4 +1,5 @@
 fun _Exit: GLIBC_2.1.1
+fun _Fork: GLIBC_2.34
 obj _IO_2_1_stderr_: GLIBC_2.1
 obj _IO_2_1_stdin_: GLIBC_2.1
 obj _IO_2_1_stdout_: GLIBC_2.1
@@ -133,6 +134,7 @@ fun _IO_wfile_xsputn: GLIBC_2.2
 fun _IO_wmarker_delta: GLIBC_2.2
 fun _IO_wsetb: GLIBC_2.2
 obj _LIB_VERSION: GLIBC_2.0
+fun ___adjtimex64: GLIBC_2.34
 obj ___brk_addr: GLIBC_2.0
 fun __acos_finite: GLIBC_2.15
 fun __acosf128_finite: GLIBC_2.26
@@ -142,8 +144,10 @@ fun __acoshf128_finite: GLIBC_2.26
 fun __acoshf_finite: GLIBC_2.15
 fun __acoshl_finite: GLIBC_2.15
 fun __acosl_finite: GLIBC_2.15
+fun __adjtime64: GLIBC_2.34
 fun __adjtimex: GLIBC_2.0
 obj __after_morecore_hook: GLIBC_2.0
+fun __aio_suspend_time64: GLIBC_2.34
 fun __argz_count: GLIBC_2.0
 fun __argz_next: GLIBC_2.0
 fun __argz_stringify: GLIBC_2.0
@@ -164,6 +168,8 @@ fun __atanh_finite: GLIBC_2.15
 fun __atanhf128_finite: GLIBC_2.26
 fun __atanhf_finite: GLIBC_2.15
 fun __atanhl_finite: GLIBC_2.15
+fun __b64_ntop: GLIBC_2.0
+fun __b64_pton: GLIBC_2.0
 fun __backtrace: GLIBC_2.1
 fun __backtrace_symbols: GLIBC_2.1
 fun __backtrace_symbols_fd: GLIBC_2.1
@@ -171,18 +177,26 @@ fun __bsd_getpgrp: GLIBC_2.0
 fun __bzero: GLIBC_2.0
 obj __check_rhosts_file: GLIBC_2.0
 fun __chk_fail: GLIBC_2.3.4
+fun __clock_adjtime64: GLIBC_2.34
+fun __clock_getres64: GLIBC_2.34
+fun __clock_gettime64: GLIBC_2.34
+fun __clock_nanosleep_time64: GLIBC_2.34
+fun __clock_settime64: GLIBC_2.34
 fun __clog10: GLIBC_2.1
 fun __clog10f: GLIBC_2.1
 fun __clog10l: GLIBC_2.1
 fun __clone: GLIBC_2.0
 fun __close: GLIBC_2.0
 fun __cmsg_nxthdr: GLIBC_2.0
+fun __cnd_timedwait64: GLIBC_2.34
 fun __confstr_chk: GLIBC_2.4
 fun __connect: GLIBC_2.0
 fun __cosh_finite: GLIBC_2.15
 fun __coshf128_finite: GLIBC_2.26
 fun __coshf_finite: GLIBC_2.15
 fun __coshl_finite: GLIBC_2.15
+fun __ctime64: GLIBC_2.34
+fun __ctime64_r: GLIBC_2.34
 obj __ctype32_b: GLIBC_2.0
 obj __ctype32_tolower: GLIBC_2.2
 obj __ctype32_toupper: GLIBC_2.2
@@ -206,12 +220,18 @@ fun __default_morecore: GLIBC_2.0
 fun __deregister_frame: GLIBC_2.0
 fun __deregister_frame_info: GLIBC_2.0
 fun __dgettext: GLIBC_2.0
+fun __difftime64: GLIBC_2.34
 fun __divdi3: GLIBC_2.0
+fun __dn_comp: GLIBC_2.0
+fun __dn_count_labels: GLIBC_2.0
+fun __dn_expand: GLIBC_2.2
+fun __dn_skipname: GLIBC_2.0
 fun __dprintf_chk: GLIBC_2.8
 fun __dup2: GLIBC_2.0
 fun __duplocale: GLIBC_2.1
 fun __endmntent: GLIBC_2.2
 obj __environ: GLIBC_2.0
+fun __epoll_pwait2_time64: GLIBC_2.35
 fun __errno_location: GLIBC_2.0
 fun __exp10_finite: GLIBC_2.15
 fun __exp10f128_finite: GLIBC_2.26
@@ -230,6 +250,7 @@ fun __explicit_bzero_chk: GLIBC_2.25
 fun __expm1l: GLIBC_2.2
 fun __fbufsize: GLIBC_2.2
 fun __fcntl: GLIBC_2.0
+fun __fcntl_time64: GLIBC_2.34
 fun __fdelt_chk: GLIBC_2.15
 fun __fdelt_warn: GLIBC_2.15
 fun __fentry__: GLIBC_2.13
@@ -248,6 +269,9 @@ fun __fmodf128_finite: GLIBC_2.26
 fun __fmodf_finite: GLIBC_2.15
 fun __fmodl_finite: GLIBC_2.15
 fun __fork: GLIBC_2.0
+fun __fp_nquery: GLIBC_2.0
+fun __fp_query: GLIBC_2.0
+fun __fp_resstat: GLIBC_2.0
 fun __fpclassify: GLIBC_2.1
 fun __fpclassifyf: GLIBC_2.1
 fun __fpclassifyf128: GLIBC_2.26
@@ -264,6 +288,17 @@ fun __freading: GLIBC_2.2
 obj __free_hook: GLIBC_2.0
 fun __freelocale: GLIBC_2.1
 fun __fsetlocking: GLIBC_2.2
+fun __fstat64_time64: GLIBC_2.34
+fun __fstatat64_time64: GLIBC_2.34
+fun __fts64_children_time64: GLIBC_2.34
+fun __fts64_close_time64: GLIBC_2.34
+fun __fts64_open_time64: GLIBC_2.34
+fun __fts64_read_time64: GLIBC_2.34
+fun __fts64_set_time64: GLIBC_2.34
+fun __ftw64_time64: GLIBC_2.34
+fun __futimens64: GLIBC_2.34
+fun __futimes64: GLIBC_2.34
+fun __futimesat64: GLIBC_2.34
 fun __fwprintf_chk: GLIBC_2.4
 fun __fwritable: GLIBC_2.2
 fun __fwriting: GLIBC_2.2
@@ -271,6 +306,7 @@ fun __fxstat: GLIBC_2.0
 fun __fxstat64: GLIBC_2.1, GLIBC_2.2
 fun __fxstatat: GLIBC_2.4
 fun __fxstatat64: GLIBC_2.4
+fun __gai_suspend_time64: GLIBC_2.34
 fun __gamma_r_finite: GLIBC_2.15
 fun __gammaf128_r_finite: GLIBC_2.26
 fun __gammaf_r_finite: GLIBC_2.15
@@ -281,20 +317,30 @@ fun __getdelim: GLIBC_2.0
 fun __getdomainname_chk: GLIBC_2.4
 fun __getgroups_chk: GLIBC_2.4
 fun __gethostname_chk: GLIBC_2.4
+fun __getitimer64: GLIBC_2.34
 fun __getlogin_r_chk: GLIBC_2.4
 fun __getmntent_r: GLIBC_2.2
 fun __getpagesize: GLIBC_2.0
 fun __getpgid: GLIBC_2.0
 fun __getpid: GLIBC_2.0
+fun __getrusage64: GLIBC_2.34
 fun __gets_chk: GLIBC_2.3.4
+fun __getsockopt64: GLIBC_2.34
 fun __gettimeofday: GLIBC_2.0
+fun __gettimeofday64: GLIBC_2.34
 fun __getwd_chk: GLIBC_2.4
+fun __glob64_time64: GLIBC_2.34
+fun __globfree64_time64: GLIBC_2.34
+fun __gmtime64: GLIBC_2.34
+fun __gmtime64_r: GLIBC_2.34
 fun __gmtime_r: GLIBC_2.0
 fun __h_errno_location: GLIBC_2.0
+fun __hostalias: GLIBC_2.0
 fun __hypot_finite: GLIBC_2.15
 fun __hypotf128_finite: GLIBC_2.26
 fun __hypotf_finite: GLIBC_2.15
 fun __hypotl_finite: GLIBC_2.15
+fun __ioctl_time64: GLIBC_2.34
 fun __isalnum_l: GLIBC_2.1
 fun __isalpha_l: GLIBC_2.1
 fun __isascii_l: GLIBC_2.1
@@ -315,7 +361,7 @@ fun __isinfl: GLIBC_2.0
 fun __islower_l: GLIBC_2.1
 fun __isnan: GLIBC_2.0
 fun __isnanf: GLIBC_2.0
-fun __isnanf128: GLIBC_2.26
+fun __isnanf128: GLIBC_2.26, GLIBC_2.34
 fun __isnanl: GLIBC_2.0
 fun __isoc99_fscanf: GLIBC_2.7
 fun __isoc99_fwscanf: GLIBC_2.7
@@ -383,8 +429,16 @@ fun __libc_memalign: GLIBC_2.0
 fun __libc_pvalloc: GLIBC_2.0
 fun __libc_realloc: GLIBC_2.0
 fun __libc_sa_len: GLIBC_2.1
-fun __libc_start_main: GLIBC_2.0
+obj __libc_single_threaded: GLIBC_2.32
+fun __libc_start_main: GLIBC_2.0, GLIBC_2.34
 fun __libc_valloc: GLIBC_2.0
+fun __libdl_version_placeholder: GLIBC_2.0, GLIBC_2.1, GLIBC_2.3.3, GLIBC_2.3.4
+fun __libpthread_version_placeholder: GLIBC_2.0, GLIBC_2.1, GLIBC_2.1.1, GLIBC_2.1.2, GLIBC_2.11, GLIBC_2.12, GLIBC_2.18, GLIBC_2.2, GLIBC_2.2.3, GLIBC_2.2.6, GLIBC_2.28, GLIBC_2.3.2, GLIBC_2.3.3, GLIBC_2.3.4, GLIBC_2.30, GLIBC_2.31, GLIBC_2.4
+fun __librt_version_placeholder: GLIBC_2.1, GLIBC_2.2, GLIBC_2.3.4, GLIBC_2.4, GLIBC_2.7
+fun __loc_aton: GLIBC_2.0
+fun __loc_ntoa: GLIBC_2.0
+fun __localtime64: GLIBC_2.34
+fun __localtime64_r: GLIBC_2.34
 fun __log10_finite: GLIBC_2.15
 fun __log10f128_finite: GLIBC_2.26
 fun __log10f_finite: GLIBC_2.15
@@ -399,6 +453,8 @@ fun __logf_finite: GLIBC_2.15
 fun __logl_finite: GLIBC_2.15
 fun __longjmp_chk: GLIBC_2.11
 fun __lseek: GLIBC_2.0
+fun __lstat64_time64: GLIBC_2.34
+fun __lutimes64: GLIBC_2.34
 fun __lxstat: GLIBC_2.0
 fun __lxstat64: GLIBC_2.1, GLIBC_2.2
 obj __malloc_hook: GLIBC_2.0
@@ -409,6 +465,7 @@ fun __mbsnrtowcs_chk: GLIBC_2.4
 fun __mbsrtowcs_chk: GLIBC_2.4
 fun __mbstowcs_chk: GLIBC_2.4
 obj __memalign_hook: GLIBC_2.0
+fun __memcmpeq: GLIBC_2.35
 fun __memcpy_by2: GLIBC_2.1.1
 fun __memcpy_by4: GLIBC_2.1.1
 fun __memcpy_c: GLIBC_2.1.1
@@ -429,12 +486,19 @@ fun __memset_chk: GLIBC_2.3.4
 fun __memset_gcn_by2: GLIBC_2.1.1
 fun __memset_gcn_by4: GLIBC_2.1.1
 fun __memset_gg: GLIBC_2.1.1
+fun __mktime64: GLIBC_2.34
 fun __moddi3: GLIBC_2.0
 fun __monstartup: GLIBC_2.0
 obj __morecore: GLIBC_2.0
-fun __mq_open_2: GLIBC_2.7
+fun __mq_open_2: GLIBC_2.34, GLIBC_2.7
+fun __mq_timedreceive_time64: GLIBC_2.34
+fun __mq_timedsend_time64: GLIBC_2.34
+fun __msgctl64: GLIBC_2.34
+fun __mtx_timedlock64: GLIBC_2.34
 fun __nanosleep: GLIBC_2.2.6
+fun __nanosleep64: GLIBC_2.34
 fun __newlocale: GLIBC_2.1
+fun __nftw64_time64: GLIBC_2.34
 fun __nl_langinfo_l: GLIBC_2.2
 fun __nss_configure_lookup: GLIBC_2.0
 fun __nss_database_lookup: GLIBC_2.0
@@ -443,6 +507,8 @@ fun __nss_hostname_digits_dots: GLIBC_2.2.2
 fun __nss_hosts_lookup: GLIBC_2.0
 fun __nss_next: GLIBC_2.0
 fun __nss_passwd_lookup: GLIBC_2.0
+fun __ntp_gettime64: GLIBC_2.34
+fun __ntp_gettimex64: GLIBC_2.34
 fun __obstack_printf_chk: GLIBC_2.8
 fun __obstack_vprintf_chk: GLIBC_2.8
 fun __open: GLIBC_2.0
@@ -452,6 +518,19 @@ fun __open_2: GLIBC_2.7
 fun __openat64_2: GLIBC_2.7
 fun __openat_2: GLIBC_2.7
 fun __overflow: GLIBC_2.0
+fun __p_cdname: GLIBC_2.0
+fun __p_cdnname: GLIBC_2.0
+fun __p_class: GLIBC_2.0
+obj __p_class_syms: GLIBC_2.0
+fun __p_fqname: GLIBC_2.0
+fun __p_fqnname: GLIBC_2.0
+fun __p_option: GLIBC_2.0
+fun __p_query: GLIBC_2.0
+fun __p_rcode: GLIBC_2.3.2
+fun __p_secstodate: GLIBC_2.0
+fun __p_time: GLIBC_2.0
+fun __p_type: GLIBC_2.0
+obj __p_type_syms: GLIBC_2.0
 fun __pipe: GLIBC_2.0
 fun __poll: GLIBC_2.1
 fun __poll_chk: GLIBC_2.16
@@ -460,7 +539,9 @@ fun __pow_finite: GLIBC_2.15
 fun __powf128_finite: GLIBC_2.26
 fun __powf_finite: GLIBC_2.15
 fun __powl_finite: GLIBC_2.15
+fun __ppoll64: GLIBC_2.34
 fun __ppoll_chk: GLIBC_2.16
+fun __prctl_time64: GLIBC_2.34
 fun __pread64: GLIBC_2.1, GLIBC_2.2
 fun __pread64_chk: GLIBC_2.4
 fun __pread_chk: GLIBC_2.4
@@ -469,32 +550,45 @@ fun __printf_fp: GLIBC_2.0
 fun __profile_frequency: GLIBC_2.0
 obj __progname: GLIBC_2.0
 obj __progname_full: GLIBC_2.0
-fun __pthread_cleanup_routine: GLIBC_2.3.3
+fun __pselect64: GLIBC_2.34
+fun __pthread_cleanup_routine: GLIBC_2.3.3, GLIBC_2.34
+fun __pthread_clockjoin_np64: GLIBC_2.34
+fun __pthread_cond_clockwait64: GLIBC_2.34
+fun __pthread_cond_timedwait64: GLIBC_2.34
 fun __pthread_getspecific: GLIBC_2.0
-fun __pthread_key_create: GLIBC_2.0
+fun __pthread_key_create: GLIBC_2.0, GLIBC_2.34
+fun __pthread_mutex_clocklock64: GLIBC_2.34
 fun __pthread_mutex_destroy: GLIBC_2.0
 fun __pthread_mutex_init: GLIBC_2.0
 fun __pthread_mutex_lock: GLIBC_2.0
+fun __pthread_mutex_timedlock64: GLIBC_2.34
 fun __pthread_mutex_trylock: GLIBC_2.0
 fun __pthread_mutex_unlock: GLIBC_2.0
 fun __pthread_mutexattr_destroy: GLIBC_2.0
 fun __pthread_mutexattr_init: GLIBC_2.0
 fun __pthread_mutexattr_settype: GLIBC_2.0
 fun __pthread_once: GLIBC_2.0
-fun __pthread_register_cancel: GLIBC_2.3.3
-fun __pthread_register_cancel_defer: GLIBC_2.3.3
+fun __pthread_register_cancel: GLIBC_2.3.3, GLIBC_2.34
+fun __pthread_register_cancel_defer: GLIBC_2.3.3, GLIBC_2.34
+fun __pthread_rwlock_clockrdlock64: GLIBC_2.34
+fun __pthread_rwlock_clockwrlock64: GLIBC_2.34
 fun __pthread_rwlock_destroy: GLIBC_2.2
 fun __pthread_rwlock_init: GLIBC_2.2
 fun __pthread_rwlock_rdlock: GLIBC_2.2
+fun __pthread_rwlock_timedrdlock64: GLIBC_2.34
+fun __pthread_rwlock_timedwrlock64: GLIBC_2.34
 fun __pthread_rwlock_tryrdlock: GLIBC_2.2
 fun __pthread_rwlock_trywrlock: GLIBC_2.2
 fun __pthread_rwlock_unlock: GLIBC_2.2
 fun __pthread_rwlock_wrlock: GLIBC_2.2
 fun __pthread_setspecific: GLIBC_2.0
-fun __pthread_unregister_cancel: GLIBC_2.3.3
-fun __pthread_unregister_cancel_restore: GLIBC_2.3.3
-fun __pthread_unwind_next: GLIBC_2.3.3
+fun __pthread_timedjoin_np64: GLIBC_2.34
+fun __pthread_unregister_cancel: GLIBC_2.3.3, GLIBC_2.34
+fun __pthread_unregister_cancel_restore: GLIBC_2.3.3, GLIBC_2.34
+fun __pthread_unwind_next: GLIBC_2.3.3, GLIBC_2.34
 fun __ptsname_r_chk: GLIBC_2.4
+fun __putlong: GLIBC_2.0
+fun __putshort: GLIBC_2.0
 fun __pwrite64: GLIBC_2.1, GLIBC_2.2
 fun __rawmemchr: GLIBC_2.1
 obj __rcmd_errstr: GLIBC_2.0
@@ -506,6 +600,8 @@ obj __realloc_hook: GLIBC_2.0
 fun __realpath_chk: GLIBC_2.4
 fun __recv_chk: GLIBC_2.4
 fun __recvfrom_chk: GLIBC_2.4
+fun __recvmmsg64: GLIBC_2.34
+fun __recvmsg64: GLIBC_2.34
 fun __register_atfork: GLIBC_2.3.2
 fun __register_frame: GLIBC_2.0
 fun __register_frame_info: GLIBC_2.0
@@ -515,10 +611,29 @@ fun __remainder_finite: GLIBC_2.15
 fun __remainderf128_finite: GLIBC_2.26
 fun __remainderf_finite: GLIBC_2.15
 fun __remainderl_finite: GLIBC_2.15
+fun __res_close: GLIBC_2.0
+fun __res_dnok: GLIBC_2.0
+fun __res_hnok: GLIBC_2.0
+fun __res_hostalias: GLIBC_2.2
 fun __res_init: GLIBC_2.2
+fun __res_isourserver: GLIBC_2.0
+fun __res_mailok: GLIBC_2.0
+fun __res_mkquery: GLIBC_2.2
+fun __res_nameinquery: GLIBC_2.0
 fun __res_nclose: GLIBC_2.2
 fun __res_ninit: GLIBC_2.2
+fun __res_nmkquery: GLIBC_2.2
+fun __res_nquery: GLIBC_2.2
+fun __res_nquerydomain: GLIBC_2.2
+fun __res_nsearch: GLIBC_2.2
+fun __res_nsend: GLIBC_2.2
+fun __res_ownok: GLIBC_2.0
+fun __res_queriesmatch: GLIBC_2.0
+fun __res_query: GLIBC_2.2
+fun __res_querydomain: GLIBC_2.2
 fun __res_randomid: GLIBC_2.0
+fun __res_search: GLIBC_2.2
+fun __res_send: GLIBC_2.0
 fun __res_state: GLIBC_2.2
 fun __rpc_thread_createerr: GLIBC_2.2.3
 fun __rpc_thread_svc_fdset: GLIBC_2.2.3
@@ -535,13 +650,25 @@ fun __sched_get_priority_max: GLIBC_2.0
 fun __sched_get_priority_min: GLIBC_2.0
 fun __sched_getparam: GLIBC_2.0
 fun __sched_getscheduler: GLIBC_2.0
+fun __sched_rr_get_interval64: GLIBC_2.34
 fun __sched_setscheduler: GLIBC_2.0
 fun __sched_yield: GLIBC_2.0
 fun __secure_getenv: GLIBC_2.0
 fun __select: GLIBC_2.0
+fun __select64: GLIBC_2.34
+fun __sem_clockwait64: GLIBC_2.34
+fun __sem_timedwait64: GLIBC_2.34
+fun __semctl64: GLIBC_2.34
+fun __semtimedop64: GLIBC_2.34
 fun __send: GLIBC_2.0
+fun __sendmmsg64: GLIBC_2.34
+fun __sendmsg64: GLIBC_2.34
+fun __setitimer64: GLIBC_2.34
 fun __setmntent: GLIBC_2.2
 fun __setpgid: GLIBC_2.0
+fun __setsockopt64: GLIBC_2.34
+fun __settimeofday64: GLIBC_2.34
+fun __shmctl64: GLIBC_2.34
 fun __sigaction: GLIBC_2.0
 fun __sigaddset: GLIBC_2.0
 fun __sigdelset: GLIBC_2.0
@@ -554,6 +681,7 @@ obj __signgam: GLIBC_2.23
 fun __sigpause: GLIBC_2.0
 fun __sigsetjmp: GLIBC_2.0
 fun __sigsuspend: GLIBC_2.1.3
+fun __sigtimedwait64: GLIBC_2.34
 fun __sinh_finite: GLIBC_2.15
 fun __sinhf128_finite: GLIBC_2.26
 fun __sinhf_finite: GLIBC_2.15
@@ -565,6 +693,7 @@ fun __sqrtf128_finite: GLIBC_2.26
 fun __sqrtf_finite: GLIBC_2.15
 fun __sqrtl_finite: GLIBC_2.15
 fun __stack_chk_fail: GLIBC_2.4
+fun __stat64_time64: GLIBC_2.34
 fun __statfs: GLIBC_2.2
 fun __stpcpy: GLIBC_2.0
 fun __stpcpy_chk: GLIBC_2.3.4
@@ -646,10 +775,22 @@ fun __strtouq_internal: GLIBC_2.0
 fun __strverscmp: GLIBC_2.1.1
 fun __strxfrm_l: GLIBC_2.1
 fun __swprintf_chk: GLIBC_2.4
+fun __sym_ntop: GLIBC_2.0
+fun __sym_ntos: GLIBC_2.0
+fun __sym_ston: GLIBC_2.0
 fun __sysconf: GLIBC_2.2
 fun __sysctl: GLIBC_2.2
 fun __syslog_chk: GLIBC_2.4
 fun __sysv_signal: GLIBC_2.0
+fun __thrd_sleep64: GLIBC_2.34
+fun __time64: GLIBC_2.34
+fun __timegm64: GLIBC_2.34
+fun __timer_gettime64: GLIBC_2.34
+fun __timer_settime64: GLIBC_2.34
+fun __timerfd_gettime64: GLIBC_2.34
+fun __timerfd_settime64: GLIBC_2.34
+fun __timespec_get64: GLIBC_2.34
+fun __timespec_getres64: GLIBC_2.34
 obj __timezone: GLIBC_2.0
 fun __toascii_l: GLIBC_2.1
 fun __tolower_l: GLIBC_2.1
@@ -665,6 +806,9 @@ fun __uflow: GLIBC_2.0
 fun __umoddi3: GLIBC_2.0
 fun __underflow: GLIBC_2.0
 fun __uselocale: GLIBC_2.3
+fun __utime64: GLIBC_2.34
+fun __utimensat64: GLIBC_2.34
+fun __utimes64: GLIBC_2.34
 fun __vasprintf_chk: GLIBC_2.8
 fun __vdprintf_chk: GLIBC_2.8
 fun __vfork: GLIBC_2.1.2
@@ -680,6 +824,8 @@ fun __vswprintf_chk: GLIBC_2.4
 fun __vsyslog_chk: GLIBC_2.4
 fun __vwprintf_chk: GLIBC_2.4
 fun __wait: GLIBC_2.0
+fun __wait3_time64: GLIBC_2.34
+fun __wait4_time64: GLIBC_2.34
 fun __waitpid: GLIBC_2.0
 fun __wcpcpy_chk: GLIBC_2.4
 fun __wcpncpy_chk: GLIBC_2.4
@@ -723,6 +869,7 @@ fun __wprintf_chk: GLIBC_2.4
 fun __write: GLIBC_2.0
 fun __wuflow: GLIBC_2.2
 fun __wunderflow: GLIBC_2.2
+fun __x86_get_cpuid_feature_leaf: GLIBC_2.33
 fun __xmknod: GLIBC_2.0
 fun __xmknodat: GLIBC_2.4
 fun __xpg_basename: GLIBC_2.0
@@ -743,11 +890,18 @@ fun __ynf128_finite: GLIBC_2.26
 fun __ynf_finite: GLIBC_2.15
 fun __ynl_finite: GLIBC_2.15
 fun _authenticate: GLIBC_2.1
+fun _dl_find_object: GLIBC_2.35
 fun _dl_mcount_wrapper: GLIBC_2.1
 fun _dl_mcount_wrapper_check: GLIBC_2.1
 obj _environ: GLIBC_2.0
 fun _exit: GLIBC_2.0
 fun _flushlbf: GLIBC_2.2
+fun _gethtbyaddr: GLIBC_2.0
+fun _gethtbyname: GLIBC_2.0
+fun _gethtbyname2: GLIBC_2.0
+fun _gethtent: GLIBC_2.0
+fun _getlong: GLIBC_2.0
+fun _getshort: GLIBC_2.0
 obj _libc_intl_domainname: GLIBC_2.0
 fun _longjmp: GLIBC_2.0
 fun _mcleanup: GLIBC_2.0
@@ -763,14 +917,16 @@ fun _obstack_begin_1: GLIBC_2.0
 fun _obstack_free: GLIBC_2.0
 fun _obstack_memory_used: GLIBC_2.0
 fun _obstack_newchunk: GLIBC_2.0
-fun _pthread_cleanup_pop: GLIBC_2.0
+fun _pthread_cleanup_pop: GLIBC_2.0, GLIBC_2.34
 fun _pthread_cleanup_pop_restore: GLIBC_2.0
-fun _pthread_cleanup_push: GLIBC_2.0
+fun _pthread_cleanup_push: GLIBC_2.0, GLIBC_2.34
 fun _pthread_cleanup_push_defer: GLIBC_2.0
 obj _res: GLIBC_2.0
 obj _res_hconf: GLIBC_2.2
+obj _res_opcodes: GLIBC_2.0
 fun _rpc_dtablesize: GLIBC_2.0
 fun _seterr_reply: GLIBC_2.0
+fun _sethtent: GLIBC_2.0
 fun _setjmp: GLIBC_2.0
 obj _sys_errlist: GLIBC_2.0, GLIBC_2.1, GLIBC_2.12, GLIBC_2.3, GLIBC_2.4
 obj _sys_nerr: GLIBC_2.0, GLIBC_2.1, GLIBC_2.12, GLIBC_2.3, GLIBC_2.4
@@ -805,21 +961,21 @@ fun addseverity: GLIBC_2.1
 fun adjtime: GLIBC_2.0
 fun adjtimex: GLIBC_2.0
 fun advance: GLIBC_2.0
-fun aio_cancel: GLIBC_2.1
-fun aio_cancel64: GLIBC_2.1
-fun aio_error: GLIBC_2.1
-fun aio_error64: GLIBC_2.1
-fun aio_fsync: GLIBC_2.1
-fun aio_fsync64: GLIBC_2.1
-fun aio_init: GLIBC_2.1
-fun aio_read: GLIBC_2.1
-fun aio_read64: GLIBC_2.1
-fun aio_return: GLIBC_2.1
-fun aio_return64: GLIBC_2.1
-fun aio_suspend: GLIBC_2.1
-fun aio_suspend64: GLIBC_2.1
-fun aio_write: GLIBC_2.1
-fun aio_write64: GLIBC_2.1
+fun aio_cancel: GLIBC_2.1, GLIBC_2.34
+fun aio_cancel64: GLIBC_2.1, GLIBC_2.34
+fun aio_error: GLIBC_2.1, GLIBC_2.34
+fun aio_error64: GLIBC_2.1, GLIBC_2.34
+fun aio_fsync: GLIBC_2.1, GLIBC_2.34
+fun aio_fsync64: GLIBC_2.1, GLIBC_2.34
+fun aio_init: GLIBC_2.1, GLIBC_2.34
+fun aio_read: GLIBC_2.1, GLIBC_2.34
+fun aio_read64: GLIBC_2.1, GLIBC_2.34
+fun aio_return: GLIBC_2.1, GLIBC_2.34
+fun aio_return64: GLIBC_2.1, GLIBC_2.34
+fun aio_suspend: GLIBC_2.1, GLIBC_2.34
+fun aio_suspend64: GLIBC_2.1, GLIBC_2.34
+fun aio_write: GLIBC_2.1, GLIBC_2.34
+fun aio_write64: GLIBC_2.1, GLIBC_2.34
 fun alarm: GLIBC_2.0
 fun aligned_alloc: GLIBC_2.16
 fun alphasort: GLIBC_2.0
@@ -942,7 +1098,7 @@ fun cacoshf64: GLIBC_2.27
 fun cacoshf64x: GLIBC_2.27
 fun cacoshl: GLIBC_2.1
 fun cacosl: GLIBC_2.1
-fun call_once: GLIBC_2.28
+fun call_once: GLIBC_2.28, GLIBC_2.34
 fun calloc: GLIBC_2.0
 fun callrpc: GLIBC_2.0
 fun canonicalize: GLIBC_2.25
@@ -1101,14 +1257,16 @@ fun clogf64x: GLIBC_2.27
 fun clogl: GLIBC_2.1
 fun clone: GLIBC_2.0
 fun close: GLIBC_2.0
+fun close_range: GLIBC_2.34
 fun closedir: GLIBC_2.0
+fun closefrom: GLIBC_2.34
 fun closelog: GLIBC_2.0
-fun cnd_broadcast: GLIBC_2.28
-fun cnd_destroy: GLIBC_2.28
-fun cnd_init: GLIBC_2.28
-fun cnd_signal: GLIBC_2.28
-fun cnd_timedwait: GLIBC_2.28
-fun cnd_wait: GLIBC_2.28
+fun cnd_broadcast: GLIBC_2.28, GLIBC_2.34
+fun cnd_destroy: GLIBC_2.28, GLIBC_2.34
+fun cnd_init: GLIBC_2.28, GLIBC_2.34
+fun cnd_signal: GLIBC_2.28, GLIBC_2.34
+fun cnd_timedwait: GLIBC_2.28, GLIBC_2.34
+fun cnd_wait: GLIBC_2.28, GLIBC_2.34
 fun confstr: GLIBC_2.0
 fun conj: GLIBC_2.1
 fun conjf: GLIBC_2.1
@@ -1223,22 +1381,26 @@ fun dcngettext: GLIBC_2.2
 fun ddivl: GLIBC_2.28
 fun delete_module: GLIBC_2.0
 fun des_setparity: GLIBC_2.1
+fun dfmal: GLIBC_2.35
 fun dgettext: GLIBC_2.0
 fun difftime: GLIBC_2.0
 fun dirfd: GLIBC_2.0
 fun dirname: GLIBC_2.0
 fun div: GLIBC_2.0
 fun dl_iterate_phdr: GLIBC_2.2.4
-fun dladdr: GLIBC_2.0
-fun dladdr1: GLIBC_2.3.3
-fun dlclose: GLIBC_2.0
-fun dlerror: GLIBC_2.0
-fun dlinfo: GLIBC_2.3.3
-fun dlmopen: GLIBC_2.3.4
-fun dlopen: GLIBC_2.0, GLIBC_2.1
-fun dlsym: GLIBC_2.0
-fun dlvsym: GLIBC_2.1
+fun dladdr: GLIBC_2.0, GLIBC_2.34
+fun dladdr1: GLIBC_2.3.3, GLIBC_2.34
+fun dlclose: GLIBC_2.0, GLIBC_2.34
+fun dlerror: GLIBC_2.0, GLIBC_2.34
+fun dlinfo: GLIBC_2.3.3, GLIBC_2.34
+fun dlmopen: GLIBC_2.3.4, GLIBC_2.34
+fun dlopen: GLIBC_2.0, GLIBC_2.1, GLIBC_2.34
+fun dlsym: GLIBC_2.0, GLIBC_2.34
+fun dlvsym: GLIBC_2.1, GLIBC_2.34
 fun dmull: GLIBC_2.28
+fun dn_comp: GLIBC_2.34
+fun dn_expand: GLIBC_2.0, GLIBC_2.34
+fun dn_skipname: GLIBC_2.34
 fun dngettext: GLIBC_2.2
 fun dprintf: GLIBC_2.0
 fun drand48: GLIBC_2.0
@@ -1246,6 +1408,7 @@ fun drand48_r: GLIBC_2.0
 fun drem: GLIBC_2.0
 fun dremf: GLIBC_2.0
 fun dreml: GLIBC_2.0
+fun dsqrtl: GLIBC_2.35
 fun dsubl: GLIBC_2.28
 fun dup: GLIBC_2.0
 fun dup2: GLIBC_2.0
@@ -1284,6 +1447,7 @@ fun epoll_create: GLIBC_2.3.2
 fun epoll_create1: GLIBC_2.9
 fun epoll_ctl: GLIBC_2.3.2
 fun epoll_pwait: GLIBC_2.6
+fun epoll_pwait2: GLIBC_2.35
 fun epoll_wait: GLIBC_2.3.2
 fun erand48: GLIBC_2.0
 fun erand48_r: GLIBC_2.0
@@ -1326,19 +1490,20 @@ fun execle: GLIBC_2.0
 fun execlp: GLIBC_2.0
 fun execv: GLIBC_2.0
 fun execve: GLIBC_2.0
+fun execveat: GLIBC_2.34
 fun execvp: GLIBC_2.0
 fun execvpe: GLIBC_2.11
 fun exit: GLIBC_2.0
-fun exp: GLIBC_2.0
+fun exp: GLIBC_2.0, GLIBC_2.29
 fun exp10: GLIBC_2.1
-fun exp10f: GLIBC_2.1
+fun exp10f: GLIBC_2.1, GLIBC_2.32
 fun exp10f128: GLIBC_2.26
 fun exp10f32: GLIBC_2.27
 fun exp10f32x: GLIBC_2.27
 fun exp10f64: GLIBC_2.27
 fun exp10f64x: GLIBC_2.27
 fun exp10l: GLIBC_2.1
-fun exp2: GLIBC_2.1
+fun exp2: GLIBC_2.1, GLIBC_2.29
 fun exp2f: GLIBC_2.1, GLIBC_2.27
 fun exp2f128: GLIBC_2.26
 fun exp2f32: GLIBC_2.27
@@ -1370,10 +1535,18 @@ fun f32divf128: GLIBC_2.28
 fun f32divf32x: GLIBC_2.28
 fun f32divf64: GLIBC_2.28
 fun f32divf64x: GLIBC_2.28
+fun f32fmaf128: GLIBC_2.35
+fun f32fmaf32x: GLIBC_2.35
+fun f32fmaf64: GLIBC_2.35
+fun f32fmaf64x: GLIBC_2.35
 fun f32mulf128: GLIBC_2.28
 fun f32mulf32x: GLIBC_2.28
 fun f32mulf64: GLIBC_2.28
 fun f32mulf64x: GLIBC_2.28
+fun f32sqrtf128: GLIBC_2.35
+fun f32sqrtf32x: GLIBC_2.35
+fun f32sqrtf64: GLIBC_2.35
+fun f32sqrtf64x: GLIBC_2.35
 fun f32subf128: GLIBC_2.28
 fun f32subf32x: GLIBC_2.28
 fun f32subf64: GLIBC_2.28
@@ -1384,9 +1557,15 @@ fun f32xaddf64x: GLIBC_2.28
 fun f32xdivf128: GLIBC_2.28
 fun f32xdivf64: GLIBC_2.28
 fun f32xdivf64x: GLIBC_2.28
+fun f32xfmaf128: GLIBC_2.35
+fun f32xfmaf64: GLIBC_2.35
+fun f32xfmaf64x: GLIBC_2.35
 fun f32xmulf128: GLIBC_2.28
 fun f32xmulf64: GLIBC_2.28
 fun f32xmulf64x: GLIBC_2.28
+fun f32xsqrtf128: GLIBC_2.35
+fun f32xsqrtf64: GLIBC_2.35
+fun f32xsqrtf64x: GLIBC_2.35
 fun f32xsubf128: GLIBC_2.28
 fun f32xsubf64: GLIBC_2.28
 fun f32xsubf64x: GLIBC_2.28
@@ -1394,13 +1573,19 @@ fun f64addf128: GLIBC_2.28
 fun f64addf64x: GLIBC_2.28
 fun f64divf128: GLIBC_2.28
 fun f64divf64x: GLIBC_2.28
+fun f64fmaf128: GLIBC_2.35
+fun f64fmaf64x: GLIBC_2.35
 fun f64mulf128: GLIBC_2.28
 fun f64mulf64x: GLIBC_2.28
+fun f64sqrtf128: GLIBC_2.35
+fun f64sqrtf64x: GLIBC_2.35
 fun f64subf128: GLIBC_2.28
 fun f64subf64x: GLIBC_2.28
 fun f64xaddf128: GLIBC_2.28
 fun f64xdivf128: GLIBC_2.28
+fun f64xfmaf128: GLIBC_2.35
 fun f64xmulf128: GLIBC_2.28
+fun f64xsqrtf128: GLIBC_2.35
 fun f64xsubf128: GLIBC_2.28
 fun fabs: GLIBC_2.0
 fun fabsf: GLIBC_2.0
@@ -1469,6 +1654,8 @@ fun feupdateenv: GLIBC_2.1, GLIBC_2.2
 fun fexecve: GLIBC_2.0
 fun fflush: GLIBC_2.0
 fun fflush_unlocked: GLIBC_2.0
+fun ffma: GLIBC_2.35
+fun ffmal: GLIBC_2.35
 fun ffs: GLIBC_2.0
 fun ffsl: GLIBC_2.1
 fun ffsll: GLIBC_2.1
@@ -1522,6 +1709,38 @@ fun fmaxf32: GLIBC_2.27
 fun fmaxf32x: GLIBC_2.27
 fun fmaxf64: GLIBC_2.27
 fun fmaxf64x: GLIBC_2.27
+fun fmaximum: GLIBC_2.35
+fun fmaximum_mag: GLIBC_2.35
+fun fmaximum_mag_num: GLIBC_2.35
+fun fmaximum_mag_numf: GLIBC_2.35
+fun fmaximum_mag_numf128: GLIBC_2.35
+fun fmaximum_mag_numf32: GLIBC_2.35
+fun fmaximum_mag_numf32x: GLIBC_2.35
+fun fmaximum_mag_numf64: GLIBC_2.35
+fun fmaximum_mag_numf64x: GLIBC_2.35
+fun fmaximum_mag_numl: GLIBC_2.35
+fun fmaximum_magf: GLIBC_2.35
+fun fmaximum_magf128: GLIBC_2.35
+fun fmaximum_magf32: GLIBC_2.35
+fun fmaximum_magf32x: GLIBC_2.35
+fun fmaximum_magf64: GLIBC_2.35
+fun fmaximum_magf64x: GLIBC_2.35
+fun fmaximum_magl: GLIBC_2.35
+fun fmaximum_num: GLIBC_2.35
+fun fmaximum_numf: GLIBC_2.35
+fun fmaximum_numf128: GLIBC_2.35
+fun fmaximum_numf32: GLIBC_2.35
+fun fmaximum_numf32x: GLIBC_2.35
+fun fmaximum_numf64: GLIBC_2.35
+fun fmaximum_numf64x: GLIBC_2.35
+fun fmaximum_numl: GLIBC_2.35
+fun fmaximumf: GLIBC_2.35
+fun fmaximumf128: GLIBC_2.35
+fun fmaximumf32: GLIBC_2.35
+fun fmaximumf32x: GLIBC_2.35
+fun fmaximumf64: GLIBC_2.35
+fun fmaximumf64x: GLIBC_2.35
+fun fmaximuml: GLIBC_2.35
 fun fmaxl: GLIBC_2.1
 fun fmaxmag: GLIBC_2.25
 fun fmaxmagf: GLIBC_2.25
@@ -1539,6 +1758,38 @@ fun fminf32: GLIBC_2.27
 fun fminf32x: GLIBC_2.27
 fun fminf64: GLIBC_2.27
 fun fminf64x: GLIBC_2.27
+fun fminimum: GLIBC_2.35
+fun fminimum_mag: GLIBC_2.35
+fun fminimum_mag_num: GLIBC_2.35
+fun fminimum_mag_numf: GLIBC_2.35
+fun fminimum_mag_numf128: GLIBC_2.35
+fun fminimum_mag_numf32: GLIBC_2.35
+fun fminimum_mag_numf32x: GLIBC_2.35
+fun fminimum_mag_numf64: GLIBC_2.35
+fun fminimum_mag_numf64x: GLIBC_2.35
+fun fminimum_mag_numl: GLIBC_2.35
+fun fminimum_magf: GLIBC_2.35
+fun fminimum_magf128: GLIBC_2.35
+fun fminimum_magf32: GLIBC_2.35
+fun fminimum_magf32x: GLIBC_2.35
+fun fminimum_magf64: GLIBC_2.35
+fun fminimum_magf64x: GLIBC_2.35
+fun fminimum_magl: GLIBC_2.35
+fun fminimum_num: GLIBC_2.35
+fun fminimum_numf: GLIBC_2.35
+fun fminimum_numf128: GLIBC_2.35
+fun fminimum_numf32: GLIBC_2.35
+fun fminimum_numf32x: GLIBC_2.35
+fun fminimum_numf64: GLIBC_2.35
+fun fminimum_numf64x: GLIBC_2.35
+fun fminimum_numl: GLIBC_2.35
+fun fminimumf: GLIBC_2.35
+fun fminimumf128: GLIBC_2.35
+fun fminimumf32: GLIBC_2.35
+fun fminimumf32x: GLIBC_2.35
+fun fminimumf64: GLIBC_2.35
+fun fminimumf64x: GLIBC_2.35
+fun fminimuml: GLIBC_2.35
 fun fminl: GLIBC_2.1
 fun fminmag: GLIBC_2.25
 fun fminmagf: GLIBC_2.25
@@ -1564,6 +1815,7 @@ fun fopen: GLIBC_2.0, GLIBC_2.1
 fun fopen64: GLIBC_2.1
 fun fopencookie: GLIBC_2.0, GLIBC_2.2
 fun fork: GLIBC_2.0
+fun forkpty: GLIBC_2.0, GLIBC_2.34
 fun fpathconf: GLIBC_2.0
 fun fprintf: GLIBC_2.0
 fun fputc: GLIBC_2.0
@@ -1614,6 +1866,12 @@ fun fseeko64: GLIBC_2.1
 fun fsetpos: GLIBC_2.0, GLIBC_2.2
 fun fsetpos64: GLIBC_2.1, GLIBC_2.2
 fun fsetxattr: GLIBC_2.3
+fun fsqrt: GLIBC_2.35
+fun fsqrtl: GLIBC_2.35
+fun fstat: GLIBC_2.33
+fun fstat64: GLIBC_2.33
+fun fstatat: GLIBC_2.33
+fun fstatat64: GLIBC_2.33
 fun fstatfs: GLIBC_2.0
 fun fstatfs64: GLIBC_2.1
 fun fstatvfs: GLIBC_2.1
@@ -1650,7 +1908,10 @@ fun fwprintf: GLIBC_2.2
 fun fwrite: GLIBC_2.0
 fun fwrite_unlocked: GLIBC_2.1
 fun fwscanf: GLIBC_2.2
+fun gai_cancel: GLIBC_2.2.3, GLIBC_2.34
+fun gai_error: GLIBC_2.2.3, GLIBC_2.34
 fun gai_strerror: GLIBC_2.1
+fun gai_suspend: GLIBC_2.2.3, GLIBC_2.34
 fun gamma: GLIBC_2.0
 fun gammaf: GLIBC_2.0
 fun gammal: GLIBC_2.0
@@ -1663,6 +1924,7 @@ fun get_nprocs: GLIBC_2.0
 fun get_nprocs_conf: GLIBC_2.0
 fun get_phys_pages: GLIBC_2.0
 fun getaddrinfo: GLIBC_2.0
+fun getaddrinfo_a: GLIBC_2.2.3, GLIBC_2.34
 fun getaliasbyname: GLIBC_2.0
 fun getaliasbyname_r: GLIBC_2.0, GLIBC_2.1.2
 fun getaliasent: GLIBC_2.0
@@ -1673,11 +1935,13 @@ fun getc_unlocked: GLIBC_2.0
 fun getchar: GLIBC_2.0
 fun getchar_unlocked: GLIBC_2.0
 fun getcontext: GLIBC_2.1
+fun getcpu: GLIBC_2.29
 fun getcwd: GLIBC_2.0
 fun getdate: GLIBC_2.1
 obj getdate_err: GLIBC_2.1
 fun getdate_r: GLIBC_2.1
 fun getdelim: GLIBC_2.0
+fun getdents64: GLIBC_2.30
 fun getdirentries: GLIBC_2.0
 fun getdirentries64: GLIBC_2.2
 fun getdomainname: GLIBC_2.0
@@ -1798,6 +2062,7 @@ fun getspnam: GLIBC_2.0
 fun getspnam_r: GLIBC_2.0, GLIBC_2.1.2
 fun getsubopt: GLIBC_2.0
 fun gettext: GLIBC_2.0
+fun gettid: GLIBC_2.30
 fun gettimeofday: GLIBC_2.0
 fun getttyent: GLIBC_2.0
 fun getttynam: GLIBC_2.0
@@ -1851,8 +2116,8 @@ fun hsearch_r: GLIBC_2.0
 fun hstrerror: GLIBC_2.0
 fun htonl: GLIBC_2.0
 fun htons: GLIBC_2.0
-fun hypot: GLIBC_2.0
-fun hypotf: GLIBC_2.0
+fun hypot: GLIBC_2.0, GLIBC_2.35
+fun hypotf: GLIBC_2.0, GLIBC_2.35
 fun hypotf128: GLIBC_2.26
 fun hypotf32: GLIBC_2.27
 fun hypotf32x: GLIBC_2.27
@@ -1902,6 +2167,9 @@ fun inet_addr: GLIBC_2.0
 fun inet_aton: GLIBC_2.0
 fun inet_lnaof: GLIBC_2.0
 fun inet_makeaddr: GLIBC_2.0
+fun inet_net_ntop: GLIBC_2.0
+fun inet_net_pton: GLIBC_2.0
+fun inet_neta: GLIBC_2.0
 fun inet_netof: GLIBC_2.0
 fun inet_network: GLIBC_2.0
 fun inet_nsap_addr: GLIBC_2.0
@@ -2059,8 +2327,8 @@ fun lgammal_r: GLIBC_2.0
 fun lgetxattr: GLIBC_2.3
 fun link: GLIBC_2.0
 fun linkat: GLIBC_2.4
-fun lio_listio: GLIBC_2.1, GLIBC_2.4
-fun lio_listio64: GLIBC_2.1, GLIBC_2.4
+fun lio_listio: GLIBC_2.1, GLIBC_2.34, GLIBC_2.4
+fun lio_listio64: GLIBC_2.1, GLIBC_2.34, GLIBC_2.4
 fun listen: GLIBC_2.0
 fun listxattr: GLIBC_2.3
 fun llabs: GLIBC_2.0
@@ -2099,7 +2367,7 @@ fun localtime_r: GLIBC_2.0
 fun lockf: GLIBC_2.0
 fun lockf64: GLIBC_2.1
 obj locs: GLIBC_2.0
-fun log: GLIBC_2.0
+fun log: GLIBC_2.0, GLIBC_2.29
 fun log10: GLIBC_2.0
 fun log10f: GLIBC_2.0
 fun log10f128: GLIBC_2.26
@@ -2116,7 +2384,7 @@ fun log1pf32x: GLIBC_2.27
 fun log1pf64: GLIBC_2.27
 fun log1pf64x: GLIBC_2.27
 fun log1pl: GLIBC_2.0
-fun log2: GLIBC_2.1
+fun log2: GLIBC_2.1, GLIBC_2.29
 fun log2f: GLIBC_2.1, GLIBC_2.27
 fun log2f128: GLIBC_2.26
 fun log2f32: GLIBC_2.27
@@ -2138,7 +2406,11 @@ fun logf32: GLIBC_2.27
 fun logf32x: GLIBC_2.27
 fun logf64: GLIBC_2.27
 fun logf64x: GLIBC_2.27
+fun login: GLIBC_2.0, GLIBC_2.34
+fun login_tty: GLIBC_2.0, GLIBC_2.34
 fun logl: GLIBC_2.0
+fun logout: GLIBC_2.0, GLIBC_2.34
+fun logwtmp: GLIBC_2.0, GLIBC_2.34
 fun longjmp: GLIBC_2.0
 fun lrand48: GLIBC_2.0
 fun lrand48_r: GLIBC_2.0
@@ -2163,14 +2435,15 @@ fun lsearch: GLIBC_2.0
 fun lseek: GLIBC_2.0
 fun lseek64: GLIBC_2.1, GLIBC_2.2
 fun lsetxattr: GLIBC_2.3
+fun lstat: GLIBC_2.33
+fun lstat64: GLIBC_2.33
 fun lutimes: GLIBC_2.3
 fun madvise: GLIBC_2.0
 fun makecontext: GLIBC_2.1
 fun mallinfo: GLIBC_2.0
+fun mallinfo2: GLIBC_2.33
 fun malloc: GLIBC_2.0
-fun malloc_get_state: GLIBC_2.0
 fun malloc_info: GLIBC_2.10
-fun malloc_set_state: GLIBC_2.0
 fun malloc_stats: GLIBC_2.0
 fun malloc_trim: GLIBC_2.0
 fun malloc_usable_size: GLIBC_2.0
@@ -2209,6 +2482,8 @@ fun mkdirat: GLIBC_2.4
 fun mkdtemp: GLIBC_2.2
 fun mkfifo: GLIBC_2.0
 fun mkfifoat: GLIBC_2.4
+fun mknod: GLIBC_2.33
+fun mknodat: GLIBC_2.33
 fun mkostemp: GLIBC_2.7
 fun mkostemp64: GLIBC_2.7
 fun mkostemps: GLIBC_2.11
@@ -2238,16 +2513,16 @@ fun monstartup: GLIBC_2.0
 fun mount: GLIBC_2.0
 fun mprobe: GLIBC_2.0
 fun mprotect: GLIBC_2.0
-fun mq_close: GLIBC_2.3.4
-fun mq_getattr: GLIBC_2.3.4
-fun mq_notify: GLIBC_2.3.4
-fun mq_open: GLIBC_2.3.4
-fun mq_receive: GLIBC_2.3.4
-fun mq_send: GLIBC_2.3.4
-fun mq_setattr: GLIBC_2.3.4
-fun mq_timedreceive: GLIBC_2.3.4
-fun mq_timedsend: GLIBC_2.3.4
-fun mq_unlink: GLIBC_2.3.4
+fun mq_close: GLIBC_2.3.4, GLIBC_2.34
+fun mq_getattr: GLIBC_2.3.4, GLIBC_2.34
+fun mq_notify: GLIBC_2.3.4, GLIBC_2.34
+fun mq_open: GLIBC_2.3.4, GLIBC_2.34
+fun mq_receive: GLIBC_2.3.4, GLIBC_2.34
+fun mq_send: GLIBC_2.3.4, GLIBC_2.34
+fun mq_setattr: GLIBC_2.3.4, GLIBC_2.34
+fun mq_timedreceive: GLIBC_2.3.4, GLIBC_2.34
+fun mq_timedsend: GLIBC_2.3.4, GLIBC_2.34
+fun mq_unlink: GLIBC_2.3.4, GLIBC_2.34
 fun mrand48: GLIBC_2.0
 fun mrand48_r: GLIBC_2.0
 fun mremap: GLIBC_2.0
@@ -2257,12 +2532,12 @@ fun msgrcv: GLIBC_2.0
 fun msgsnd: GLIBC_2.0
 fun msync: GLIBC_2.0
 fun mtrace: GLIBC_2.0
-fun mtx_destroy: GLIBC_2.28
-fun mtx_init: GLIBC_2.28
-fun mtx_lock: GLIBC_2.28
-fun mtx_timedlock: GLIBC_2.28
-fun mtx_trylock: GLIBC_2.28
-fun mtx_unlock: GLIBC_2.28
+fun mtx_destroy: GLIBC_2.28, GLIBC_2.34
+fun mtx_init: GLIBC_2.28, GLIBC_2.34
+fun mtx_lock: GLIBC_2.28, GLIBC_2.34
+fun mtx_timedlock: GLIBC_2.28, GLIBC_2.34
+fun mtx_trylock: GLIBC_2.28, GLIBC_2.34
+fun mtx_unlock: GLIBC_2.28, GLIBC_2.34
 fun munlock: GLIBC_2.0
 fun munlockall: GLIBC_2.0
 fun munmap: GLIBC_2.0
@@ -2324,6 +2599,32 @@ fun nl_langinfo: GLIBC_2.0
 fun nl_langinfo_l: GLIBC_2.3
 fun nrand48: GLIBC_2.0
 fun nrand48_r: GLIBC_2.0
+fun ns_datetosecs: GLIBC_2.9
+fun ns_format_ttl: GLIBC_2.9
+fun ns_get16: GLIBC_2.9
+fun ns_get32: GLIBC_2.9
+fun ns_initparse: GLIBC_2.9
+fun ns_makecanon: GLIBC_2.9
+fun ns_msg_getflag: GLIBC_2.9
+fun ns_name_compress: GLIBC_2.34, GLIBC_2.9
+fun ns_name_ntol: GLIBC_2.9
+fun ns_name_ntop: GLIBC_2.34, GLIBC_2.9
+fun ns_name_pack: GLIBC_2.34, GLIBC_2.9
+fun ns_name_pton: GLIBC_2.34, GLIBC_2.9
+fun ns_name_rollback: GLIBC_2.9
+fun ns_name_skip: GLIBC_2.34, GLIBC_2.9
+fun ns_name_uncompress: GLIBC_2.34, GLIBC_2.9
+fun ns_name_unpack: GLIBC_2.34, GLIBC_2.9
+fun ns_parse_ttl: GLIBC_2.9
+fun ns_parserr: GLIBC_2.9
+fun ns_put16: GLIBC_2.9
+fun ns_put32: GLIBC_2.9
+fun ns_samedomain: GLIBC_2.9
+fun ns_samename: GLIBC_2.9
+fun ns_skiprr: GLIBC_2.9
+fun ns_sprintrr: GLIBC_2.9
+fun ns_sprintrrf: GLIBC_2.9
+fun ns_subdomain: GLIBC_2.9
 fun ntohl: GLIBC_2.0
 fun ntohs: GLIBC_2.0
 fun ntp_adjtime: GLIBC_2.1
@@ -2344,6 +2645,7 @@ fun openat: GLIBC_2.4
 fun openat64: GLIBC_2.4
 fun opendir: GLIBC_2.0
 fun openlog: GLIBC_2.0
+fun openpty: GLIBC_2.0, GLIBC_2.34
 obj optarg: GLIBC_2.0
 obj opterr: GLIBC_2.0
 obj optind: GLIBC_2.0
@@ -2378,9 +2680,13 @@ fun posix_madvise: GLIBC_2.2
 fun posix_memalign: GLIBC_2.2
 fun posix_openpt: GLIBC_2.2.1
 fun posix_spawn: GLIBC_2.15, GLIBC_2.2
+fun posix_spawn_file_actions_addchdir_np: GLIBC_2.29
 fun posix_spawn_file_actions_addclose: GLIBC_2.2
+fun posix_spawn_file_actions_addclosefrom_np: GLIBC_2.34
 fun posix_spawn_file_actions_adddup2: GLIBC_2.2
+fun posix_spawn_file_actions_addfchdir_np: GLIBC_2.29
 fun posix_spawn_file_actions_addopen: GLIBC_2.2
+fun posix_spawn_file_actions_addtcsetpgrp_np: GLIBC_2.35
 fun posix_spawn_file_actions_destroy: GLIBC_2.2
 fun posix_spawn_file_actions_init: GLIBC_2.2
 fun posix_spawnattr_destroy: GLIBC_2.2
@@ -2398,7 +2704,7 @@ fun posix_spawnattr_setschedpolicy: GLIBC_2.2
 fun posix_spawnattr_setsigdefault: GLIBC_2.2
 fun posix_spawnattr_setsigmask: GLIBC_2.2
 fun posix_spawnp: GLIBC_2.15, GLIBC_2.2
-fun pow: GLIBC_2.0
+fun pow: GLIBC_2.0, GLIBC_2.29
 fun pow10: GLIBC_2.1
 fun pow10f: GLIBC_2.1
 fun pow10l: GLIBC_2.1
@@ -2432,126 +2738,133 @@ fun psiginfo: GLIBC_2.10
 fun psignal: GLIBC_2.0
 fun pthread_atfork: GLIBC_2.0
 fun pthread_attr_destroy: GLIBC_2.0
-fun pthread_attr_getaffinity_np: GLIBC_2.3.3, GLIBC_2.3.4
+fun pthread_attr_getaffinity_np: GLIBC_2.3.3, GLIBC_2.3.4, GLIBC_2.34
 fun pthread_attr_getdetachstate: GLIBC_2.0
-fun pthread_attr_getguardsize: GLIBC_2.1
+fun pthread_attr_getguardsize: GLIBC_2.1, GLIBC_2.34
 fun pthread_attr_getinheritsched: GLIBC_2.0
 fun pthread_attr_getschedparam: GLIBC_2.0
 fun pthread_attr_getschedpolicy: GLIBC_2.0
 fun pthread_attr_getscope: GLIBC_2.0
-fun pthread_attr_getstack: GLIBC_2.2
-fun pthread_attr_getstackaddr: GLIBC_2.1
-fun pthread_attr_getstacksize: GLIBC_2.1
+fun pthread_attr_getsigmask_np: GLIBC_2.32
+fun pthread_attr_getstack: GLIBC_2.2, GLIBC_2.34
+fun pthread_attr_getstackaddr: GLIBC_2.1, GLIBC_2.34
+fun pthread_attr_getstacksize: GLIBC_2.1, GLIBC_2.34
 fun pthread_attr_init: GLIBC_2.0, GLIBC_2.1
-fun pthread_attr_setaffinity_np: GLIBC_2.3.3, GLIBC_2.3.4
+fun pthread_attr_setaffinity_np: GLIBC_2.3.3, GLIBC_2.3.4, GLIBC_2.32
 fun pthread_attr_setdetachstate: GLIBC_2.0
-fun pthread_attr_setguardsize: GLIBC_2.1
+fun pthread_attr_setguardsize: GLIBC_2.1, GLIBC_2.34
 fun pthread_attr_setinheritsched: GLIBC_2.0
 fun pthread_attr_setschedparam: GLIBC_2.0
 fun pthread_attr_setschedpolicy: GLIBC_2.0
 fun pthread_attr_setscope: GLIBC_2.0
-fun pthread_attr_setstack: GLIBC_2.2
-fun pthread_attr_setstackaddr: GLIBC_2.1
-fun pthread_attr_setstacksize: GLIBC_2.1
-fun pthread_barrier_destroy: GLIBC_2.2
-fun pthread_barrier_init: GLIBC_2.2
-fun pthread_barrier_wait: GLIBC_2.2
-fun pthread_barrierattr_destroy: GLIBC_2.2
-fun pthread_barrierattr_getpshared: GLIBC_2.3.3
-fun pthread_barrierattr_init: GLIBC_2.2
-fun pthread_barrierattr_setpshared: GLIBC_2.2
-fun pthread_cancel: GLIBC_2.0
+fun pthread_attr_setsigmask_np: GLIBC_2.32
+fun pthread_attr_setstack: GLIBC_2.2, GLIBC_2.34
+fun pthread_attr_setstackaddr: GLIBC_2.1, GLIBC_2.34
+fun pthread_attr_setstacksize: GLIBC_2.1, GLIBC_2.34
+fun pthread_barrier_destroy: GLIBC_2.2, GLIBC_2.34
+fun pthread_barrier_init: GLIBC_2.2, GLIBC_2.34
+fun pthread_barrier_wait: GLIBC_2.2, GLIBC_2.34
+fun pthread_barrierattr_destroy: GLIBC_2.2, GLIBC_2.34
+fun pthread_barrierattr_getpshared: GLIBC_2.3.3, GLIBC_2.34
+fun pthread_barrierattr_init: GLIBC_2.2, GLIBC_2.34
+fun pthread_barrierattr_setpshared: GLIBC_2.2, GLIBC_2.34
+fun pthread_cancel: GLIBC_2.0, GLIBC_2.34
+fun pthread_clockjoin_np: GLIBC_2.31, GLIBC_2.34
 fun pthread_cond_broadcast: GLIBC_2.0, GLIBC_2.3.2
+fun pthread_cond_clockwait: GLIBC_2.30, GLIBC_2.34
 fun pthread_cond_destroy: GLIBC_2.0, GLIBC_2.3.2
 fun pthread_cond_init: GLIBC_2.0, GLIBC_2.3.2
 fun pthread_cond_signal: GLIBC_2.0, GLIBC_2.3.2
 fun pthread_cond_timedwait: GLIBC_2.0, GLIBC_2.3.2
 fun pthread_cond_wait: GLIBC_2.0, GLIBC_2.3.2
 fun pthread_condattr_destroy: GLIBC_2.0
-fun pthread_condattr_getclock: GLIBC_2.3.3
-fun pthread_condattr_getpshared: GLIBC_2.2
+fun pthread_condattr_getclock: GLIBC_2.3.3, GLIBC_2.34
+fun pthread_condattr_getpshared: GLIBC_2.2, GLIBC_2.34
 fun pthread_condattr_init: GLIBC_2.0
-fun pthread_condattr_setclock: GLIBC_2.3.3
-fun pthread_condattr_setpshared: GLIBC_2.2
-fun pthread_create: GLIBC_2.0, GLIBC_2.1
-fun pthread_detach: GLIBC_2.0
+fun pthread_condattr_setclock: GLIBC_2.3.3, GLIBC_2.34
+fun pthread_condattr_setpshared: GLIBC_2.2, GLIBC_2.34
+fun pthread_create: GLIBC_2.0, GLIBC_2.1, GLIBC_2.34
+fun pthread_detach: GLIBC_2.0, GLIBC_2.34
 fun pthread_equal: GLIBC_2.0
 fun pthread_exit: GLIBC_2.0
-fun pthread_getaffinity_np: GLIBC_2.3.3, GLIBC_2.3.4
-fun pthread_getattr_default_np: GLIBC_2.18
-fun pthread_getattr_np: GLIBC_2.2.3
-fun pthread_getconcurrency: GLIBC_2.1
-fun pthread_getcpuclockid: GLIBC_2.2
-fun pthread_getname_np: GLIBC_2.12
+fun pthread_getaffinity_np: GLIBC_2.3.3, GLIBC_2.3.4, GLIBC_2.32
+fun pthread_getattr_default_np: GLIBC_2.18, GLIBC_2.34
+fun pthread_getattr_np: GLIBC_2.2.3, GLIBC_2.32
+fun pthread_getconcurrency: GLIBC_2.1, GLIBC_2.34
+fun pthread_getcpuclockid: GLIBC_2.2, GLIBC_2.34
+fun pthread_getname_np: GLIBC_2.12, GLIBC_2.34
 fun pthread_getschedparam: GLIBC_2.0
-fun pthread_getspecific: GLIBC_2.0
-fun pthread_join: GLIBC_2.0
-fun pthread_key_create: GLIBC_2.0
-fun pthread_key_delete: GLIBC_2.0
-fun pthread_kill: GLIBC_2.0
+fun pthread_getspecific: GLIBC_2.0, GLIBC_2.34
+fun pthread_join: GLIBC_2.0, GLIBC_2.34
+fun pthread_key_create: GLIBC_2.0, GLIBC_2.34
+fun pthread_key_delete: GLIBC_2.0, GLIBC_2.34
+fun pthread_kill: GLIBC_2.0, GLIBC_2.34
 fun pthread_kill_other_threads_np: GLIBC_2.0
-fun pthread_mutex_consistent: GLIBC_2.12
+fun pthread_mutex_clocklock: GLIBC_2.30, GLIBC_2.34
+fun pthread_mutex_consistent: GLIBC_2.12, GLIBC_2.34
 fun pthread_mutex_consistent_np: GLIBC_2.4
 fun pthread_mutex_destroy: GLIBC_2.0
-fun pthread_mutex_getprioceiling: GLIBC_2.4
+fun pthread_mutex_getprioceiling: GLIBC_2.34, GLIBC_2.4
 fun pthread_mutex_init: GLIBC_2.0
 fun pthread_mutex_lock: GLIBC_2.0
-fun pthread_mutex_setprioceiling: GLIBC_2.4
-fun pthread_mutex_timedlock: GLIBC_2.2
-fun pthread_mutex_trylock: GLIBC_2.0
+fun pthread_mutex_setprioceiling: GLIBC_2.34, GLIBC_2.4
+fun pthread_mutex_timedlock: GLIBC_2.2, GLIBC_2.34
+fun pthread_mutex_trylock: GLIBC_2.0, GLIBC_2.34
 fun pthread_mutex_unlock: GLIBC_2.0
-fun pthread_mutexattr_destroy: GLIBC_2.0
+fun pthread_mutexattr_destroy: GLIBC_2.0, GLIBC_2.34
 fun pthread_mutexattr_getkind_np: GLIBC_2.0
-fun pthread_mutexattr_getprioceiling: GLIBC_2.4
-fun pthread_mutexattr_getprotocol: GLIBC_2.4
-fun pthread_mutexattr_getpshared: GLIBC_2.2
-fun pthread_mutexattr_getrobust: GLIBC_2.12
+fun pthread_mutexattr_getprioceiling: GLIBC_2.34, GLIBC_2.4
+fun pthread_mutexattr_getprotocol: GLIBC_2.34, GLIBC_2.4
+fun pthread_mutexattr_getpshared: GLIBC_2.2, GLIBC_2.34
+fun pthread_mutexattr_getrobust: GLIBC_2.12, GLIBC_2.34
 fun pthread_mutexattr_getrobust_np: GLIBC_2.4
-fun pthread_mutexattr_gettype: GLIBC_2.1
-fun pthread_mutexattr_init: GLIBC_2.0
+fun pthread_mutexattr_gettype: GLIBC_2.1, GLIBC_2.34
+fun pthread_mutexattr_init: GLIBC_2.0, GLIBC_2.34
 fun pthread_mutexattr_setkind_np: GLIBC_2.0
-fun pthread_mutexattr_setprioceiling: GLIBC_2.4
-fun pthread_mutexattr_setprotocol: GLIBC_2.4
-fun pthread_mutexattr_setpshared: GLIBC_2.2
-fun pthread_mutexattr_setrobust: GLIBC_2.12
+fun pthread_mutexattr_setprioceiling: GLIBC_2.34, GLIBC_2.4
+fun pthread_mutexattr_setprotocol: GLIBC_2.34, GLIBC_2.4
+fun pthread_mutexattr_setpshared: GLIBC_2.2, GLIBC_2.34
+fun pthread_mutexattr_setrobust: GLIBC_2.12, GLIBC_2.34
 fun pthread_mutexattr_setrobust_np: GLIBC_2.4
-fun pthread_mutexattr_settype: GLIBC_2.1
-fun pthread_once: GLIBC_2.0
-fun pthread_rwlock_destroy: GLIBC_2.1
-fun pthread_rwlock_init: GLIBC_2.1
-fun pthread_rwlock_rdlock: GLIBC_2.1
-fun pthread_rwlock_timedrdlock: GLIBC_2.2
-fun pthread_rwlock_timedwrlock: GLIBC_2.2
-fun pthread_rwlock_tryrdlock: GLIBC_2.1
-fun pthread_rwlock_trywrlock: GLIBC_2.1
-fun pthread_rwlock_unlock: GLIBC_2.1
-fun pthread_rwlock_wrlock: GLIBC_2.1
-fun pthread_rwlockattr_destroy: GLIBC_2.1
-fun pthread_rwlockattr_getkind_np: GLIBC_2.1
-fun pthread_rwlockattr_getpshared: GLIBC_2.1
-fun pthread_rwlockattr_init: GLIBC_2.1
-fun pthread_rwlockattr_setkind_np: GLIBC_2.1
-fun pthread_rwlockattr_setpshared: GLIBC_2.1
+fun pthread_mutexattr_settype: GLIBC_2.1, GLIBC_2.34
+fun pthread_once: GLIBC_2.0, GLIBC_2.34
+fun pthread_rwlock_clockrdlock: GLIBC_2.30, GLIBC_2.34
+fun pthread_rwlock_clockwrlock: GLIBC_2.30, GLIBC_2.34
+fun pthread_rwlock_destroy: GLIBC_2.1, GLIBC_2.34
+fun pthread_rwlock_init: GLIBC_2.1, GLIBC_2.34
+fun pthread_rwlock_rdlock: GLIBC_2.1, GLIBC_2.34
+fun pthread_rwlock_timedrdlock: GLIBC_2.2, GLIBC_2.34
+fun pthread_rwlock_timedwrlock: GLIBC_2.2, GLIBC_2.34
+fun pthread_rwlock_tryrdlock: GLIBC_2.1, GLIBC_2.34
+fun pthread_rwlock_trywrlock: GLIBC_2.1, GLIBC_2.34
+fun pthread_rwlock_unlock: GLIBC_2.1, GLIBC_2.34
+fun pthread_rwlock_wrlock: GLIBC_2.1, GLIBC_2.34
+fun pthread_rwlockattr_destroy: GLIBC_2.1, GLIBC_2.34
+fun pthread_rwlockattr_getkind_np: GLIBC_2.1, GLIBC_2.34
+fun pthread_rwlockattr_getpshared: GLIBC_2.1, GLIBC_2.34
+fun pthread_rwlockattr_init: GLIBC_2.1, GLIBC_2.34
+fun pthread_rwlockattr_setkind_np: GLIBC_2.1, GLIBC_2.34
+fun pthread_rwlockattr_setpshared: GLIBC_2.1, GLIBC_2.34
 fun pthread_self: GLIBC_2.0
-fun pthread_setaffinity_np: GLIBC_2.3.3, GLIBC_2.3.4
-fun pthread_setattr_default_np: GLIBC_2.18
+fun pthread_setaffinity_np: GLIBC_2.3.3, GLIBC_2.3.4, GLIBC_2.34
+fun pthread_setattr_default_np: GLIBC_2.18, GLIBC_2.34
 fun pthread_setcancelstate: GLIBC_2.0
 fun pthread_setcanceltype: GLIBC_2.0
-fun pthread_setconcurrency: GLIBC_2.1
-fun pthread_setname_np: GLIBC_2.12
+fun pthread_setconcurrency: GLIBC_2.1, GLIBC_2.34
+fun pthread_setname_np: GLIBC_2.12, GLIBC_2.34
 fun pthread_setschedparam: GLIBC_2.0
-fun pthread_setschedprio: GLIBC_2.3.4
-fun pthread_setspecific: GLIBC_2.0
-fun pthread_sigmask: GLIBC_2.0
-fun pthread_sigqueue: GLIBC_2.11
-fun pthread_spin_destroy: GLIBC_2.2
-fun pthread_spin_init: GLIBC_2.2
-fun pthread_spin_lock: GLIBC_2.2
-fun pthread_spin_trylock: GLIBC_2.2
-fun pthread_spin_unlock: GLIBC_2.2
-fun pthread_testcancel: GLIBC_2.0
-fun pthread_timedjoin_np: GLIBC_2.3.3
-fun pthread_tryjoin_np: GLIBC_2.3.3
+fun pthread_setschedprio: GLIBC_2.3.4, GLIBC_2.34
+fun pthread_setspecific: GLIBC_2.0, GLIBC_2.34
+fun pthread_sigmask: GLIBC_2.0, GLIBC_2.32
+fun pthread_sigqueue: GLIBC_2.11, GLIBC_2.34
+fun pthread_spin_destroy: GLIBC_2.2, GLIBC_2.34
+fun pthread_spin_init: GLIBC_2.2, GLIBC_2.34
+fun pthread_spin_lock: GLIBC_2.2, GLIBC_2.34
+fun pthread_spin_trylock: GLIBC_2.2, GLIBC_2.34
+fun pthread_spin_unlock: GLIBC_2.2, GLIBC_2.34
+fun pthread_testcancel: GLIBC_2.0, GLIBC_2.34
+fun pthread_timedjoin_np: GLIBC_2.3.3, GLIBC_2.34
+fun pthread_tryjoin_np: GLIBC_2.3.3, GLIBC_2.34
 fun pthread_yield: GLIBC_2.2
 fun ptrace: GLIBC_2.0
 fun ptsname: GLIBC_2.1
@@ -2661,7 +2974,26 @@ fun remquol: GLIBC_2.1
 fun rename: GLIBC_2.0
 fun renameat: GLIBC_2.4
 fun renameat2: GLIBC_2.28
+fun res_dnok: GLIBC_2.34
+fun res_gethostbyaddr: GLIBC_2.0
+fun res_gethostbyname: GLIBC_2.0
+fun res_gethostbyname2: GLIBC_2.0
+fun res_hnok: GLIBC_2.34
 fun res_init: GLIBC_2.0
+fun res_mailok: GLIBC_2.34
+fun res_mkquery: GLIBC_2.0, GLIBC_2.34
+fun res_nmkquery: GLIBC_2.34
+fun res_nquery: GLIBC_2.34
+fun res_nquerydomain: GLIBC_2.34
+fun res_nsearch: GLIBC_2.34
+fun res_nsend: GLIBC_2.34
+fun res_ownok: GLIBC_2.34
+fun res_query: GLIBC_2.0, GLIBC_2.34
+fun res_querydomain: GLIBC_2.0, GLIBC_2.34
+fun res_search: GLIBC_2.0, GLIBC_2.34
+fun res_send: GLIBC_2.34
+fun res_send_setqhook: GLIBC_2.0
+fun res_send_setrhook: GLIBC_2.0
 fun revoke: GLIBC_2.0
 fun rewind: GLIBC_2.0
 fun rewinddir: GLIBC_2.0
@@ -2743,16 +3075,17 @@ fun seed48: GLIBC_2.0
 fun seed48_r: GLIBC_2.0
 fun seekdir: GLIBC_2.0
 fun select: GLIBC_2.0
-fun sem_close: GLIBC_2.1.1
-fun sem_destroy: GLIBC_2.0, GLIBC_2.1
-fun sem_getvalue: GLIBC_2.0, GLIBC_2.1
-fun sem_init: GLIBC_2.0, GLIBC_2.1
-fun sem_open: GLIBC_2.1.1
-fun sem_post: GLIBC_2.0, GLIBC_2.1
-fun sem_timedwait: GLIBC_2.2
-fun sem_trywait: GLIBC_2.0, GLIBC_2.1
-fun sem_unlink: GLIBC_2.1.1
-fun sem_wait: GLIBC_2.0, GLIBC_2.1
+fun sem_clockwait: GLIBC_2.30, GLIBC_2.34
+fun sem_close: GLIBC_2.1.1, GLIBC_2.34
+fun sem_destroy: GLIBC_2.0, GLIBC_2.1, GLIBC_2.34
+fun sem_getvalue: GLIBC_2.0, GLIBC_2.1, GLIBC_2.34
+fun sem_init: GLIBC_2.0, GLIBC_2.1, GLIBC_2.34
+fun sem_open: GLIBC_2.1.1, GLIBC_2.34
+fun sem_post: GLIBC_2.0, GLIBC_2.1, GLIBC_2.34
+fun sem_timedwait: GLIBC_2.2, GLIBC_2.34
+fun sem_trywait: GLIBC_2.0, GLIBC_2.1, GLIBC_2.34
+fun sem_unlink: GLIBC_2.1.1, GLIBC_2.34
+fun sem_wait: GLIBC_2.0, GLIBC_2.1, GLIBC_2.34
 fun semctl: GLIBC_2.0, GLIBC_2.2
 fun semget: GLIBC_2.0
 fun semop: GLIBC_2.0
@@ -2839,19 +3172,21 @@ fun sgetsgent: GLIBC_2.10
 fun sgetsgent_r: GLIBC_2.10
 fun sgetspent: GLIBC_2.0
 fun sgetspent_r: GLIBC_2.0
-fun shm_open: GLIBC_2.2
-fun shm_unlink: GLIBC_2.2
+fun shm_open: GLIBC_2.2, GLIBC_2.34
+fun shm_unlink: GLIBC_2.2, GLIBC_2.34
 fun shmat: GLIBC_2.0
 fun shmctl: GLIBC_2.0, GLIBC_2.2
 fun shmdt: GLIBC_2.0
 fun shmget: GLIBC_2.0
 fun shutdown: GLIBC_2.0
+fun sigabbrev_np: GLIBC_2.32
 fun sigaction: GLIBC_2.0
 fun sigaddset: GLIBC_2.0
 fun sigaltstack: GLIBC_2.0
 fun sigandset: GLIBC_2.0
 fun sigblock: GLIBC_2.0
 fun sigdelset: GLIBC_2.0
+fun sigdescr_np: GLIBC_2.32
 fun sigemptyset: GLIBC_2.0
 fun sigfillset: GLIBC_2.0
 fun siggetmask: GLIBC_2.0
@@ -2930,6 +3265,8 @@ fun srandom_r: GLIBC_2.0
 fun sscanf: GLIBC_2.0
 fun ssignal: GLIBC_2.0
 fun sstk: GLIBC_2.0
+fun stat: GLIBC_2.33
+fun stat64: GLIBC_2.33
 fun statfs: GLIBC_2.0
 fun statfs64: GLIBC_2.1
 fun statvfs: GLIBC_2.1
@@ -2957,6 +3294,8 @@ fun strdup: GLIBC_2.0
 fun strerror: GLIBC_2.0
 fun strerror_l: GLIBC_2.6
 fun strerror_r: GLIBC_2.0
+fun strerrordesc_np: GLIBC_2.32
+fun strerrorname_np: GLIBC_2.32
 fun strfmon: GLIBC_2.0
 fun strfmon_l: GLIBC_2.3
 fun strfromd: GLIBC_2.25
@@ -3110,27 +3449,29 @@ fun tgammaf32x: GLIBC_2.27
 fun tgammaf64: GLIBC_2.27
 fun tgammaf64x: GLIBC_2.27
 fun tgammal: GLIBC_2.1
-fun thrd_create: GLIBC_2.28
+fun tgkill: GLIBC_2.30
+fun thrd_create: GLIBC_2.28, GLIBC_2.34
 fun thrd_current: GLIBC_2.28
-fun thrd_detach: GLIBC_2.28
+fun thrd_detach: GLIBC_2.28, GLIBC_2.34
 fun thrd_equal: GLIBC_2.28
-fun thrd_exit: GLIBC_2.28
-fun thrd_join: GLIBC_2.28
+fun thrd_exit: GLIBC_2.28, GLIBC_2.34
+fun thrd_join: GLIBC_2.28, GLIBC_2.34
 fun thrd_sleep: GLIBC_2.28
 fun thrd_yield: GLIBC_2.28
 fun time: GLIBC_2.0
 fun timegm: GLIBC_2.0
 fun timelocal: GLIBC_2.0
-fun timer_create: GLIBC_2.2
-fun timer_delete: GLIBC_2.2
-fun timer_getoverrun: GLIBC_2.2
-fun timer_gettime: GLIBC_2.2
-fun timer_settime: GLIBC_2.2
+fun timer_create: GLIBC_2.2, GLIBC_2.34
+fun timer_delete: GLIBC_2.2, GLIBC_2.34
+fun timer_getoverrun: GLIBC_2.2, GLIBC_2.34
+fun timer_gettime: GLIBC_2.2, GLIBC_2.34
+fun timer_settime: GLIBC_2.2, GLIBC_2.34
 fun timerfd_create: GLIBC_2.8
 fun timerfd_gettime: GLIBC_2.8
 fun timerfd_settime: GLIBC_2.8
 fun times: GLIBC_2.0
 fun timespec_get: GLIBC_2.16
+fun timespec_getres: GLIBC_2.34
 obj timezone: GLIBC_2.0
 fun tmpfile: GLIBC_2.0, GLIBC_2.1
 fun tmpfile64: GLIBC_2.1
@@ -3139,22 +3480,22 @@ fun tmpnam_r: GLIBC_2.0
 fun toascii: GLIBC_2.0
 fun tolower: GLIBC_2.0
 fun tolower_l: GLIBC_2.3
-fun totalorder: GLIBC_2.25
-fun totalorderf: GLIBC_2.25
-fun totalorderf128: GLIBC_2.26
-fun totalorderf32: GLIBC_2.27
-fun totalorderf32x: GLIBC_2.27
-fun totalorderf64: GLIBC_2.27
-fun totalorderf64x: GLIBC_2.27
-fun totalorderl: GLIBC_2.25
-fun totalordermag: GLIBC_2.25
-fun totalordermagf: GLIBC_2.25
-fun totalordermagf128: GLIBC_2.26
-fun totalordermagf32: GLIBC_2.27
-fun totalordermagf32x: GLIBC_2.27
-fun totalordermagf64: GLIBC_2.27
-fun totalordermagf64x: GLIBC_2.27
-fun totalordermagl: GLIBC_2.25
+fun totalorder: GLIBC_2.25, GLIBC_2.31
+fun totalorderf: GLIBC_2.25, GLIBC_2.31
+fun totalorderf128: GLIBC_2.26, GLIBC_2.31
+fun totalorderf32: GLIBC_2.27, GLIBC_2.31
+fun totalorderf32x: GLIBC_2.27, GLIBC_2.31
+fun totalorderf64: GLIBC_2.27, GLIBC_2.31
+fun totalorderf64x: GLIBC_2.27, GLIBC_2.31
+fun totalorderl: GLIBC_2.25, GLIBC_2.31
+fun totalordermag: GLIBC_2.25, GLIBC_2.31
+fun totalordermagf: GLIBC_2.25, GLIBC_2.31
+fun totalordermagf128: GLIBC_2.26, GLIBC_2.31
+fun totalordermagf32: GLIBC_2.27, GLIBC_2.31
+fun totalordermagf32x: GLIBC_2.27, GLIBC_2.31
+fun totalordermagf64: GLIBC_2.27, GLIBC_2.31
+fun totalordermagf64x: GLIBC_2.27, GLIBC_2.31
+fun totalordermagl: GLIBC_2.25, GLIBC_2.31
 fun toupper: GLIBC_2.0
 fun toupper_l: GLIBC_2.3
 fun towctrans: GLIBC_2.0
@@ -3175,14 +3516,15 @@ fun truncf64: GLIBC_2.27
 fun truncf64x: GLIBC_2.27
 fun truncl: GLIBC_2.1
 fun tsearch: GLIBC_2.0
-fun tss_create: GLIBC_2.28
-fun tss_delete: GLIBC_2.28
-fun tss_get: GLIBC_2.28
-fun tss_set: GLIBC_2.28
+fun tss_create: GLIBC_2.28, GLIBC_2.34
+fun tss_delete: GLIBC_2.28, GLIBC_2.34
+fun tss_get: GLIBC_2.28, GLIBC_2.34
+fun tss_set: GLIBC_2.28, GLIBC_2.34
 fun ttyname: GLIBC_2.0
 fun ttyname_r: GLIBC_2.0
 fun ttyslot: GLIBC_2.0
 fun twalk: GLIBC_2.0
+fun twalk_r: GLIBC_2.30
 obj tzname: GLIBC_2.0
 fun tzset: GLIBC_2.0
 fun ualarm: GLIBC_2.0

@@ -20,6 +20,7 @@ def libmap(target_dir, libdir_suffix)
     'libdl.so.2'           => shim_path,
     'libm.so.6 '           => shim_path,
     'libpthread.so.0'      => shim_path,
+    'libresolv.so.2'       => shim_path,
     'librt.so.1'           => shim_path,
     'libcxxrt.so.1'        => (File.expand_path('fakecxxrt.so', target_dir) if ENV['SHIM_FAKECXXRT'] == '1')
   }

@@ -4,7 +4,7 @@
 symbols = {}
 
 libs = []
-for lib in ['libc.so.6', 'libm.so.6', 'libdl.so.2', 'librt.so.1', 'libpthread.so.0']
+for lib in ['libc.so.6', 'libm.so.6', 'libdl.so.2', 'libresolv.so.2', 'librt.so.1', 'libpthread.so.0']
   libs << (ARGV.include?('-32') ? "/compat/linux/lib/#{lib}" : "/compat/linux/lib64/#{lib}")
 end
 
