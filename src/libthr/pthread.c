@@ -190,29 +190,29 @@ static int shim_pthread_mutex_init_impl(linux_pthread_mutex_t* mutex, const linu
   return pthread_mutex_init(NATIVE_MUTEX_T(mutex), find_native_mutexattr(attr));
 }
 
+static pthread_mutex_t mutex_initialization_mutex = PTHREAD_MUTEX_INITIALIZER;
+
 static void init_mutex_if_necessary(linux_pthread_mutex_t* mutex) {
 
-  if (mutex->_wrapped_mutex == 0 && mutex->linux_kind > 0) {
+  if (mutex->_wrapped_mutex == NULL && mutex->linux_kind != LINUX_PTHREAD_MUTEX_NORMAL) {
 
-    // presumably this is a statically allocated mutex, so we don't have to explicitly initialize _init_mutex
-    int err = pthread_mutex_lock(&(mutex->_init_mutex));
-    if (err == 0) {
+    int lock_err = pthread_mutex_lock(&mutex_initialization_mutex);
+    assert(lock_err == 0);
 
-      if (mutex->_wrapped_mutex == 0) {
+    if (mutex->_wrapped_mutex == NULL) {
 
-        pthread_mutexattr_t attr;
-        pthread_mutexattr_init(&attr);
-        pthread_mutexattr_settype(&attr, linux_to_native_mutex_kind(mutex->linux_kind));
+      int type = linux_to_native_mutex_kind(mutex->linux_kind);
+      LOG("%s: init %p (type = %d -> %d)", __func__, mutex, mutex->linux_kind, type);
 
-        LOG("%s: init %p", __func__, mutex);
+      pthread_mutexattr_t attr;
+      pthread_mutexattr_init(&attr);
+      pthread_mutexattr_settype(&attr, type);
 
-        pthread_mutex_init(NATIVE_MUTEX_T(mutex), &attr);
-      }
-
-      assert(pthread_mutex_unlock(&(mutex->_init_mutex)) == 0);
-    } else {
-      assert(0);
+      pthread_mutex_init(NATIVE_MUTEX_T(mutex), &attr);
     }
+
+    int unlock_err = pthread_mutex_unlock(&mutex_initialization_mutex);
+    assert(unlock_err == 0);
   }
 }
 
@@ -256,7 +256,7 @@ SHIM_WRAP(pthread_mutex_timedlock);
 SHIM_WRAP(pthread_mutex_trylock);
 
 static int shim_pthread_mutex_destroy_impl(linux_pthread_mutex_t* mutex) {
-  //~ assert(mutex->_wrapped_mutex != 0);
+  assert(mutex->_wrapped_mutex != 0);
   return pthread_mutex_destroy(NATIVE_MUTEX_T(mutex));
 }
 
