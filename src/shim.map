@@ -38,6 +38,13 @@ GLIBC_2.25  {} SHIM;
 GLIBC_2.26  {} SHIM;
 GLIBC_2.27  {} SHIM;
 GLIBC_2.28  {} SHIM;
+GLIBC_2.29  {} SHIM;
+GLIBC_2.30  {} SHIM;
+GLIBC_2.31  {} SHIM;
+GLIBC_2.32  {} SHIM;
+GLIBC_2.33  {} SHIM;
+GLIBC_2.34  {} SHIM;
+GLIBC_2.35  {} SHIM;
 
 # libexecinfo.so.1 brings _Unwind_Find_FDE@@GCC_3.0 (through libgcc_s.so.1)
 # as required by 32-bit libnvidia-{glvkspirv.so,gpucomp.so} and lsteamclient.dll.so
