@@ -3543,7 +3543,7 @@ lsb_define([
   "char* gettext(const char* msgid)",
   "struct utmp* getutent(void)",
   "int getutent_r(struct utmp* buffer, struct utmp** result)",
-  "int glob64(const char* pattern, int flags, int (*errfunc)(const char*, int), glob64_t* pglob)",
+  "int glob64(const char* restrict pattern, int flags, int (*errfunc)(const char*, int), glob64_t* restrict pglob)",
   "void globfree64(glob64_t* pglob)",
   "const char* gnu_get_libc_version(void)",
   "const char* gnu_get_libc_release(void)",

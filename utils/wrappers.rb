@@ -89,6 +89,8 @@ def to_shim_type(type)
   case type
     when 'cpu_set_t*'
       'linux_cpu_set_t*'
+    when /glob(64|)_t\*(\srestrict|)/
+      "linux_glob#{$1}_t*#{$2}"
     when 'mode_t'
       'linux_mode_t'
     when 'off_t'
