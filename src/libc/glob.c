@@ -33,6 +33,8 @@ static int shim_glob_impl(const char* restrict pattern, int linux_flags, int (*e
   assert(errfunc == NULL);                            // ditto
 
   glob_t out;
+  out.gl_offs = pglob->gl_offs;
+
   int err = glob(pattern, linux_to_native_glob_flags(linux_flags), NULL, &out);
 
   pglob->gl_pathc = out.gl_pathc;
