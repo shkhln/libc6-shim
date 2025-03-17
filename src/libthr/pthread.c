@@ -3,7 +3,6 @@
 #include <pthread.h>
 #include <pthread_np.h>
 #include <signal.h>
-#include <spawn.h>
 #include "../shim.h"
 #include "../libc/sched.h"
 #include "../libc/signal.h"
@@ -593,27 +592,6 @@ static int shim_pthread_sigmask_impl(int linux_how, const linux_sigset_t* restri
 }
 
 SHIM_WRAP(pthread_sigmask);
-
-static int shim_posix_spawnattr_getsigdefault_impl(const posix_spawnattr_t* restrict attr, linux_sigset_t* restrict sigdefault) {
-  return posix_spawnattr_getsigdefault(attr, (sigset_t*)sigdefault);
-}
-
-static int shim_posix_spawnattr_getsigmask_impl(const posix_spawnattr_t* restrict attr, linux_sigset_t* restrict sigmask) {
-  return posix_spawnattr_getsigmask(attr, (sigset_t*)sigmask);
-}
-
-static int shim_posix_spawnattr_setsigdefault_impl(posix_spawnattr_t* attr, const linux_sigset_t* restrict sigdefault) {
-  return posix_spawnattr_setsigdefault(attr, (sigset_t*)sigdefault);
-}
-
-static int shim_posix_spawnattr_setsigmask_impl(posix_spawnattr_t* attr, const linux_sigset_t* restrict sigmask) {
-  return posix_spawnattr_setsigmask(attr, (sigset_t*)sigmask);
-}
-
-SHIM_WRAP(posix_spawnattr_getsigdefault);
-SHIM_WRAP(posix_spawnattr_getsigmask);
-SHIM_WRAP(posix_spawnattr_setsigdefault);
-SHIM_WRAP(posix_spawnattr_setsigmask);
 
 // FMOD init workaround (https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=240043#c26)
 static int shim_pthread_attr_setschedparam_impl(pthread_attr_t* attr, const linux_sched_param* param) {
