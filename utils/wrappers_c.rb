@@ -82,6 +82,8 @@ require(__dir__ + '/wrappers.rb')
 
 def check_compat(function)
 
+  return false if function[:name] =~ /^sig|signal/ && function[:name] != 'pthread_cond_signal'
+
   args = function[:args]
   args = [] if args.size == 1 && args.first[:type] == 'void'
 
@@ -121,7 +123,7 @@ for sym in symbols.keys
 
   puts "// #{sym}"
 
-  if symbols[sym][:type] == 'fun' && !(SUBSTITUTIONS[sym.to_sym] || sym.to_sym =~ /setjmp|__libc_start_main/)
+  if symbols[sym][:type] == 'fun' && !(SUBSTITUTIONS[sym.to_sym] || sym.to_sym =~ /^__libc_start_main$|setjmp/)
 
     puts "#ifndef SHIM_WRAPPER_#{sym}"
     puts
