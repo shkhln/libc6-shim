@@ -4,14 +4,20 @@
 #include "../shim.h"
 #include "locale.h"
 
-long int shim_timezone = 0;
+long shim_timezone = 0;
 SHIM_EXPORT(timezone);
 
-extern long int shim___timezone __attribute__((alias("shim_timezone")));
+extern long shim___timezone __attribute__((alias("shim_timezone")));
 SHIM_EXPORT(__timezone);
 
-static char shim_tzname_0[] = "GMT";
-static char shim_tzname_1[] = "GMT";
+int shim_daylight = 0;
+SHIM_EXPORT(daylight);
+
+extern int shim___daylight __attribute__((alias("shim_daylight")));
+SHIM_EXPORT(__daylight);
+
+static char shim_tzname_0[] = "GMT\0\0";
+static char shim_tzname_1[] = "GMT\0\0";
 
 char* shim_tzname[2] = {shim_tzname_0, shim_tzname_1};
 SHIM_EXPORT(tzname);
@@ -19,10 +25,76 @@ SHIM_EXPORT(tzname);
 extern char** shim___tzname __attribute__((alias("shim_tzname")));
 SHIM_EXPORT(__tzname);
 
+static bool find_offset(int current_year, int current_month, bool is_dst, long* offset) {
+
+  struct tm date = {0};
+  struct tm out;
+
+  for (int year = current_year; year >= 70; year--) {
+    for (int month = 11; month >= 5; month -= 6) {
+
+      if (year == current_year && month > current_month) {
+        continue;
+      }
+
+      date.tm_mday = 21;
+      date.tm_mon  = month;
+      date.tm_year = year;
+
+      time_t t = timegm(&date);
+
+      if (localtime_r(&t, &out) == NULL) {
+        PANIC("localtime_r");
+      }
+
+      if (out.tm_isdst == is_dst) {
+        if (offset != NULL) {
+          *offset = out.tm_gmtoff;
+        }
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
 static void shim_tzset_impl() {
+
   tzset();
+
   strlcpy(shim_tzname_0, tzname[0], sizeof(shim_tzname_0));
   strlcpy(shim_tzname_1, tzname[1], sizeof(shim_tzname_1));
+
+  time_t t = time(NULL);
+
+  struct tm lt;
+  if (localtime_r(&t, &lt) == NULL) {
+    PANIC("localtime_r");
+  }
+
+  int current_year  = lt.tm_year;
+  int current_month = lt.tm_mon;
+
+  long timezone;
+  if (find_offset(current_year, current_month, 0, &timezone)) {
+    timezone = -timezone;
+  } else {
+    timezone = 0;
+  }
+
+  *globals.timezone   = timezone;
+  *globals.__timezone = timezone;
+
+  int daylight;
+  if (find_offset(current_year, current_month, 1, NULL)) {
+    daylight = 1;
+  } else {
+    daylight = 0;
+  }
+
+  *globals.daylight   = daylight;
+  *globals.__daylight = daylight;
 }
 
 SHIM_WRAP(tzset);

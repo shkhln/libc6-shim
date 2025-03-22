@@ -61,6 +61,8 @@ static void shim_init(int argc, char** argv, char** env) {
   G(_IO_2_1_stderr_,               "GLIBC_2.2.5", stderr);
   G(_IO_2_1_stdin_,                "GLIBC_2.2.5", stdin);
   G(_IO_2_1_stdout_,               "GLIBC_2.2.5", stdout);
+  G(__daylight,                    "GLIBC_2.2.5", 0);
+  G(daylight,                      "GLIBC_2.2.5", 0);
   G(__environ,                     "GLIBC_2.2.5", env);
   G(_environ,                      "GLIBC_2.2.5", env);
   G(environ,                       "GLIBC_2.2.5", env);
@@ -75,6 +77,8 @@ static void shim_init(int argc, char** argv, char** env) {
   G(__progname_full,               "GLIBC_2.2.5", argv[0]);
   G(program_invocation_name,       "GLIBC_2.2.5", argv[0]);
   G(program_invocation_short_name, "GLIBC_2.2.5", short_program_name);
+  G(__timezone,                    "GLIBC_2.2.5", 0);
+  G(timezone,                      "GLIBC_2.2.5", 0);
 #endif
 
 #ifdef __i386__
@@ -84,6 +88,8 @@ static void shim_init(int argc, char** argv, char** env) {
   G(_IO_2_1_stderr_,               "GLIBC_2.1", stderr);
   G(_IO_2_1_stdin_,                "GLIBC_2.1", stdin);
   G(_IO_2_1_stdout_,               "GLIBC_2.1", stdout);
+  G(__daylight,                    "GLIBC_2.0", 0);
+  G(daylight,                      "GLIBC_2.0", 0);
   G(__environ,                     "GLIBC_2.0", env);
   G(_environ,                      "GLIBC_2.0", env);
   G(environ,                       "GLIBC_2.0", env);
@@ -98,6 +104,8 @@ static void shim_init(int argc, char** argv, char** env) {
   G(__progname_full,               "GLIBC_2.0", argv[0]);
   G(program_invocation_name,       "GLIBC_2.0", argv[0]);
   G(program_invocation_short_name, "GLIBC_2.0", short_program_name);
+  G(__timezone,                    "GLIBC_2.0", 0);
+  G(timezone,                      "GLIBC_2.0", 0);
 #endif
 
 #undef G

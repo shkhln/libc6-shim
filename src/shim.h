@@ -11,6 +11,8 @@
 #define __HEAD(head, ...) head
 #define __TAIL(head, ...) __VA_ARGS__
 
+#define __OPT_TAIL(head, ...) __VA_OPT__(,) __VA_ARGS__
+
 #ifdef DEBUG
 
 #include <errno.h>
@@ -52,7 +54,7 @@ extern __thread int what_was_that_error;
 }
 
 #define PANIC(...) {\
-  fprintf(stderr, "%s: " __HEAD(__VA_ARGS__) "\n", __func__, __TAIL(__VA_ARGS__));\
+  fprintf(stderr, "%s: " __HEAD(__VA_ARGS__) "\n", __func__ __OPT_TAIL(__VA_ARGS__));\
   void* buffer[100];\
   int nframes = backtrace(buffer, 100);\
   backtrace_symbols_fd(buffer, nframes, STDERR_FILENO);\
@@ -85,6 +87,8 @@ struct globals {
   FILE**  _IO_2_1_stderr_;
   FILE**  _IO_2_1_stdin_;
   FILE**  _IO_2_1_stdout_;
+  int*    __daylight;
+  int*    daylight;
   char*** __environ;
   char*** _environ;
   char*** environ;
@@ -99,6 +103,8 @@ struct globals {
   char**  __progname_full;
   char**  program_invocation_name;
   char**  program_invocation_short_name;
+  long*   __timezone;
+  long*   timezone;
 };
 
 extern struct globals globals;
