@@ -71,8 +71,8 @@ if launcher_args.include?('-d')
   ]
 
   system('mount', '-t', 'nullfs', '-o', 'nocover', debug_target, target) || raise
-  system(File.join(__dir__, 'c6-env'), 'lldb', *lldb_args, target, '--', *target_args)
+  system(File.join(__dir__, 'c6-shim-env'), 'lldb', *lldb_args, target, '--', *target_args)
   system('umount', target)
 else
-  exec(File.join(__dir__, 'c6-env'), '/libexec/ld-elf.so.1', target, *target_args)
+  exec(File.join(__dir__, 'c6-shim-env'), '/libexec/ld-elf.so.1', target, *target_args)
 end

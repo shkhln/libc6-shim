@@ -36,4 +36,4 @@ ENV['__GLX_VENDOR_LIBRARY_NAME'] = 'nvidia'
 ENV['OCL_ICD_VENDORS']           = File.join(__dir__, '../icds/ocl')
 ENV['VK_ICD_FILENAMES']          = File.join(__dir__, '../icds/vk/nv.json')
 
-exec(File.join(__dir__, 'c6-env'), *ARGV)
+exec(File.join(__dir__, 'c6-shim-env'), *ARGV)
