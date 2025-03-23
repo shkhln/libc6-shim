@@ -16,11 +16,12 @@ Only i386/amd64 binaries are supported.
 
 ## Dependencies
 
-FreeBSD, *ruby*. Additionally, `bin/nv-sglrun` requires *nvidia-driver* and *linux-nvidia-libs*.
+FreeBSD, *ruby*. *libepoll-shim*, *libiconv*, *libinotify* will be used if installed.
+Additionally, `bin/nv-sglrun` requires *nvidia-driver* and *linux-nvidia-libs*.
 
 ## Usage
 
 ```
 % make
-% [env SHIM_DEBUG=1] ./bin/<with-glibc-shim | nv-sglrun> <application>
+% [env SHIM_DEBUG=1] ./bin/<c6-shim-env | nv-sglrun> <application>
 ```
