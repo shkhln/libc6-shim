@@ -65,3 +65,7 @@ const struct in6_addr shim_in6addr_loopback = IN6ADDR_LOOPBACK_INIT;
 
 SHIM_EXPORT(in6addr_any);
 SHIM_EXPORT(in6addr_loopback);
+
+char shim___libc_single_threaded = 0;
+
+SHIM_EXPORT(__libc_single_threaded);
