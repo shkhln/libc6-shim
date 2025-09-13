@@ -138,6 +138,7 @@ static int shim_getifaddrs_impl(linux_ifaddrs** res) {
       ifa = ifa->ifa_next;
     }
 
+    linux_ifa->ifa_next = NULL;
     freeifaddrs(list_head);
   }
 
