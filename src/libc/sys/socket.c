@@ -288,7 +288,11 @@ static int shim_connect_impl(int s, const linux_sockaddr* linux_name, socklen_t 
         assert(namelen <= sizeof(struct linux_sockaddr_un));
         linux_to_native_sockaddr_un(&addr, (linux_sockaddr_un*)linux_name);
         LOG("%s: path = %s", __func__, addr.sun_path);
-        return connect(s, (struct sockaddr*)&addr, sizeof(addr));
+        int err = connect(s, (struct sockaddr*)&addr, sizeof(addr));
+        if (err == -1) {
+          errno = native_to_linux_errno(errno);
+        }
+        return err;
       }
 
     case LINUX_PF_INET:
@@ -296,7 +300,11 @@ static int shim_connect_impl(int s, const linux_sockaddr* linux_name, socklen_t 
         struct sockaddr_in addr;
         assert(namelen == sizeof(struct linux_sockaddr_in));
         linux_to_native_sockaddr_in(&addr, (linux_sockaddr_in*)linux_name);
-        return connect(s, (struct sockaddr*)&addr, sizeof(addr));
+        int err = connect(s, (struct sockaddr*)&addr, sizeof(addr));
+        if (err == -1) {
+          errno = native_to_linux_errno(errno);
+        }
+        return err;
       }
 
     case LINUX_PF_INET6:
@@ -304,7 +312,11 @@ static int shim_connect_impl(int s, const linux_sockaddr* linux_name, socklen_t 
         struct sockaddr_in6 addr;
         assert(namelen == sizeof(struct linux_sockaddr_in6));
         linux_to_native_sockaddr_in6(&addr, (linux_sockaddr_in6*)linux_name);
-        return connect(s, (struct sockaddr*)&addr, sizeof(addr));
+        int err = connect(s, (struct sockaddr*)&addr, sizeof(addr));
+        if (err == -1) {
+          errno = native_to_linux_errno(errno);
+        }
+        return err;
       }
 
     default:
