@@ -20,6 +20,7 @@ struct NvUvmInitParams
 #define LINUX_TIOCGWINSZ     0x5413
 #define LINUX_FIONREAD       0x541b
 #define LINUX_FIONBIO        0x5421
+#define LINUX_SIOCGIFCONF    0x8912
 #define LINUX_SNDCTL_SYSINFO 0x84f85801
 
 static int shim_ioctl_impl(int fd, unsigned long request, va_list args) {
@@ -54,6 +55,13 @@ static int shim_ioctl_impl(int fd, unsigned long request, va_list args) {
 
   if (request == LINUX_FIONBIO) {
     return ioctl(fd, FIONBIO, va_arg(args, int*));
+  }
+
+  // steamclient.so wants this, but it already calls getifaddrs,
+  // which presumably returns the same information
+  if (request == LINUX_SIOCGIFCONF) {
+    errno = EINVAL;
+    return -1;
   }
 
   if (request == LINUX_SNDCTL_SYSINFO) {
