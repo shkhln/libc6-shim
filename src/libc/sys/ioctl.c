@@ -23,26 +23,39 @@ struct NvUvmInitParams
 #define LINUX_SIOCGIFCONF    0x8912
 #define LINUX_SNDCTL_SYSINFO 0x84f85801
 
+#define LINUX_IOC_DIR(x) (((x) >> 30) & 0x0003)
+#define LINUX_IOC_LEN(x) (((x) >> 16) & 0x3fff)
+#define LINUX_IOC_GRP(x) (((x) >>  8) & 0x00ff)
+#define LINUX_IOC_CMD(x) ( (x)        & 0x00ff)
+
+static unsigned long linux_to_native_dir(int linux_dir) {
+  switch (linux_dir) {
+    case 0: return IOC_VOID;
+    case 1: return IOC_IN;
+    case 2: return IOC_OUT;
+    case 3: return IOC_IN | IOC_OUT;
+    default:
+      assert(0);
+  }
+}
+
+static int check_len(int len) {
+  assert(len < (1 << 13));
+  return len;
+}
+
+#define LINUX_TO_NATIVE_REQ(x) (_IOC(linux_to_native_dir(LINUX_IOC_DIR(x)), LINUX_IOC_GRP(x), LINUX_IOC_CMD(x), check_len(LINUX_IOC_LEN(x))))
+
 static int shim_ioctl_impl(int fd, unsigned long request, va_list args) {
 
-  int m = request & 0xffff;
-  if ((m >= 0x4600 && m <= 0x46ff) /* nvidia */ || m == 0x6d00 /* nvidia-modeset */) {
-    return ioctl(fd, request, va_arg(args, void*));
-  }
-
-  if (m >= 0x4d00 && m <= 0x510E /* SOUND_MIXER_WRITE_VOLUME to SNDCTL_SYNTH_MEMAVL */) {
-
-    // Linuxulator has slightly more elaborate OSS handling, so this is somewhat off
-
-    if ((request & 0xff000000) == 0x40000000) {
-      return ioctl(fd, (0x80 << 24) + (request & 0xffffff), va_arg(args, void*));
-    }
-
-    if ((request & 0xff000000) == 0x80000000) {
-      return ioctl(fd, (0x40 << 24) + (request & 0xffffff), va_arg(args, void*));
-    }
-
-    return ioctl(fd, request, va_arg(args, void*));
+  int command = request & 0xffff;
+  if ((command >= 0x4600 && command <= 0x46ff) || /* nvidia */
+       command == 0x6d00                       || /* nvidia-modeset */
+      // Linuxulator has slightly more elaborate OSS handling, so this is somewhat off
+      (command >= 0x4d00 && command <= 0x510e) || /* SOUND_MIXER_WRITE_VOLUME to SNDCTL_SYNTH_MEMAVL */
+      (command >= 0x6440 && command <= 0x64a0))   /* [DRM_IOCTL_BASE, DRM_COMMAND_BASE to DRM_COMMAND_END] */
+  {
+    return ioctl(fd, LINUX_TO_NATIVE_REQ(request), va_arg(args, void*));
   }
 
   if (request == LINUX_TIOCGWINSZ) {
