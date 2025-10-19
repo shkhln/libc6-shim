@@ -53,7 +53,7 @@ static int shim_ioctl_impl(int fd, unsigned long request, va_list args) {
        command == 0x6d00                       || /* nvidia-modeset */
       // Linuxulator has slightly more elaborate OSS handling, so this is somewhat off
       (command >= 0x4d00 && command <= 0x510e) || /* SOUND_MIXER_WRITE_VOLUME to SNDCTL_SYNTH_MEMAVL */
-      (command >= 0x6440 && command <= 0x64a0))   /* [DRM_IOCTL_BASE, DRM_COMMAND_BASE to DRM_COMMAND_END] */
+      (command >= 0x6400 && command <= 0x64ff))   /* DRM */
   {
     return ioctl(fd, LINUX_TO_NATIVE_REQ(request), va_arg(args, void*));
   }
