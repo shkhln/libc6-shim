@@ -77,3 +77,25 @@ static void* shim_mremap_impl(void* old_address, size_t old_size, size_t new_siz
 }
 
 SHIM_WRAP(mremap);
+
+#define LINUX_MS_ASYNC      1
+#define LINUX_MS_INVALIDATE 2
+#define LINUX_MS_SYNC       4
+
+static int linux_to_native_msync_flags(int linux_flags) {
+
+  assert((linux_flags & ~(LINUX_MS_ASYNC | LINUX_MS_INVALIDATE | LINUX_MS_SYNC)) == 0);
+
+  int flags = 0;
+  if (linux_flags & LINUX_MS_ASYNC)      flags |= MS_ASYNC;
+  if (linux_flags & LINUX_MS_INVALIDATE) flags |= MS_INVALIDATE;
+  if (linux_flags & LINUX_MS_SYNC)       flags |= MS_SYNC;
+
+  return flags;
+}
+
+static int shim_msync_impl(void *addr, size_t len, int linux_flags) {
+  return msync(addr, len, linux_to_native_msync_flags(linux_flags));
+}
+
+SHIM_WRAP(msync);
