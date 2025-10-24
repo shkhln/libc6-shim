@@ -16,6 +16,7 @@ def libmap(target_dir, libdir_suffix)
   lmap = {
     'ld-linux.so.2'        => shim_path,
     'ld-linux-x86-64.so.2' => shim_path,
+    'libanl.so.1'          => shim_path,
     'libc.so.6'            => shim_path,
     'libdl.so.2'           => shim_path,
     'libm.so.6 '           => shim_path,
