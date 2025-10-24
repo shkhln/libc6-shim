@@ -1,4 +1,6 @@
 #include <assert.h>
+#include <errno.h>
+#include <inttypes.h>
 #include <stdarg.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -71,6 +73,16 @@ void* shim_mmap_impl(void *addr, size_t len, int prot, int linux_flags, int fd, 
 
 SHIM_WRAP(mmap);
 SHIM_WRAP(mmap64);
+
+static int shim_munmap_impl(void* addr, size_t len) {
+  if ((uintptr_t)addr & (getpagesize() - 1)) {
+    errno = EINVAL;
+    return -1;
+  }
+  return munmap(addr, len);
+}
+
+SHIM_WRAP(munmap);
 
 static void* shim_mremap_impl(void* old_address, size_t old_size, size_t new_size, int flags, va_list args) {
   return (void*)-1;
