@@ -491,26 +491,13 @@ static int shim_pthread_attr_setscope_impl(pthread_attr_t* attr, int linux_scope
 SHIM_WRAP(pthread_attr_getscope);
 SHIM_WRAP(pthread_attr_setscope);
 
-#define MAX_ONCES 250
+// only the state field in struct pthread_once is actually being used
+_Static_assert(offsetof(pthread_once_t, state) == 0, "");
+_Static_assert(sizeof(((pthread_once_t*)0)->state) == sizeof(linux_pthread_once_t), "");
+_Static_assert(((pthread_once_t)PTHREAD_ONCE_INIT).state == 0, "");
 
-static pthread_mutex_t onces_mutex = PTHREAD_MUTEX_INITIALIZER;
-
-static pthread_once_t onces[MAX_ONCES] = { PTHREAD_ONCE_INIT };
-static uint32_t onces_index = 0;
-
-static int shim_pthread_once_impl(linux_pthread_once_t* linux_once, void (*routine)(void)) {
-
-  assert(pthread_mutex_lock(&onces_mutex) == 0);
-
-  if (*linux_once == 0) {
-    assert(onces_index < MAX_ONCES);
-    *linux_once = onces_index;
-    onces_index++;
-  }
-
-  assert(pthread_mutex_unlock(&onces_mutex) == 0);
-
-  return pthread_once(&onces[*linux_once], routine);
+static int shim_pthread_once_impl(linux_pthread_once_t* linux_once_control, void (*routine)(void)) {
+  return pthread_once((pthread_once_t*)linux_once_control, routine);
 }
 
 SHIM_WRAP(pthread_once);
