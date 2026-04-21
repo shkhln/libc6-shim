@@ -139,6 +139,12 @@ static int shim_fcntl_impl(int fd, int cmd, va_list args) {
     assert(0);
   }
 
+  if (cmd == LINUX_F_DUPFD_CLOEXEC) {
+    int arg = va_arg(args, int);
+    LOG("%s: cmd = LINUX_F_DUPFD_CLOEXEC, arg = %d", __func__, arg);
+    return fcntl(fd, F_DUPFD_CLOEXEC, arg);
+  }
+
   if (cmd == LINUX_F_ADD_SEALS) {
     int flags = va_arg(args, int);
     LOG("%s: cmd = LINUX_F_ADD_SEALS, arg = 0x%x", __func__, flags);
