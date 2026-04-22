@@ -169,7 +169,7 @@ static int linux_to_native_mutex_kind(int linux_kind) {
     case LINUX_PTHREAD_MUTEX_ERRORCHECK:  return PTHREAD_MUTEX_ERRORCHECK;
     case LINUX_PTHREAD_MUTEX_ADAPTIVE_NP: return PTHREAD_MUTEX_ADAPTIVE_NP;
     default:
-      assert(0);
+      PANIC("Unknown linux mutex type: %d", linux_kind);
   }
 }
 
@@ -393,7 +393,7 @@ static int shim_pthread_attr_getinheritsched_impl(const pthread_attr_t* attr, in
         *linux_inheritsched = LINUX_PTHREAD_EXPLICIT_SCHED;
         break;
       default:
-        assert(0);
+        PANIC("Unknown native sched: %d", inheritsched);
     }
   }
 
@@ -412,7 +412,7 @@ static int shim_pthread_attr_setinheritsched_impl(pthread_attr_t* attr, int linu
       inheritsched = PTHREAD_EXPLICIT_SCHED;
       break;
     default:
-      assert(0);
+      PANIC("Unknown linux sched: %d", linux_inheritsched);
   }
 
   return pthread_attr_setinheritsched(attr, inheritsched);
@@ -467,7 +467,7 @@ static int shim_pthread_attr_getscope_impl(const pthread_attr_t* attr, int* linu
         *linux_scope = LINUX_PTHREAD_SCOPE_PROCESS;
         break;
       default:
-        assert(0);
+        PANIC("Unknown native scope: %d", scope);
     }
   }
 
@@ -486,7 +486,7 @@ static int shim_pthread_attr_setscope_impl(pthread_attr_t* attr, int linux_scope
       scope = PTHREAD_SCOPE_PROCESS;
       break;
     default:
-      assert(0);
+      PANIC("Unknown linux scope: %d", linux_scope);
   }
 
   return pthread_attr_setscope(attr, scope);
