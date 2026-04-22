@@ -21,7 +21,8 @@
                                                                                                             \
     assert(attr != NULL);                                                                                   \
                                                                                                             \
-    assert(pthread_mutex_lock(& name ## _attributes_mutex) == 0);                                           \
+    int lock_err = pthread_mutex_lock(& name ## _attributes_mutex);                                         \
+    assert(lock_err == 0);                                                                                  \
                                                                                                             \
     for (int i = 0; i < max_attrs; i++) {                                                                   \
       uint32_t idx = name ## _attributes_index;                                                             \
@@ -30,13 +31,14 @@
         if (err == 0) {                                                                                     \
           *attr = idx + 1;                                                                                  \
         }                                                                                                   \
-        assert(pthread_mutex_unlock(& name ## _attributes_mutex) == 0);                                     \
+        int unlock_err = pthread_mutex_unlock(& name ## _attributes_mutex);                                 \
+        assert(unlock_err == 0);                                                                            \
         return err;                                                                                         \
       }                                                                                                     \
       name ## _attributes_index = (idx + 1) % max_attrs;                                                    \
     }                                                                                                       \
                                                                                                             \
-    assert(0);                                                                                              \
+    PANIC("Exceeded the limit of %d attributes, it's likely a leak", max_attrs);                            \
   }                                                                                                         \
                                                                                                             \
   static pthread_ ## name ## attr_t* find_native_ ## name ## attr(linux_pthread_ ## name ## attr_t* attr) { \
@@ -57,18 +59,20 @@
                                                                                                             \
     int err = pthread_ ## name ## attr_destroy(& name ## _attributes[*attr - 1]);                           \
     if (err == 0) {                                                                                         \
-      assert(pthread_mutex_lock(& name ## _attributes_mutex) == 0);                                         \
+      int lock_err = pthread_mutex_lock(& name ## _attributes_mutex);                                       \
+      assert(lock_err == 0);                                                                                \
       name ## _attributes[*attr - 1] = NULL;                                                                \
-      assert(pthread_mutex_unlock(& name ## _attributes_mutex) == 0);                                       \
+      int unlock_err = pthread_mutex_unlock(& name ## _attributes_mutex);                                   \
+      assert(unlock_err == 0);                                                                              \
       *attr = 0;                                                                                            \
     }                                                                                                       \
                                                                                                             \
     return err;                                                                                             \
   }
 
-NATIVE_WHATEVER_ATTRS(barrier,  10);
-NATIVE_WHATEVER_ATTRS(cond,    100);
-NATIVE_WHATEVER_ATTRS(mutex,   300);
+NATIVE_WHATEVER_ATTRS(barrier, 1000);
+NATIVE_WHATEVER_ATTRS(cond,    1000);
+NATIVE_WHATEVER_ATTRS(mutex,   1000);
 
 static int shim_pthread_join_impl(pthread_t thread, void** value_ptr) {
   int err = pthread_join(thread, value_ptr);
