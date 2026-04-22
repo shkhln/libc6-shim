@@ -71,7 +71,6 @@
   }
 
 NATIVE_WHATEVER_ATTRS(barrier, 1000);
-NATIVE_WHATEVER_ATTRS(cond,    1000);
 NATIVE_WHATEVER_ATTRS(mutex,   1000);
 
 static int shim_pthread_join_impl(pthread_t thread, void** value_ptr) {
@@ -341,40 +340,88 @@ static int shim_pthread_barrier_init_impl(pthread_barrier_t* barrier, const linu
 SHIM_WRAP(pthread_barrier_init);
 
 static int shim_pthread_condattr_init_impl(linux_pthread_condattr_t* attr) {
-  return init_native_condattr(attr);
+  *attr = 0;
+  return 0;
 }
 
 static int shim_pthread_condattr_destroy_impl(linux_pthread_condattr_t* attr) {
-  return destroy_native_condattr(attr);
+  return 0;
 }
 
 SHIM_WRAP(pthread_condattr_init);
 SHIM_WRAP(pthread_condattr_destroy);
 
-static int shim_pthread_condattr_getclock_impl(linux_pthread_condattr_t* restrict attr, clockid_t* restrict clock_id) {
-  return pthread_condattr_getclock(find_native_condattr(attr), clock_id);
+#define SHIM_CONDATTR_MONOTONIC 0x1
+#define SHIM_CONDATTR_SHARED    0x2
+
+static int shim_pthread_condattr_getclock_impl(linux_pthread_condattr_t* restrict attr, linux_clockid_t* restrict linux_clock_id) {
+  if (*attr & SHIM_CONDATTR_MONOTONIC) {
+    *linux_clock_id = LINUX_CLOCK_MONOTONIC;
+  } else {
+    *linux_clock_id = LINUX_CLOCK_REALTIME;
+  }
+  return 0;
 }
 
-static int shim_pthread_condattr_setclock_impl(linux_pthread_condattr_t* attr, clockid_t clock_id) {
-  return pthread_condattr_setclock(find_native_condattr(attr), clock_id);
+static int shim_pthread_condattr_setclock_impl(linux_pthread_condattr_t* attr, linux_clockid_t linux_clock_id) {
+
+  if (linux_clock_id != LINUX_CLOCK_REALTIME && linux_clock_id != LINUX_CLOCK_MONOTONIC) {
+    return EINVAL;
+  }
+
+  if (linux_clock_id == LINUX_CLOCK_MONOTONIC) {
+    *attr |= SHIM_CONDATTR_MONOTONIC;
+  } else {
+    *attr &= ~SHIM_CONDATTR_MONOTONIC;
+  }
+
+  return 0;
 }
 
 SHIM_WRAP(pthread_condattr_getclock);
 SHIM_WRAP(pthread_condattr_setclock);
 
-static int shim_pthread_condattr_getpshared_impl(linux_pthread_condattr_t* restrict attr, int* restrict pshared) {
-  return pthread_condattr_getpshared(find_native_condattr(attr), pshared);
+static int shim_pthread_condattr_getpshared_impl(linux_pthread_condattr_t* restrict attr, int* restrict linux_pshared) {
+  if (*attr & SHIM_CONDATTR_SHARED) {
+    *linux_pshared = LINUX_PTHREAD_PROCESS_SHARED;
+  } else {
+    *linux_pshared = LINUX_PTHREAD_PROCESS_PRIVATE;
+  }
+  return 0;
 }
 
-static int shim_pthread_condattr_setpshared_impl(linux_pthread_condattr_t* attr, int pshared) {
-  return pthread_condattr_setpshared(find_native_condattr(attr), pshared);
+static int shim_pthread_condattr_setpshared_impl(linux_pthread_condattr_t* attr, int linux_pshared) {
+
+  assert(linux_pshared == LINUX_PTHREAD_PROCESS_PRIVATE || linux_pshared == LINUX_PTHREAD_PROCESS_SHARED);
+
+  if (linux_pshared == LINUX_PTHREAD_PROCESS_SHARED) {
+    *attr |= SHIM_CONDATTR_SHARED;
+  } else {
+    *attr &= ~SHIM_CONDATTR_SHARED;
+  }
+
+  return 0;
 }
 
 SHIM_WRAP(pthread_condattr_setpshared);
 SHIM_WRAP(pthread_condattr_getpshared);
 
-static int shim_pthread_cond_init_impl(pthread_cond_t* cond, const linux_pthread_condattr_t* attr) {
-  return pthread_cond_init(cond, find_native_condattr(attr));
+static int shim_pthread_cond_init_impl(pthread_cond_t* cond, const linux_pthread_condattr_t* linux_attr) {
+  if (linux_attr != NULL) {
+    pthread_condattr_t attr;
+    pthread_condattr_init(&attr);
+    if (*linux_attr & SHIM_CONDATTR_MONOTONIC) {
+      pthread_condattr_setclock(&attr, CLOCK_MONOTONIC);
+    }
+    if (*linux_attr & SHIM_CONDATTR_SHARED) {
+      pthread_condattr_setpshared(&attr, PTHREAD_PROCESS_SHARED);
+    }
+    int err = pthread_cond_init(cond, &attr);
+    pthread_condattr_destroy(&attr);
+    return err;
+  } else {
+    return pthread_cond_init(cond, NULL);
+  }
 }
 
 SHIM_WRAP(pthread_cond_init);
