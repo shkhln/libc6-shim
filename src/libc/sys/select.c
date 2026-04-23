@@ -12,7 +12,7 @@ static int shim_pselect_impl(int nfds, fd_set* restrict readfds, fd_set* restric
 
 SHIM_WRAP(pselect);
 
-long shim___fdelt_chk_impl(long d) {
+static long shim___fdelt_chk_impl(long d) {
   assert(0 <= d && d < 1024);
   return d / (8 * sizeof(long));
 }

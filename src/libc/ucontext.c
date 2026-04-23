@@ -2,7 +2,7 @@
 #include "../shim.h"
 
 // Breakpad
-int shim_getcontext_impl(ucontext_t* ucp) {
+static int shim_getcontext_impl(ucontext_t* ucp) {
   return -1;
 }
 
