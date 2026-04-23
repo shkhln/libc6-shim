@@ -9,69 +9,6 @@
 #include "../libc/time.h"
 #include "pthread.h"
 
-#define NATIVE_WHATEVER_ATTRS(name, max_attrs) \
-                                                                                                            \
-  static pthread_mutex_t name ## _attributes_mutex = PTHREAD_MUTEX_INITIALIZER;                             \
-                                                                                                            \
-  static pthread_ ## name ## attr_t name ## _attributes[max_attrs] = { NULL };                              \
-                                                                                                            \
-  static uint32_t name ## _attributes_index = 0;                                                            \
-                                                                                                            \
-  static int init_native_ ## name ## attr(linux_pthread_ ## name ## attr_t* attr) {                         \
-                                                                                                            \
-    assert(attr != NULL);                                                                                   \
-                                                                                                            \
-    int lock_err = pthread_mutex_lock(& name ## _attributes_mutex);                                         \
-    assert(lock_err == 0);                                                                                  \
-                                                                                                            \
-    for (int i = 0; i < max_attrs; i++) {                                                                   \
-      uint32_t idx = name ## _attributes_index;                                                             \
-      if (name ## _attributes[idx] == NULL) {                                                               \
-        int err = pthread_ ## name ## attr_init(& name ## _attributes[idx]);                                \
-        if (err == 0) {                                                                                     \
-          *attr = idx + 1;                                                                                  \
-        }                                                                                                   \
-        int unlock_err = pthread_mutex_unlock(& name ## _attributes_mutex);                                 \
-        assert(unlock_err == 0);                                                                            \
-        return err;                                                                                         \
-      }                                                                                                     \
-      name ## _attributes_index = (idx + 1) % max_attrs;                                                    \
-    }                                                                                                       \
-                                                                                                            \
-    PANIC("Exceeded the limit of %d attributes, it's likely a leak", max_attrs);                            \
-  }                                                                                                         \
-                                                                                                            \
-  static pthread_ ## name ## attr_t* find_native_ ## name ## attr(linux_pthread_ ## name ## attr_t* attr) { \
-                                                                                                            \
-    if (attr == NULL) {                                                                                     \
-      return NULL;                                                                                          \
-    }                                                                                                       \
-                                                                                                            \
-    assert(*attr >= 1 && *attr <= max_attrs);                                                               \
-                                                                                                            \
-    return & name ## _attributes[*attr - 1];                                                                \
-  }                                                                                                         \
-                                                                                                            \
-  static int destroy_native_ ## name ## attr(linux_pthread_ ## name ## attr_t* attr) {                      \
-                                                                                                            \
-    assert(attr != NULL);                                                                                   \
-    assert(*attr >= 1 && *attr <= max_attrs);                                                               \
-                                                                                                            \
-    int err = pthread_ ## name ## attr_destroy(& name ## _attributes[*attr - 1]);                           \
-    if (err == 0) {                                                                                         \
-      int lock_err = pthread_mutex_lock(& name ## _attributes_mutex);                                       \
-      assert(lock_err == 0);                                                                                \
-      name ## _attributes[*attr - 1] = NULL;                                                                \
-      int unlock_err = pthread_mutex_unlock(& name ## _attributes_mutex);                                   \
-      assert(unlock_err == 0);                                                                              \
-      *attr = 0;                                                                                            \
-    }                                                                                                       \
-                                                                                                            \
-    return err;                                                                                             \
-  }
-
-NATIVE_WHATEVER_ATTRS(mutex, 1000);
-
 static int shim_pthread_join_impl(pthread_t thread, void** value_ptr) {
   int err = pthread_join(thread, value_ptr);
   if (err == 0) {
@@ -136,29 +73,77 @@ static int shim_pthread_mutexattr_setkind_np_impl(linux_pthread_mutexattr_t* att
   return shim_pthread_mutexattr_settype_impl(attr, linux_kind);
 }
 
-static int shim_pthread_mutexattr_getprioceiling_impl(const linux_pthread_mutexattr_t* restrict attr, int* restrict prioceiling) {
-  UNIMPLEMENTED();
+static int shim_pthread_mutexattr_getprioceiling_impl(const linux_pthread_mutexattr_t* restrict attr,
+  int* restrict linux_prioceiling)
+{
+  *linux_prioceiling = attr->linux_prioceiling;
+  return 0;
 }
 
-static int shim_pthread_mutexattr_setprioceiling_impl(linux_pthread_mutexattr_t* attr, int prioceiling) {
-  UNIMPLEMENTED();
+static int shim_pthread_mutexattr_setprioceiling_impl(linux_pthread_mutexattr_t* attr, int linux_prioceiling) {
+  assert(linux_prioceiling >= 0 && linux_prioceiling < (1 << SHIM_MUTEXATTR_PRIOCEIL_NBITS));
+  attr->linux_prioceiling = linux_prioceiling;
+  return 0;
 }
 
-static int shim_pthread_mutexattr_setpshared_impl(linux_pthread_mutexattr_t* attr, int pshared) {
-  return pthread_mutexattr_setpshared(find_native_mutexattr(attr), pshared);
+static int shim_pthread_mutexattr_getprotocol_impl(linux_pthread_mutexattr_t* attr, int* linux_protocol) {
+  *linux_protocol = attr->linux_protocol;
+  return 0;
 }
 
-static int shim_pthread_mutexattr_getrobust_impl(const linux_pthread_mutexattr_t* attr, int* robustness) {
-  UNIMPLEMENTED();
+static int shim_pthread_mutexattr_setprotocol_impl(linux_pthread_mutexattr_t* attr, int linux_protocol) {
+  assert(linux_protocol >= 0 && linux_protocol < (1 << SHIM_MUTEXATTR_PROTOCOL_NBITS));
+  attr->linux_protocol = linux_protocol;
+  return 0;
 }
 
-static int shim_pthread_mutexattr_setrobust_impl(const linux_pthread_mutexattr_t* attr, int robustness) {
-  UNIMPLEMENTED();
+static int shim_pthread_mutexattr_getpshared_impl(const linux_pthread_mutexattr_t* restrict attr,
+  int* restrict linux_pshared)
+{
+  *linux_pshared = attr->linux_pshared;
+  return 0;
 }
 
-static int shim_pthread_mutexattr_gettype_impl(const linux_pthread_mutexattr_t* attr, int* kind) {
-  UNIMPLEMENTED();
+static int shim_pthread_mutexattr_setpshared_impl(linux_pthread_mutexattr_t* attr, int linux_pshared) {
+  assert(linux_pshared >= 0 && linux_pshared < (1 << SHIM_MUTEXATTR_PSHARED_NBITS));
+  attr->linux_pshared = linux_pshared;
+  return 0;
 }
+
+static int shim_pthread_mutexattr_getrobust_impl(const linux_pthread_mutexattr_t* attr, int* linux_robustness) {
+  *linux_robustness = attr->linux_robust;
+  return 0;
+}
+
+static int shim_pthread_mutexattr_setrobust_impl(linux_pthread_mutexattr_t* attr, int linux_robustness) {
+  assert(linux_robustness >= 0 && linux_robustness < (1 << SHIM_MUTEXATTR_ROBUST_NBITS));
+  attr->linux_robust = linux_robustness;
+  return 0;
+}
+
+static int shim_pthread_mutexattr_gettype_impl(const linux_pthread_mutexattr_t* attr, int* linux_kind) {
+  *linux_kind = attr->linux_kind;
+  return 0;
+}
+
+static int shim_pthread_mutexattr_settype_impl(linux_pthread_mutexattr_t* attr, int linux_kind) {
+  assert(linux_kind >= 0 && linux_kind < (1 << SHIM_MUTEXATTR_KIND_NBITS));
+  attr->linux_kind = linux_kind;
+  return 0;
+}
+
+SHIM_WRAP(pthread_mutexattr_getkind_np);
+SHIM_WRAP(pthread_mutexattr_setkind_np);
+SHIM_WRAP(pthread_mutexattr_getprioceiling);
+SHIM_WRAP(pthread_mutexattr_setprioceiling);
+SHIM_WRAP(pthread_mutexattr_getprotocol);
+SHIM_WRAP(pthread_mutexattr_setprotocol);
+SHIM_WRAP(pthread_mutexattr_getpshared);
+SHIM_WRAP(pthread_mutexattr_setpshared);
+SHIM_WRAP(pthread_mutexattr_getrobust);
+SHIM_WRAP(pthread_mutexattr_setrobust);
+SHIM_WRAP(pthread_mutexattr_gettype);
+SHIM_WRAP(pthread_mutexattr_settype);
 
 static int linux_to_native_mutex_kind(int linux_kind) {
   switch (linux_kind) {
@@ -171,24 +156,51 @@ static int linux_to_native_mutex_kind(int linux_kind) {
   }
 }
 
-static int shim_pthread_mutexattr_settype_impl(linux_pthread_mutexattr_t* attr, int linux_kind) {
-  return pthread_mutexattr_settype(find_native_mutexattr(attr), linux_to_native_mutex_kind(linux_kind));
+static int linux_to_native_protocol(int linux_protocol) {
+  switch (linux_protocol) {
+    case LINUX_PTHREAD_PRIO_NONE:    return PTHREAD_PRIO_NONE;
+    case LINUX_PTHREAD_PRIO_INHERIT: return PTHREAD_PRIO_INHERIT;
+    case LINUX_PTHREAD_PRIO_PROTECT: return PTHREAD_PRIO_PROTECT;
+    default:
+      PANIC();
+  }
 }
 
-SHIM_WRAP(pthread_mutexattr_getkind_np);
-SHIM_WRAP(pthread_mutexattr_setkind_np);
-SHIM_WRAP(pthread_mutexattr_getprioceiling);
-SHIM_WRAP(pthread_mutexattr_setprioceiling);
-SHIM_WRAP(pthread_mutexattr_setpshared);
-SHIM_WRAP(pthread_mutexattr_getrobust);
-SHIM_WRAP(pthread_mutexattr_setrobust);
-SHIM_WRAP(pthread_mutexattr_gettype);
-SHIM_WRAP(pthread_mutexattr_settype);
+static int linux_to_native_pshared(int linux_pshared) {
+  switch (linux_pshared) {
+    case LINUX_PTHREAD_PROCESS_PRIVATE: return PTHREAD_PROCESS_PRIVATE;
+    case LINUX_PTHREAD_PROCESS_SHARED:  return PTHREAD_PROCESS_SHARED;
+    default:
+      PANIC();
+  }
+}
+
+static int linux_to_native_robust(int linux_robust) {
+  switch (linux_robust) {
+    case LINUX_PTHREAD_MUTEX_STALLED: return PTHREAD_MUTEX_STALLED;
+    case LINUX_PTHREAD_MUTEX_ROBUST:  return PTHREAD_MUTEX_ROBUST;
+    default:
+      PANIC();
+  }
+}
 
 #define NATIVE_MUTEX_T(shim_mutex) &(shim_mutex->_wrapped_mutex)
 
-static int shim_pthread_mutex_init_impl(linux_pthread_mutex_t* mutex, const linux_pthread_mutexattr_t* attr) {
-  return pthread_mutex_init(NATIVE_MUTEX_T(mutex), find_native_mutexattr(attr));
+static int shim_pthread_mutex_init_impl(linux_pthread_mutex_t* mutex, const linux_pthread_mutexattr_t* linux_attr) {
+  if (linux_attr != NULL) {
+    pthread_mutexattr_t attr;
+    pthread_mutexattr_init(&attr);
+    pthread_mutexattr_settype(&attr, linux_to_native_mutex_kind(linux_attr->linux_kind));
+    assert(linux_attr->linux_prioceiling == 0); // ?
+    pthread_mutexattr_setprotocol(&attr, linux_to_native_protocol(linux_attr->linux_protocol));
+    pthread_mutexattr_setpshared (&attr, linux_to_native_pshared (linux_attr->linux_pshared));
+    pthread_mutexattr_setrobust  (&attr, linux_to_native_robust  (linux_attr->linux_robust));
+    int err = pthread_mutex_init(NATIVE_MUTEX_T(mutex), &attr);
+    pthread_mutexattr_destroy(&attr);
+    return err;
+  } else {
+    return pthread_mutex_init(NATIVE_MUTEX_T(mutex), NULL);
+  }
 }
 
 static pthread_mutex_t mutex_initialization_mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -287,28 +299,25 @@ static int shim_pthread_getattr_np_impl(pthread_t thread, pthread_attr_t* attr) 
 
 SHIM_WRAP(pthread_getattr_np);
 
+static const linux_pthread_mutexattr_t default_mutexattr = {
+  .linux_kind        = LINUX_PTHREAD_MUTEX_NORMAL,
+  .linux_prioceiling = 0,
+  .linux_protocol    = LINUX_PTHREAD_PRIO_NONE,
+  .linux_pshared     = LINUX_PTHREAD_PROCESS_PRIVATE,
+  .linux_robust      = LINUX_PTHREAD_MUTEX_STALLED
+};
+
 static int shim_pthread_mutexattr_init_impl(linux_pthread_mutexattr_t* attr) {
-  return init_native_mutexattr(attr);
+  *attr = default_mutexattr;
+  return 0;
+}
+
+static int shim_pthread_mutexattr_destroy_impl(linux_pthread_mutexattr_t* attr) {
+  return 0;
 }
 
 SHIM_WRAP(pthread_mutexattr_init);
-
-static int shim_pthread_mutexattr_destroy_impl(linux_pthread_mutexattr_t* attr) {
-  return destroy_native_mutexattr(attr);
-}
-
 SHIM_WRAP(pthread_mutexattr_destroy);
-
-static int shim_pthread_mutexattr_getprotocol_impl(linux_pthread_mutexattr_t* attr, int* protocol) {
-  return pthread_mutexattr_getprotocol(find_native_mutexattr(attr), protocol);
-}
-
-static int shim_pthread_mutexattr_setprotocol_impl(linux_pthread_mutexattr_t* attr, int protocol) {
-  return pthread_mutexattr_setprotocol(find_native_mutexattr(attr), protocol);
-}
-
-SHIM_WRAP(pthread_mutexattr_getprotocol);
-SHIM_WRAP(pthread_mutexattr_setprotocol);
 
 static int shim_pthread_barrierattr_init_impl(linux_pthread_barrierattr_t* attr) {
   *attr = 0;

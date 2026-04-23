@@ -20,7 +20,25 @@ _Static_assert(sizeof(struct shim_pthread_mutex) <= 40 /* sizeof(pthread_mutex_t
 
 typedef uint32_t linux_pthread_barrierattr_t;
 typedef uint32_t linux_pthread_condattr_t;
-typedef uint32_t linux_pthread_mutexattr_t;
+
+#define SHIM_MUTEXATTR_KIND_NBITS     2
+#define SHIM_MUTEXATTR_PRIOCEIL_NBITS 2
+#define SHIM_MUTEXATTR_PROTOCOL_NBITS 1
+#define SHIM_MUTEXATTR_PSHARED_NBITS  1
+#define SHIM_MUTEXATTR_ROBUST_NBITS   1
+
+struct shim_pthread_mutexattr {
+  unsigned int linux_kind        : SHIM_MUTEXATTR_KIND_NBITS;
+  unsigned int linux_prioceiling : SHIM_MUTEXATTR_PRIOCEIL_NBITS;
+  unsigned int linux_protocol    : SHIM_MUTEXATTR_PROTOCOL_NBITS;
+  unsigned int linux_pshared     : SHIM_MUTEXATTR_PSHARED_NBITS;
+  unsigned int linux_robust      : SHIM_MUTEXATTR_ROBUST_NBITS;
+};
+
+typedef struct shim_pthread_mutexattr linux_pthread_mutexattr_t;
+
+_Static_assert(sizeof(linux_pthread_mutexattr_t) <= 4, "");
+
 typedef uint32_t linux_pthread_once_t;
 
 _Static_assert(sizeof(pthread_rwlockattr_t) <= 8 /* sizeof(pthread_rwlockattr_t) on glibc/Linux */, "");
@@ -45,6 +63,17 @@ enum linux_pthread_contentionscope {
 };
 
 enum {
+  LINUX_PTHREAD_PRIO_NONE,
+  LINUX_PTHREAD_PRIO_INHERIT,
+  LINUX_PTHREAD_PRIO_PROTECT
+};
+
+enum {
   LINUX_PTHREAD_PROCESS_PRIVATE,
   LINUX_PTHREAD_PROCESS_SHARED
+};
+
+enum {
+  LINUX_PTHREAD_MUTEX_STALLED,
+  LINUX_PTHREAD_MUTEX_ROBUST
 };
