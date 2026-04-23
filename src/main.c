@@ -246,3 +246,10 @@ static unsigned long shim_getauxval_impl(unsigned long type) {
 }
 
 SHIM_WRAP(getauxval);
+
+static int shim___assert_fail_impl(const char* assertion, const char* file, unsigned int line, const char* function) {
+  fprintf(stderr, "%s:%d: %s: assertion check \"%s\" failed\n", file, line, function, assertion);
+  abort();
+}
+
+SHIM_WRAP(__assert_fail);
