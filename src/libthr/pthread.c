@@ -677,3 +677,14 @@ static int shim_pthread_attr_setschedparam_impl(pthread_attr_t* attr, const linu
 }
 
 SHIM_WRAP(pthread_attr_setschedparam);
+
+static int shim_pthread_getcpuclockid_impl(pthread_t thread_id, linux_clockid_t* linux_clock_id) {
+  clockid_t clock_id;
+  int err = pthread_getcpuclockid(thread_id, &clock_id);
+  if (err == 0) {
+    *linux_clock_id = native_to_linux_clockid(clock_id);
+  }
+  return err;
+}
+
+SHIM_WRAP(pthread_getcpuclockid);

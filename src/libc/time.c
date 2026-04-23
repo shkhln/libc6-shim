@@ -117,10 +117,21 @@ static clockid_t linux_to_native_clockid(linux_clockid_t linux_clock_id) {
 }
 
 int shim_clock_gettime_impl(linux_clockid_t linux_clock_id, linux_timespec* tp) {
-  return clock_gettime(linux_to_native_clockid(linux_clock_id),  tp);
+  return clock_gettime(linux_to_native_clockid(linux_clock_id), tp);
+}
+
+static int shim_clock_settime_impl(linux_clockid_t linux_clock_id, const linux_timespec* tp) {
+  return clock_settime(linux_to_native_clockid(linux_clock_id), tp);
 }
 
 SHIM_WRAP(clock_gettime);
+SHIM_WRAP(clock_settime);
+
+static int shim_clock_getres_impl(linux_clockid_t linux_clock_id, linux_timespec* tp) {
+  return clock_getres(linux_to_native_clockid(linux_clock_id), tp);
+}
+
+SHIM_WRAP(clock_getres);
 
 static size_t shim___strftime_l_impl(char* restrict buf, size_t maxsize, const char* restrict format, const linux_tm* restrict timeptr, linux_locale_t loc) {
   return strftime_l(buf, maxsize, format, timeptr, loc->native_locale);
@@ -137,3 +148,34 @@ static char* shim_strptime_l_impl(const char* restrict buf, const char* restrict
 SHIM_WRAP(__strftime_l);
 SHIM_WRAP(strftime_l);
 SHIM_WRAP(strptime_l);
+
+static int shim_clock_nanosleep_impl(linux_clockid_t linux_clock_id, int linux_flags,
+  const linux_timespec* rqtp, linux_timespec* rmtp)
+{
+  return clock_nanosleep(linux_to_native_clockid(linux_clock_id), linux_flags /* same flag values*/, rqtp, rmtp);
+}
+
+SHIM_WRAP(clock_nanosleep);
+
+linux_clockid_t native_to_linux_clockid(linux_clockid_t clock_id) {
+  switch (clock_id) {
+    case CLOCK_REALTIME:       return LINUX_CLOCK_REALTIME;
+    case CLOCK_MONOTONIC:      return LINUX_CLOCK_MONOTONIC;
+    case CLOCK_REALTIME_FAST:  return LINUX_CLOCK_REALTIME_COARSE;
+    case CLOCK_MONOTONIC_FAST: return LINUX_CLOCK_MONOTONIC_COARSE;
+    case CLOCK_BOOTTIME:       return LINUX_CLOCK_BOOTTIME;
+    default:
+      UNIMPLEMENTED_ARGS("%d", clock_id);
+  }
+}
+
+static int shim_clock_getcpuclockid_impl(pid_t pid, linux_clockid_t* linux_clock_id) {
+  clockid_t clock_id;
+  int err = clock_getcpuclockid(pid, &clock_id);
+  if (err == 0) {
+    *linux_clock_id = native_to_linux_clockid(clock_id);
+  }
+  return err;
+}
+
+SHIM_WRAP(clock_getcpuclockid);
