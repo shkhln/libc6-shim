@@ -66,6 +66,7 @@
 
 #define LINUX_IP_TOS            1
 #define LINUX_IP_MTU_DISCOVER  10
+#define LINUX_IP_RECVERR       11
 #define LINUX_IP_RECVTOS       13
 
 #define LINUX_IPV6_V6ONLY      26

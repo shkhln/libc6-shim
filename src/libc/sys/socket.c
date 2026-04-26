@@ -616,10 +616,11 @@ static int linux_to_native_so_opt(int linux_optname) {
 
 static int linux_to_native_ip4_opt(int linux_optname) {
   switch (linux_optname) {
+    case LINUX_IP_RECVERR:      return -1; // UTPatch469e
     case LINUX_IP_RECVTOS:      return IP_RECVTOS;
     case LINUX_IP_MTU_DISCOVER: return IP_DONTFRAG; // good enough for Mono (probably)
     default:
-      PANIC("Unknown native ip4 option: %d", linux_optname);
+      PANIC("Unknown linux ip4 option: %d", linux_optname);
   }
 }
 
@@ -627,7 +628,7 @@ static int linux_to_native_ip6_opt(int linux_optname) {
   switch (linux_optname) {
     case LINUX_IPV6_V6ONLY: return IPV6_V6ONLY;
     default:
-      PANIC("Unknown native ip6 option: %d", linux_optname);
+      PANIC("Unknown linux ip6 option: %d", linux_optname);
   }
 }
 
@@ -638,7 +639,7 @@ static int linux_to_native_tcp_opt(int linux_optname) {
     case LINUX_TCP_KEEPINTVL:    return TCP_KEEPINTVL;
     case LINUX_TCP_USER_TIMEOUT: return -1; // ?
     default:
-      PANIC("Unknown native tcp option: %d", linux_optname);
+      PANIC("Unknown linux tcp option: %d", linux_optname);
   }
 }
 
