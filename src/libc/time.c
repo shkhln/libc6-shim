@@ -99,10 +99,6 @@ static void shim_tzset_impl() {
 
 SHIM_WRAP(tzset);
 
-#ifndef CLOCK_BOOTTIME
-#define CLOCK_BOOTTIME CLOCK_UPTIME
-#endif
-
 static clockid_t linux_to_native_clockid(linux_clockid_t linux_clock_id) {
   switch (linux_clock_id) {
     case LINUX_CLOCK_REALTIME:         return CLOCK_REALTIME;
@@ -110,7 +106,7 @@ static clockid_t linux_to_native_clockid(linux_clockid_t linux_clock_id) {
     case LINUX_CLOCK_MONOTONIC_RAW:    return CLOCK_MONOTONIC_FAST;
     case LINUX_CLOCK_REALTIME_COARSE:  return CLOCK_REALTIME_FAST;
     case LINUX_CLOCK_MONOTONIC_COARSE: return CLOCK_MONOTONIC_FAST;
-    case LINUX_CLOCK_BOOTTIME:         return CLOCK_BOOTTIME;
+    case LINUX_CLOCK_BOOTTIME:         return CLOCK_MONOTONIC;
     default:
       UNIMPLEMENTED_ARGS("%d", linux_clock_id);
   }
@@ -163,7 +159,6 @@ linux_clockid_t native_to_linux_clockid(linux_clockid_t clock_id) {
     case CLOCK_MONOTONIC:      return LINUX_CLOCK_MONOTONIC;
     case CLOCK_REALTIME_FAST:  return LINUX_CLOCK_REALTIME_COARSE;
     case CLOCK_MONOTONIC_FAST: return LINUX_CLOCK_MONOTONIC_COARSE;
-    case CLOCK_BOOTTIME:       return LINUX_CLOCK_BOOTTIME;
     default:
       UNIMPLEMENTED_ARGS("%d", clock_id);
   }
