@@ -12,8 +12,18 @@ static int shim_sched_setaffinity_impl(pid_t pid, size_t cpusetsize, linux_cpu_s
   return 0;
 }
 
+static cpu_set_t* shim___sched_cpualloc_impl(size_t count) {
+    return malloc (CPU_ALLOC_SIZE(count));
+}
+
+static void shim___sched_cpufree_impl(cpu_set_t* set) {
+    free (set);
+}
+
 SHIM_WRAP(sched_getaffinity);
 SHIM_WRAP(sched_setaffinity);
+SHIM_WRAP(__sched_cpualloc);
+SHIM_WRAP(__sched_cpufree);
 
 int linux_to_native_sched_policy(int linux_policy) {
   switch (linux_policy) {
