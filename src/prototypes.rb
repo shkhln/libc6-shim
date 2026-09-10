@@ -3574,6 +3574,8 @@ lsb_define([
   "int scandir64(const char* dir, struct dirent64*** namelist, int (*selector)(const struct dirent64*), int (*cmp)(const struct dirent64**, const struct dirent64**))",
   "int sched_getaffinity(pid_t pid, unsigned int cpusetsize, cpu_set_t* mask)",
   "int sched_setaffinity(pid_t pid, unsigned int cpusetsize, cpu_set_t* mask)",
+  "cpu_set_t* __sched_cpualloc(size_t count)",
+  "void __sched_cpufree(cpu_set_t* set)",
   "int seed48_r(unsigned short seed16v[3], struct drand48_data* buffer)",
   #~ "ssize_t sendfile(int out_fd, int in_fd, off_t* offset, size_t count)",
   #~ "ssize_t sendfile64(int out_fd, int in_fd, off64_t* offset, size_t count)",
