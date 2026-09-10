@@ -13,11 +13,11 @@ static int shim_sched_setaffinity_impl(pid_t pid, size_t cpusetsize, linux_cpu_s
 }
 
 static cpu_set_t* shim___sched_cpualloc_impl(size_t count) {
-    return malloc (CPU_ALLOC_SIZE(count));
+  return malloc(CPU_ALLOC_SIZE(count));
 }
 
 static void shim___sched_cpufree_impl(cpu_set_t* set) {
-    free (set);
+  free(set);
 }
 
 SHIM_WRAP(sched_getaffinity);
