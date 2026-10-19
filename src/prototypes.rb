@@ -3644,7 +3644,7 @@ lsb_define(["pthread.h"], [
   "int pthread_mutexattr_getrobust_np(const pthread_mutexattr_t* __attr, int* __robustness)",
   "int pthread_mutexattr_setrobust_np(const pthread_mutexattr_t* __attr, int __robustness)",
   "int pthread_rwlockattr_getkind_np(const pthread_rwlockattr_t* attr, int* pref)",
-  "int pthread_rwlockattr_setkind_np(pthread_rwlockattr_t* attr, int* pref)"
+  "int pthread_rwlockattr_setkind_np(pthread_rwlockattr_t* attr, int pref)"
 ])
 
 # 14.17. Interface Definitions for libdl

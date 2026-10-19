@@ -688,3 +688,9 @@ static int shim_pthread_getcpuclockid_impl(pthread_t thread_id, linux_clockid_t*
 }
 
 SHIM_WRAP(pthread_getcpuclockid);
+
+static int shim_pthread_rwlockattr_setkind_np_impl(linux_pthread_rwlockattr_t *attr, int pref) {
+  return EINVAL;
+}
+
+SHIM_WRAP(pthread_rwlockattr_setkind_np);
