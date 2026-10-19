@@ -694,3 +694,9 @@ static int shim_pthread_rwlockattr_setkind_np_impl(linux_pthread_rwlockattr_t *a
 }
 
 SHIM_WRAP(pthread_rwlockattr_setkind_np);
+
+static int shim_pthread_mutex_clocklock_impl(linux_pthread_mutex_t* mutex, clockid_t linux_clock_id, const linux_timespec* abstime) {
+  return EINVAL;
+}
+
+SHIM_WRAP(pthread_mutex_clocklock);
