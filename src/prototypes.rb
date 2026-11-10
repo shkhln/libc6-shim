@@ -3707,3 +3707,9 @@ lsb_define(['stdlib.h'], [
   "void* __libc_malloc(size_t size)",
   "void __libc_free(void* ptr)"
 ])
+
+lsb_define(['sys/timerfd.h'], [
+  "int timerfd_create(int clockid, int flags)",
+  "int timerfd_settime(int fd, int flags, const struct itimerspec* new_value, struct itimerspec* old_value)",
+  "int timerfd_gettime(int fd, struct itimerspec* curr_value)"
+])

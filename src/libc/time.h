@@ -17,6 +17,7 @@ typedef struct timeval  linux_timeval;
 typedef struct timezone linux_timezone;
 typedef struct tm       linux_tm;
 
+clockid_t linux_to_native_clockid(linux_clockid_t linux_clock_id);
 linux_clockid_t native_to_linux_clockid(linux_clockid_t clock_id);
 
 int shim_clock_gettime_impl(linux_clockid_t clock_id, linux_timespec* tp);
